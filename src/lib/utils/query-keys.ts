@@ -8,6 +8,13 @@ export const queryKeys = {
   categories: {
     all: ['categories'] as const,
   },
+  products: {
+    all: ['products'] as const,
+    list: (cursor?: string) => ['products', 'list', cursor] as const,
+  },
+  pos: {
+    sales: ['pos', 'sales'] as const,
+  },
   insights: {
     period: (periodType: string, periodKey: string, lang: string) =>
       ['insights', periodType, periodKey, lang] as const,
