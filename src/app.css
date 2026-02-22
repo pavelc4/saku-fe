@@ -1,0 +1,72 @@
+@import 'tailwindcss';
+@import '@fontsource/geist';
+@import '@fontsource/geist-mono';
+@import '@fontsource/nunito/700.css';
+
+@theme inline {
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-income: var(--income);
+	--color-income-foreground: var(--income-foreground);
+	--color-expense: var(--expense);
+	--color-expense-foreground: var(--expense-foreground);
+	--color-warning: var(--warning);
+	--color-warning-foreground: var(--warning-foreground);
+	--color-success: var(--success);
+	--color-destructive: var(--destructive);
+	--color-destructive-foreground: var(--destructive-foreground);
+	--font-sans: var(--font-sans);
+	--font-mono: var(--font-mono);
+	--font-brand: var(--font-brand);
+	--radius: var(--radius);
+}
+
+:root {
+	--background: #ffffff;
+	--foreground: #0a0a0a;
+	--card: #f9f9f9;
+	--card-foreground: #0a0a0a;
+	--muted: #f4f4f5;
+	--muted-foreground: #71717a;
+	--border: #e4e4e7;
+	--input: #e4e4e7;
+	--ring: #18181b;
+	--primary: #3b5bdb;
+	--primary-foreground: #ffffff;
+	--income: #2f9e44;
+	--income-foreground: #ffffff;
+	--expense: #e03131;
+	--expense-foreground: #ffffff;
+	--warning: #f08c00;
+	--warning-foreground: #ffffff;
+	--success: #2f9e44;
+	--destructive: #e03131;
+	--destructive-foreground: #ffffff;
+	--radius: 0.625rem;
+	--font-sans: 'Geist', sans-serif;
+	--font-mono: 'Geist Mono', monospace;
+	--font-brand: 'Nunito', sans-serif;
+}
+
+.dark {
+	--background: #0a0a0a;
+	--foreground: #fafafa;
+	--card: #111111;
+	--card-foreground: #fafafa;
+	--muted: #1c1c1c;
+	--muted-foreground: #a1a1aa;
+	--border: #27272a;
+	--input: #27272a;
+	--ring: #d4d4d8;
+	--primary: #4c6ef5;
+	--primary-foreground: #ffffff;
+}
