@@ -8,6 +8,7 @@
   }>();
 
   const isIncome = $derived(category.type === 'income');
+  const isSystem = $derived(category.user_id === null);
 </script>
 
 <div class="flex items-center justify-between p-4 bg-card rounded-[var(--radius)] border border-border hover:bg-muted/50 transition-colors">
@@ -24,17 +25,24 @@
     </div>
     
     <div>
-      <p class="font-medium text-foreground">{category.name}</p>
+      <div class="flex flex-wrap items-center gap-2">
+        <p class="font-medium text-foreground">{category.name}</p>
+        {#if isSystem}
+          <span class="px-1.5 py-0.5 text-[10px] font-semibold bg-muted text-muted-foreground rounded uppercase tracking-wide border border-border/50">
+            Default
+          </span>
+        {/if}
+      </div>
       <div class="flex items-center gap-2 text-sm text-muted-foreground mt-0.5">
-        <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold {isIncome ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'}">
-          {category.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}
+        <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold {category.type === 'income' ? 'bg-success/10 text-success' : category.type === 'expense' ? 'bg-destructive/10 text-destructive' : 'bg-primary/10 text-primary'}">
+          {category.type === 'income' ? 'Pemasukan' : category.type === 'expense' ? 'Pengeluaran' : 'Keduanya'}
         </span>
       </div>
     </div>
   </div>
   
   <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity md:opacity-100">
-    {#if onEdit}
+    {#if !isSystem && onEdit}
       <button 
         onclick={() => onEdit(category)}
         class="p-2 text-muted-foreground hover:bg-muted hover:text-foreground rounded-full transition-colors"
@@ -43,7 +51,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
       </button>
     {/if}
-    {#if onDelete}
+    {#if !isSystem && onDelete}
       <button 
         onclick={() => onDelete(category)}
         class="p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive rounded-full transition-colors"

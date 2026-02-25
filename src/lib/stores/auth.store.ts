@@ -4,8 +4,8 @@ import type { User } from '$lib/features/auth/types';
 const _token = writable<string | null>(null);
 const _user = writable<User | null>(null);
 
-export const token = { subscribe: _token.subscribe };
-export const user = { subscribe: _user.subscribe };
+export const token = _token;
+export const user = _user;
 export const isAuthenticated = derived(_token, ($t) => $t !== null);
 
 export function setAuth(newToken: string, newUser: User): void {

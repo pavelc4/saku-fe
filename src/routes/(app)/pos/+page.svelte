@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { productService } from '$lib/features/pos/services/product.service';
 	import { categoryService } from '$lib/features/category/services/category.service';
-	import { saleService } from '$lib/features/pos/services/sale.service';
+	import { transactionService } from '$lib/features/transaction/services/transaction.service';
 	import {
 		items,
 		totalAmount,
@@ -16,6 +16,7 @@
 	import CheckoutForm from '$lib/features/pos/components/CheckoutForm.svelte';
 	import type { Category } from '$lib/features/category/types';
 	import type { Product } from '$lib/features/pos/types';
+	import type { CreateTransactionPayload } from '$lib/features/transaction/types';
 
 	let products = $state<Product[]>([]);
 	let categories = $state<Category[]>([]);
@@ -25,8 +26,8 @@
 	let isCheckoutOpen = $state(false);
 	let checkoutForm: CheckoutForm;
 
-	const expenseCategories = $derived(
-		categories.filter((c) => c.type === 'expense' || c.type === 'both')
+	const incomeCategories = $derived(
+		categories.filter((c) => c.type === 'income' || c.type === 'both')
 	);
 
 	onMount(async () => {
@@ -56,17 +57,28 @@
 		let currentItems: any[] = [];
 		items.subscribe((v) => (currentItems = v))();
 
-		const salePayload = {
+		let currentTotal = 0;
+		totalAmount.subscribe((v) => (currentTotal = v))();
+
+		const selectedCategory = categories.find(c => c.id === data.categoryId);
+		const type = (selectedCategory?.type === 'expense' ? 'expense' : 'income') as 'expense' | 'income';
+
+		const transactionPayload: CreateTransactionPayload = {
+			category_id: data.categoryId,
+			type,
+			amount: currentTotal,
+			date: Date.now(),
+			note: data.note,
+			source: 'manual' as const,
 			items: currentItems.map((item) => ({
-				product_id: item.product.id.startsWith('manual-') ? '' : item.product.id,
+				product_id: item.product.id.startsWith('manual-') ? undefined : item.product.id,
+				name: item.product.name,
 				quantity: item.quantity,
-				unit_price: item.product.price
-			})),
-			payment_amount: data.paymentAmount,
-			note: data.note
+				price: item.product.price
+			}))
 		};
 
-		const [result, error] = await saleService.create(salePayload);
+		const [result, error] = await transactionService.create(transactionPayload);
 
 		if (error) {
 			checkoutForm?.setError(error.message);
@@ -149,6 +161,6 @@
 	onClose={() => (isCheckoutOpen = false)}
 	items={$items}
 	totalAmount={$totalAmount}
-	categories={expenseCategories}
+	categories={incomeCategories}
 	onSubmit={handleCheckoutSubmit}
 />

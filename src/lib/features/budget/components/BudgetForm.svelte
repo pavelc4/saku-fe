@@ -25,7 +25,7 @@
     loading = true;
     errorMsg = '';
     
-    const parsedAmount = parseInt(amount.replace(/[^0-9]/g, ''), 10) || 0;
+    const parsedAmount = parseInt(String(amount).replace(/[^0-9]/g, ''), 10) || 0;
     
     if (parsedAmount <= 0) {
       errorMsg = 'Anggaran harus lebih dari 0';

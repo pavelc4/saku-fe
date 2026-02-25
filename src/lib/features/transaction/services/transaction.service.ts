@@ -1,26 +1,44 @@
 import type { Result } from '$lib/utils/result';
-import type { PaginatedResponse } from '$lib/types/api';
-import type { Period } from '$lib/types/common';
-import type { 
-  CreateTransactionPayload, 
-  PaginatedTransaction, 
-  Transaction, 
-  TransactionSummary, 
-  UpdateTransactionPayload 
+import type {
+  CreateTransactionPayload,
+  PaginatedTransaction,
+  Transaction,
+  TransactionSummary,
+  UpdateTransactionPayload,
 } from '../types';
 import { api } from '$lib/services/api';
 import { toAppError } from '$lib/utils/error';
+import type { Period } from '$lib/types/common';
+
+// Backend response shape for paginated transactions
+type BackendPaginatedResponse = {
+  data: Transaction[];
+  meta: {
+    next_cursor: string | null;
+    has_more: boolean;
+  };
+};
 
 async function list(cursor?: string, limit = 20): Promise<Result<PaginatedTransaction>> {
   try {
     const params = new URLSearchParams({ limit: limit.toString() });
-    if (cursor) params.append('cursor', cursor);
-    
-    const data = await api.get<PaginatedResponse<Transaction>>(`/transactions?${params.toString()}`);
+    if (cursor) params.set('cursor', cursor);
+
+    // api.get returns json.data — but for paginated, backend wraps in
+    // { success: true, data: [...], meta: {...} }
+    // Our api.ts returns json.data, so we must fetch the raw envelope here.
+    const token = typeof window !== 'undefined' ? sessionStorage.getItem('saku_token') : null;
+    const res = await fetch(
+      `${api.baseUrl}/transactions?${params.toString()}`,
+      { headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) } }
+    );
+    const json = await res.json();
+    if (!json.success) throw { message: json.message ?? 'Gagal memuat transaksi', code: json.error, status: res.status };
+
     return [{
-      transactions: data.data,
-      next_cursor: data.pagination.next_cursor,
-      has_more: data.pagination.has_more
+      transactions: json.data as Transaction[],
+      next_cursor: json.meta?.next_cursor ?? null,
+      has_more: json.meta?.has_more ?? false,
     }, null];
   } catch (e) {
     return [null, toAppError(e)];
@@ -45,9 +63,9 @@ async function create(payload: CreateTransactionPayload): Promise<Result<Transac
   }
 }
 
-async function update(id: string, payload: UpdateTransactionPayload): Promise<Result<Transaction>> {
+async function update(id: string, payload: UpdateTransactionPayload): Promise<Result<{ message: string }>> {
   try {
-    const data = await api.put<Transaction>(`/transactions/${id}`, payload);
+    const data = await api.put<{ message: string }>(`/transactions/${id}`, payload);
     return [data, null];
   } catch (e) {
     return [null, toAppError(e)];
@@ -57,7 +75,7 @@ async function update(id: string, payload: UpdateTransactionPayload): Promise<Re
 async function remove(id: string): Promise<Result<void>> {
   try {
     await api.delete<void>(`/transactions/${id}`);
-    return [null, null];
+    return [undefined, null];
   } catch (e) {
     return [null, toAppError(e)];
   }
@@ -72,15 +90,22 @@ async function getSummary(period: Period = 'month'): Promise<Result<TransactionS
   }
 }
 
-async function uploadReceipt(file: File): Promise<Result<string>> {
+/**
+ * Upload receipt for a specific transaction.
+ * Uses multipart/form-data with key "receipt". Max 5MB.
+ */
+async function uploadReceipt(
+  transactionId: string,
+  file: File
+): Promise<Result<{ message: string; url: string }>> {
   try {
     const formData = new FormData();
     formData.append('receipt', file);
-    
-    // Asumsikan backend mengembalikan URL file yang diupload.
-    // Jika backend mengembalikan object { url: string }, sesuaikan type return api.upload
-    const data = await api.upload<{ url: string }>('/transactions/receipt', formData);
-    return [data.url, null];
+    const data = await api.upload<{ message: string; url: string }>(
+      `/transactions/${transactionId}/receipt`,
+      formData
+    );
+    return [data, null];
   } catch (e) {
     return [null, toAppError(e)];
   }
@@ -93,5 +118,5 @@ export const transactionService = {
   update,
   remove,
   getSummary,
-  uploadReceipt
+  uploadReceipt,
 };

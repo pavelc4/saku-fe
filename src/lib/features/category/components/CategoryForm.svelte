@@ -38,6 +38,7 @@
     errorMsg = '';
     
     let err = null;
+    let _;
     
     if (initialData?.id) {
       [_, err] = await categoryService.update(initialData.id, {

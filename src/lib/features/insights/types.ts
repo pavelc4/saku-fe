@@ -1,26 +1,16 @@
+// Matches GET /insights/monthly backend response exactly
 export type InsightPeriod = 'week' | 'month' | 'year';
-
-export type CategoryInsight = {
-  category_id: string;
-  category_name: string;
-  amount: number;
-  percentage: number;
-  color: string;
+export type InsightResponse = {
+  insight: string;   // AI narrative text (may contain \n — use white-space: pre-wrap)
+  period: {
+    month: number;   // 1–12
+    year: number;
+  };
 };
 
-export type DailyTrend = {
-  date: string; // YYYY-MM-DD
-  income: number;
-  expense: number;
-};
-
-export type InsightsData = {
-  period: InsightPeriod;
-  total_income: number;
-  total_expense: number;
-  net_savings: number;
-  savings_rate: number; // percentage
-  top_expenses: CategoryInsight[];
-  trend: DailyTrend[];
-  ai_recommendation: string | null;
+export type InsightQueryParams = {
+  month?: number;
+  year?: number;
+  lang?: 'id' | 'en';
+  force_refresh?: boolean;
 };

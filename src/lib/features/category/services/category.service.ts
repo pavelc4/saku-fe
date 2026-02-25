@@ -5,8 +5,8 @@ import { toAppError } from '$lib/utils/error';
 
 async function list(): Promise<Result<Category[]>> {
   try {
-    const data = await api.get<{ data: Category[] }>('/categories');
-    return [data.data, null];
+    const data = await api.get<Category[]>('/categories');
+    return [data, null];
   } catch (e) {
     return [null, toAppError(e)];
   }
@@ -42,7 +42,7 @@ async function update(id: string, payload: UpdateCategoryPayload): Promise<Resul
 async function remove(id: string): Promise<Result<void>> {
   try {
     await api.delete<void>(`/categories/${id}`);
-    return [null, null];
+    return [undefined, null];
   } catch (e) {
     return [null, toAppError(e)];
   }

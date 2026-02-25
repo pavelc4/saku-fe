@@ -13,14 +13,14 @@
   
   const queryClient = useQueryClient();
 
-  const categoriesQuery = createQuery({
+  const categoriesQuery = createQuery(() => ({
     queryKey: queryKeys.categories.all,
     queryFn: async () => {
       const [res, err] = await categoryService.list();
       if (err) throw err;
       return (res || []).filter(c => c.type === 'expense' || c.type === 'both');
     },
-  });
+  }));
 
   function handleAdd() {
     editBudget = null;
@@ -74,7 +74,7 @@
   {#if isModalOpen}
     <BudgetForm 
       onClose={() => isModalOpen = false} 
-      categories={$categoriesQuery.data || []}
+      categories={categoriesQuery.data || []}
       initialData={editBudget ? { id: editBudget.id, category_id: editBudget.category_id, amount: editBudget.amount } : undefined}
     />
   {/if}

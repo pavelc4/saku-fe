@@ -1,61 +1,67 @@
 <script lang="ts">
-  import { createInfiniteQuery } from '@tanstack/svelte-query';
-  import { transactionService } from '../services/transaction.service';
+  import { useQueryClient, createInfiniteQuery } from '@tanstack/svelte-query';
   import { queryKeys } from '$lib/utils/query-keys';
+  import { transactionService } from '../services/transaction.service';
   import TransactionCard from './TransactionCard.svelte';
-  
-  const query = createInfiniteQuery({
+  import { onMount } from 'svelte';
+
+  const queryClient = useQueryClient();
+
+  let observerRef = $state<HTMLElement | null>(null);
+
+  const query = createInfiniteQuery(() => ({
     queryKey: queryKeys.transactions.all,
     queryFn: async ({ pageParam }) => {
-      const [res, err] = await transactionService.list(pageParam as string | undefined);
+      const [res, err] = await transactionService.list(pageParam as string | undefined, 20);
       if (err) throw err;
       return res;
     },
-    getNextPageParam: (lastPage) => lastPage?.next_cursor,
-    initialPageParam: undefined,
+    getNextPageParam: (lastPage) => lastPage.has_more ? lastPage.next_cursor : undefined,
+    initialPageParam: undefined as string | undefined,
+  }));
+
+  // Simple intersection observer array for infinite scroll
+  onMount(() => {
+    if (!observerRef) return;
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && query.hasNextPage && !query.isFetchingNextPage) {
+        query.fetchNextPage();
+      }
+    }, { rootMargin: '100px' });
+
+    observer.observe(observerRef);
+    return () => observer.disconnect();
   });
 </script>
 
 <div class="space-y-4">
-  {#if $query.isPending}
-    <div class="space-y-3">
-      {#each Array(5) as _}
-        <div class="h-20 w-full animate-pulse rounded-[var(--radius)] bg-muted"></div>
-      {/each}
-    </div>
-  {:else if $query.isError}
-    <div class="rounded-[var(--radius)] bg-destructive/10 p-4 text-destructive border border-destructive/20 text-center">
-      <p>Gagal memuat transaksi. Silakan coba lagi.</p>
-    </div>
-  {:else if $query.data?.pages[0]?.transactions.length === 0}
-    <div class="flex flex-col items-center justify-center p-8 text-center border border-dashed border-border rounded-[var(--radius)] bg-card/50">
-      <div class="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-4 text-muted-foreground">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="m9 16 2 2 4-4"/></svg>
-      </div>
-      <h3 class="font-medium text-foreground">Belum ada transaksi</h3>
-      <p class="text-sm text-muted-foreground mt-1">Transaksi yang Anda buat akan muncul di sini.</p>
+  {#if query.isPending}
+    {#each Array(5) as _}
+      <div class="h-20 w-full animate-pulse rounded-[var(--radius)] bg-muted"></div>
+    {/each}
+  {:else if query.isError}
+    <div class="p-4 bg-destructive/10 text-destructive border border-destructive/20 rounded-[var(--radius)] text-center">
+      Gagal memuat transaksi.
     </div>
   {:else}
-    <div class="space-y-3">
-      {#each $query.data?.pages ?? [] as page}
-        {#each page.transactions as transaction (transaction.id)}
-          <TransactionCard {transaction} />
-        {/each}
+    {#each query.data.pages as page}
+      {#each page.transactions as transaction (transaction.id)}
+        <TransactionCard {transaction} />
       {/each}
-      
-      {#if $query.hasNextPage}
-        <button 
-          class="w-full py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-[var(--radius)] transition-colors border border-transparent hover:border-border"
-          onclick={() => $query.fetchNextPage()}
-          disabled={$query.isFetchingNextPage}
-        >
-          {#if $query.isFetchingNextPage}
-            Memuat...
-          {:else}
-            Muat lebih banyak
-          {/if}
-        </button>
-      {/if}
-    </div>
+    {/each}
+
+    {#if query.data.pages[0].transactions.length === 0}
+      <div class="py-12 border-2 border-dashed border-border rounded-xl text-center text-muted-foreground flex flex-col items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-50"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+        <p>Belum ada transaksi.</p>
+      </div>
+    {/if}
   {/if}
+
+  <!-- Intersection Observer Target -->
+  <div bind:this={observerRef} class="h-4 w-full flex justify-center py-4">
+    {#if query.isFetchingNextPage}
+      <div class="h-6 w-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+    {/if}
+  </div>
 </div>

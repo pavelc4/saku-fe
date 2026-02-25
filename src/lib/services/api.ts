@@ -22,6 +22,47 @@ function buildHeaders(extra?: HeadersInit): Headers {
   return headers;
 }
 
+async function handleResponse<T>(res: Response): Promise<T> {
+  if (res.status === 401) {
+    if (typeof window !== 'undefined') {
+      clearAuth();
+      goto('/login');
+    }
+    throw { message: 'Sesi habis. Silakan login kembali.', status: 401 } satisfies AppError;
+  }
+
+  const text = await res.text();
+  let json: any;
+  if (text) {
+    try {
+      json = JSON.parse(text);
+    } catch (e) {
+      if (!res.ok) {
+        throw { message: text || 'Terjadi kesalahan server.', status: res.status } satisfies AppError;
+      }
+      return text as unknown as T;
+    }
+  } else {
+    json = {};
+  }
+
+  if (!res.ok || json?.success === false) {
+    throw {
+      message: json?.message ?? (typeof json === 'string' ? json : 'Terjadi kesalahan server.'),
+      code: json?.error,
+      status: res.status,
+    } satisfies AppError;
+  }
+
+  // If the backend wraps the response in a "data" property, unwrap it
+  if (json && typeof json === 'object' && 'data' in json) {
+    return json.data as T;
+  }
+
+  // Otherwise return the JSON directly (for cases where it's an array or a flat object)
+  return json as unknown as T;
+}
+
 async function request<T>(
   method: string,
   path: string,
@@ -35,25 +76,7 @@ async function request<T>(
     signal,
   });
 
-  if (res.status === 401) {
-    if (typeof window !== 'undefined') {
-      clearAuth();
-      goto('/login');
-    }
-    throw { message: 'Sesi habis. Silakan login kembali.', status: 401 } satisfies AppError;
-  }
-
-  const json = await res.json();
-
-  if (!res.ok || json.success === false) {
-    throw {
-      message: json.message ?? 'Terjadi kesalahan.',
-      code: json.error,
-      status: res.status,
-    } satisfies AppError;
-  }
-
-  return json.data as T;
+  return handleResponse<T>(res);
 }
 
 async function uploadFile<T>(path: string, formData: FormData, signal?: AbortSignal): Promise<T> {
@@ -68,24 +91,7 @@ async function uploadFile<T>(path: string, formData: FormData, signal?: AbortSig
     signal,
   });
 
-  if (res.status === 401) {
-    if (typeof window !== 'undefined') {
-      clearAuth();
-      goto('/login');
-    }
-    throw { message: 'Sesi habis. Silakan login kembali.', status: 401 } satisfies AppError;
-  }
-
-  const json = await res.json();
-  if (!res.ok || json.success === false) {
-    throw {
-      message: json.message ?? 'Upload gagal.',
-      code: json.error,
-      status: res.status,
-    } satisfies AppError;
-  }
-
-  return json.data as T;
+  return handleResponse<T>(res);
 }
 
 export const api = {
@@ -95,4 +101,5 @@ export const api = {
   patch: <T>(path: string, body: unknown, signal?: AbortSignal) => request<T>('PATCH', path, body, signal),
   delete: <T>(path: string, signal?: AbortSignal) => request<T>('DELETE', path, undefined, signal),
   upload: <T>(path: string, formData: FormData, signal?: AbortSignal) => uploadFile<T>(path, formData, signal),
+  baseUrl: BASE_URL,
 };

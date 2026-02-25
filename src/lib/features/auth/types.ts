@@ -8,9 +8,18 @@ export type User = {
   created_at: number;
 };
 
+export type SessionData = {
+  user_id: string;
+  role: 'user' | 'admin';
+  email: string;
+  device?: string;
+  ip?: string;
+  created_at: number;
+  expires_at: number;
+};
+
 export type AuthResponse = {
   token: string;
-  user: User;
 };
 
 export type LoginPayload = {

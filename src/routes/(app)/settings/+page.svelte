@@ -159,7 +159,7 @@
 		</div>
 
 		<div class="space-y-2">
-			<label class="text-sm font-medium text-muted-foreground">Nama</label>
+			<span class="text-sm font-medium text-muted-foreground">Nama</span>
 			{#if editingName}
 				<div class="flex gap-2">
 					<input
@@ -188,6 +188,7 @@
 					<span class="text-foreground">{$user?.name || '-'}</span>
 					<button
 						type="button"
+						aria-label="Ubah Nama"
 						onclick={() => (editingName = true)}
 						class="p-1 text-muted-foreground hover:text-foreground"
 					>
@@ -211,7 +212,7 @@
 		</div>
 
 		<div class="space-y-2">
-			<label class="text-sm font-medium text-muted-foreground">Email</label>
+			<span class="text-sm font-medium text-muted-foreground">Email</span>
 			<p class="text-foreground">{$user?.email || '-'}</p>
 		</div>
 	</div>
