@@ -18,7 +18,7 @@ function getToken(): string | null {
 function buildHeaders(extra?: HeadersInit): Headers {
   const headers = new Headers({ 'Content-Type': 'application/json', ...extra });
   const token = getToken();
-  if (token) headers.set('Authorization', `Token ${token}`);
+  if (token) headers.set('Authorization', `Bearer ${token}`);
   return headers;
 }
 
@@ -59,7 +59,7 @@ async function request<T>(
 async function uploadFile<T>(path: string, formData: FormData, signal?: AbortSignal): Promise<T> {
   const headers = new Headers();
   const token = getToken();
-  if (token) headers.set('Authorization', `Token ${token}`);
+  if (token) headers.set('Authorization', `Bearer ${token}`);
 
   const res = await fetch(`${BASE_URL}${path}`, {
     method: 'POST',

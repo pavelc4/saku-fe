@@ -15,6 +15,9 @@ export const queryKeys = {
   pos: {
     sales: ['pos', 'sales'] as const,
   },
+  budgets: {
+    all: ['budgets'] as const,
+  },
   insights: {
     period: (periodType: string, periodKey: string, lang: string) =>
       ['insights', periodType, periodKey, lang] as const,
