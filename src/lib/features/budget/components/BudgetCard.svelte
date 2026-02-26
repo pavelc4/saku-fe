@@ -1,5 +1,8 @@
 <script lang="ts">
+  import { createQuery } from '@tanstack/svelte-query';
   import { formatRupiah } from '$lib/utils/currency';
+  import { transactionService } from '$lib/features/transaction/services/transaction.service';
+  import { queryKeys } from '$lib/utils/query-keys';
   import type { Budget } from '../types';
   import type { Category } from '$lib/features/category/types';
   
@@ -10,8 +13,38 @@
     onDelete?: (b: Budget) => void;
   }>();
 
-  const percentage = $derived(Math.min(100, Math.max(0, (budget.spent / budget.amount) * 100)));
-  const isOverBudget = $derived(budget.spent >= budget.amount);
+  // Fetch transactions for this category to calculate actual spent
+  const transactionsQuery = createQuery(() => ({
+    queryKey: [...queryKeys.transactions.all, 'budget', budget.category_id],
+    queryFn: async () => {
+      const [res, err] = await transactionService.list(undefined, 1000); // Get all transactions
+      if (err) throw err;
+      return res.transactions;
+    },
+  }));
+
+  // Calculate spent from transactions for this category in current month
+  const actualSpent = $derived(() => {
+    if (!transactionsQuery.data) return 0;
+    
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59).getTime();
+    
+    return transactionsQuery.data
+      .filter(t => 
+        t.category_id === budget.category_id &&
+        t.type === 'expense' &&
+        t.date >= startOfMonth &&
+        t.date <= endOfMonth &&
+        !t.deleted_at
+      )
+      .reduce((sum, t) => sum + t.amount, 0);
+  });
+
+  const spent = $derived(actualSpent());
+  const percentage = $derived(Math.min(100, Math.max(0, (spent / budget.amount) * 100)));
+  const isOverBudget = $derived(spent >= budget.amount);
   const isWarning = $derived(percentage >= 80 && !isOverBudget);
   
   const barColor = $derived(
@@ -34,7 +67,13 @@
       </div>
       <div>
         <p class="font-medium text-foreground">{category?.name || 'Kategori Tidak Dikenal'}</p>
-        <p class="text-sm text-muted-foreground">{formatRupiah(budget.spent)} dari {formatRupiah(budget.amount)}</p>
+        <p class="text-sm text-muted-foreground">
+          {#if transactionsQuery.isPending}
+            <span class="animate-pulse">Menghitung...</span>
+          {:else}
+            {formatRupiah(spent)} dari {formatRupiah(budget.amount)}
+          {/if}
+        </p>
       </div>
     </div>
 
@@ -66,7 +105,7 @@
         {percentage.toFixed(0)}% Terpakai
       </span>
       <span class="text-muted-foreground text-right">
-        Sisa: {formatRupiah(Math.max(0, budget.amount - budget.spent))}
+        Sisa: {formatRupiah(Math.max(0, budget.amount - spent))}
       </span>
     </div>
     <div class="w-full h-2 bg-muted rounded-full overflow-hidden">

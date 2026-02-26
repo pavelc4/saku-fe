@@ -23,10 +23,11 @@
 			price,
 			stock: null,
 			sku: null,
-			image_url: null,
-			category_id: null,
+			photo_url: null,
+			product_category_id: null,
 			created_at: Date.now(),
-			updated_at: Date.now()
+			updated_at: Date.now(),
+			deleted_at: null
 		};
 
 		onAddToCart?.(product, 1);

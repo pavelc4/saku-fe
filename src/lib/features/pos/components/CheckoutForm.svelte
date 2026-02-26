@@ -5,8 +5,7 @@
 	import type { Category } from '$lib/features/category/types';
 
 	export type CheckoutData = {
-		categoryId: string;
-		paymentAmount: number;
+		payment_method: 'cash' | 'qris' | 'transfer' | 'debit' | 'credit';
 		note?: string;
 	};
 
@@ -15,34 +14,29 @@
 		onClose,
 		items,
 		totalAmount,
-		categories = [],
 		onSubmit
 	}: {
 		isOpen: boolean;
 		onClose: () => void;
 		items: CartItem[];
 		totalAmount: number;
-		categories?: Category[];
 		onSubmit?: (data: CheckoutData) => void;
 	} = $props();
 
-	let selectedCategoryId = $state('');
-	let paymentAmount = $state(totalAmount);
+	let paymentMethod = $state<'cash' | 'qris' | 'transfer' | 'debit' | 'credit'>('cash');
 	let note = $state('');
 	let isSubmitting = $state(false);
 	let error = $state('');
 
 	$effect(() => {
 		if (isOpen) {
-			paymentAmount = totalAmount;
-			selectedCategoryId = '';
+			paymentMethod = 'cash';
 			note = '';
 			error = '';
 		}
 	});
 
-	let changeAmount = $derived(paymentAmount >= totalAmount ? paymentAmount - totalAmount : 0);
-	let isValid = $derived(!!selectedCategoryId && paymentAmount >= totalAmount);
+	let isValid = $derived(!!paymentMethod);
 
 	function handleSubmit(e: Event) {
 		e.preventDefault();
@@ -52,8 +46,7 @@
 		error = '';
 
 		onSubmit?.({
-			categoryId: selectedCategoryId,
-			paymentAmount,
+			payment_method: paymentMethod,
 			note: note.trim() || undefined
 		});
 	}
@@ -122,46 +115,24 @@
 					<span class="text-xl font-brand font-bold text-primary">{formatRupiah(totalAmount)}</span>
 				</div>
 
-				<!-- Category selector -->
+				<!-- Payment method selector -->
 				<div class="space-y-2">
-					<label for="category" class="text-sm font-medium">
-						Kategori <span class="text-destructive">*</span>
+					<label for="payment-method" class="text-sm font-medium">
+						Metode Pembayaran <span class="text-destructive">*</span>
 					</label>
 					<select
-						id="category"
-						bind:value={selectedCategoryId}
+						id="payment-method"
+						bind:value={paymentMethod}
 						disabled={isSubmitting}
 						class="flex h-9 w-full rounded-[var(--radius)] border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
 					>
-						<option value="">Pilih kategori</option>
-						{#each categories as category}
-							<option value={category.id}>{category.name}</option>
-						{/each}
+						<option value="cash">Tunai</option>
+						<option value="qris">QRIS</option>
+						<option value="transfer">Transfer Bank</option>
+						<option value="debit">Kartu Debit</option>
+						<option value="credit">Kartu Kredit</option>
 					</select>
 				</div>
-
-				<!-- Payment amount -->
-				<div class="space-y-2">
-					<label for="payment" class="text-sm font-medium">
-						Jumlah Bayar <span class="text-destructive">*</span>
-					</label>
-					<input
-						type="number"
-						id="payment"
-						bind:value={paymentAmount}
-						disabled={isSubmitting}
-						min={totalAmount}
-						class="flex h-9 w-full rounded-[var(--radius)] border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-					/>
-				</div>
-
-				<!-- Change -->
-				{#if changeAmount > 0}
-					<div class="flex items-center justify-between p-3 bg-income/10 rounded-[var(--radius)]">
-						<span class="text-sm text-muted-foreground">Kembalian</span>
-						<span class="font-semibold text-income">{formatRupiah(changeAmount)}</span>
-					</div>
-				{/if}
 
 				<!-- Note -->
 				<div class="space-y-2">

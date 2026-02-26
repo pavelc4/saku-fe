@@ -4,27 +4,24 @@ import type { CreateProductPayload, Product, UpdateProductPayload } from '../typ
 import { api } from '$lib/services/api';
 import { toAppError } from '$lib/utils/error';
 
-const STORAGE_KEY = 'saku_mock_products';
-
-function getStorage(): Product[] {
-  if (typeof window === 'undefined') return [];
-  const stored = localStorage.getItem(STORAGE_KEY);
-  return stored ? JSON.parse(stored) : [];
-}
-
-function setStorage(data: Product[]) {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-}
-
-function delay<T>(ms: number, value: T): Promise<T> {
-  return new Promise((resolve) => setTimeout(() => resolve(value), ms));
-}
-
 async function list(cursor?: string, limit = 50): Promise<Result<Product[]>> {
   try {
-    const products = getStorage();
-    return delay(300, [products, null]);
+    const params = new URLSearchParams();
+    if (cursor) params.set('cursor', cursor);
+    if (limit) params.set('limit', limit.toString());
+    
+    const query = params.toString() ? `?${params.toString()}` : '';
+    const data = await api.get<Product[]>(`/products${query}`);
+    return [data, null];
+  } catch (e) {
+    return [null, toAppError(e)];
+  }
+}
+
+async function get(id: string): Promise<Result<Product>> {
+  try {
+    const data = await api.get<Product>(`/products/${id}`);
+    return [data, null];
   } catch (e) {
     return [null, toAppError(e)];
   }
@@ -32,23 +29,8 @@ async function list(cursor?: string, limit = 50): Promise<Result<Product[]>> {
 
 async function create(payload: CreateProductPayload): Promise<Result<Product>> {
   try {
-    const products = getStorage();
-    const newProduct: Product = {
-      id: `prod_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
-      user_id: 'local_user',
-      name: payload.name,
-      sku: payload.sku || null,
-      price: payload.price,
-      stock: payload.stock ?? null,
-      category_id: payload.category_id || null,
-      image_url: null,
-      created_at: Date.now(),
-      updated_at: Date.now()
-    };
-    
-    products.unshift(newProduct);
-    setStorage(products);
-    return delay(300, [newProduct, null]);
+    const data = await api.post<Product>('/products', payload);
+    return [data, null];
   } catch (e) {
     return [null, toAppError(e)];
   }
@@ -56,19 +38,19 @@ async function create(payload: CreateProductPayload): Promise<Result<Product>> {
 
 async function update(id: string, payload: UpdateProductPayload): Promise<Result<Product>> {
   try {
-    const products = getStorage();
-    const index = products.findIndex(p => p.id === id);
-    
-    if (index === -1) throw new Error('Product not found');
-    
-    products[index] = {
-      ...products[index],
-      ...payload,
-      updated_at: Date.now()
-    };
-    
-    setStorage(products);
-    return delay(300, [products[index], null]);
+    const data = await api.patch<Product>(`/products/${id}`, payload);
+    return [data, null];
+  } catch (e) {
+    return [null, toAppError(e)];
+  }
+}
+
+async function uploadPhoto(id: string, file: File): Promise<Result<{ photo_url: string }>> {
+  try {
+    const formData = new FormData();
+    formData.append('photo', file);
+    const data = await api.upload<{ photo_url: string }>(`/products/${id}/photo`, formData);
+    return [data, null];
   } catch (e) {
     return [null, toAppError(e)];
   }
@@ -76,13 +58,11 @@ async function update(id: string, payload: UpdateProductPayload): Promise<Result
 
 async function remove(id: string): Promise<Result<void>> {
   try {
-    let products = getStorage();
-    products = products.filter(p => p.id !== id);
-    setStorage(products);
-    return delay(300, [undefined, null]);
+    await api.delete<void>(`/products/${id}`);
+    return [undefined, null];
   } catch (e) {
     return [null, toAppError(e)];
   }
 }
 
-export const productService = { list, create, update, remove };
+export const productService = { list, get, create, update, uploadPhoto, remove };
