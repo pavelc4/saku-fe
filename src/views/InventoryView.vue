@@ -92,59 +92,74 @@
           <!-- Rows -->
           <div v-for="item in inventoryItems" :key="item.sku"
                :class="[
-                 'grid grid-cols-1 lg:grid-cols-12 gap-4 items-center bg-surface-container-lowest rounded-lg p-4 lg:px-6 hover:bg-surface-container-low transition-colors cursor-pointer group',
-                 !item.active ? 'opacity-60 hover:opacity-100' : ''
-               ]">
-            <div class="col-span-1 lg:col-span-4 flex items-center gap-4">
-              <template v-if="item.image">
-                <img :src="item.image" :alt="item.name" class="w-12 h-12 rounded-lg object-cover" />
-              </template>
-              <template v-else>
-                <div class="w-12 h-12 rounded-lg bg-surface-container-highest flex items-center justify-center text-on-surface-variant">
-                  <span class="material-symbols-outlined">{{ item.icon }}</span>
+                 'bg-surface-container-lowest rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer group flex flex-col',
+                 !item.active ? 'opacity-60 hover:opacity-100' : '',
+                 expandedItem === item.sku ? 'shadow-sm' : ''
+               ]"
+               @click="toggleExpand(item.sku)">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center p-4 lg:px-6">
+              <div class="col-span-1 lg:col-span-4 flex items-center gap-4">
+                <template v-if="item.image">
+                  <img :src="item.image" :alt="item.name" class="w-12 h-12 rounded-lg object-cover" />
+                </template>
+                <template v-else>
+                  <div class="w-12 h-12 rounded-lg bg-surface-container-highest flex items-center justify-center text-on-surface-variant">
+                    <span class="material-symbols-outlined">{{ item.icon }}</span>
+                  </div>
+                </template>
+                <div>
+                  <div :class="[
+                    'font-semibold transition-colors',
+                    item.active ? 'text-on-surface group-hover:text-primary' : 'text-on-surface-variant line-through decoration-on-surface-variant/50'
+                  ]">{{ item.name }}</div>
+                  <div class="text-sm text-on-surface-variant font-mono mt-0.5">{{ item.sku }}</div>
                 </div>
-              </template>
-              <div>
-                <div :class="[
-                  'font-semibold transition-colors',
-                  item.active ? 'text-on-surface group-hover:text-primary' : 'text-on-surface-variant line-through decoration-on-surface-variant/50'
-                ]">{{ item.name }}</div>
-                <div class="text-sm text-on-surface-variant font-mono mt-0.5">{{ item.sku }}</div>
+              </div>
+              
+              <div class="col-span-1 lg:col-span-3 text-sm text-on-surface-variant">
+                {{ item.category }}
+              </div>
+              
+              <div class="col-span-1 lg:col-span-3 flex items-center gap-2">
+                <span :class="[
+                  'font-medium flex items-center gap-1',
+                  item.stock <= 5 && item.active ? 'text-error' : (item.active ? 'text-on-surface' : 'text-on-surface-variant')
+                ]">
+                  <span v-if="item.stock <= 5 && item.active" class="material-symbols-outlined text-[18px]">warning</span>
+                  {{ item.stock }} Unit
+                </span>
+                <div v-if="item.active" :class="[
+                  'h-1.5 w-16 rounded-full overflow-hidden',
+                  item.stock <= 5 ? 'bg-error-container' : 'bg-surface-container-highest'
+                ]">
+                  <div :class="[
+                    'h-full rounded-full',
+                    item.stock <= 5 ? 'bg-error' : 'bg-tertiary'
+                  ]" :style="{ width: Math.min(100, (item.stock / item.maxStock) * 100) + '%' }"></div>
+                </div>
+              </div>
+              
+              <div class="col-span-1 lg:col-span-2 lg:text-right">
+                <span :class="[
+                  'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+                  item.active 
+                    ? 'bg-surface-container-highest text-on-surface' 
+                    : 'bg-surface-container border border-outline-variant/50 text-on-surface-variant'
+                ]">
+                  {{ item.active ? 'Active' : 'Non-Aktif' }}
+                </span>
               </div>
             </div>
-            
-            <div class="col-span-1 lg:col-span-3 text-sm text-on-surface-variant">
-              {{ item.category }}
-            </div>
-            
-            <div class="col-span-1 lg:col-span-3 flex items-center gap-2">
-              <span :class="[
-                'font-medium flex items-center gap-1',
-                item.stock <= 5 && item.active ? 'text-error' : (item.active ? 'text-on-surface' : 'text-on-surface-variant')
-              ]">
-                <span v-if="item.stock <= 5 && item.active" class="material-symbols-outlined text-[18px]">warning</span>
-                {{ item.stock }} Unit
-              </span>
-              <div v-if="item.active" :class="[
-                'h-1.5 w-16 rounded-full overflow-hidden',
-                item.stock <= 5 ? 'bg-error-container' : 'bg-surface-container-highest'
-              ]">
-                <div :class="[
-                  'h-full rounded-full',
-                  item.stock <= 5 ? 'bg-error' : 'bg-tertiary'
-                ]" :style="{ width: Math.min(100, (item.stock / item.maxStock) * 100) + '%' }"></div>
-              </div>
-            </div>
-            
-            <div class="col-span-1 lg:col-span-2 lg:text-right">
-              <span :class="[
-                'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                item.active 
-                  ? 'bg-surface-container-highest text-on-surface' 
-                  : 'bg-surface-container border border-outline-variant/50 text-on-surface-variant'
-              ]">
-                {{ item.active ? 'Active' : 'Non-Aktif' }}
-              </span>
+
+            <!-- Expanded Actions Area -->
+            <div v-if="expandedItem === item.sku" class="border-t border-surface-container-highest/50 p-4 lg:px-6 flex justify-end gap-3 bg-surface-container-low/30 rounded-b-lg" @click.stop>
+              <button class="px-5 py-2 text-white text-sm font-medium transition-colors hover:opacity-90 flex items-center cursor-pointer" style="border-radius: 10px; background-color: #c96442;">
+                Edit Product
+              </button>
+              <button class="px-5 py-2 text-white text-sm font-medium transition-colors hover:opacity-90 flex items-center cursor-pointer" style="border-radius: 10px; background-color: #b53333;">
+                Delete Product
+              </button>
             </div>
           </div>
         </div>
@@ -171,6 +186,16 @@ const tabs = ref([
   { id: 'minuman', name: 'Minuman' },
   { id: 'non-aktif', name: 'Non-Aktif' }
 ]);
+
+const expandedItem = ref<string | null>(null);
+
+const toggleExpand = (sku: string) => {
+  if (expandedItem.value === sku) {
+    expandedItem.value = null;
+  } else {
+    expandedItem.value = sku;
+  }
+};
 
 const inventoryItems = ref([
   {
