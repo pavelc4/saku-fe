@@ -41,10 +41,12 @@
             </div>
 
             <RevenueChart total="$8,420" :data="chartData" />
+            <RecentTransactionsWidget />
           </div>
 
           <div class="space-y-8">
             <LowStockWidget :items="lowStockItems" />
+            <TopSellingWidget />
             <QuickActionWidget />
           </div>
           
@@ -66,6 +68,8 @@ import MetricCard from '../components/dashboard/MetricCard.vue';
 import RevenueChart from '../components/dashboard/RevenueChart.vue';
 import LowStockWidget from '../components/dashboard/LowStockWidget.vue';
 import QuickActionWidget from '../components/dashboard/QuickActionWidget.vue';
+import RecentTransactionsWidget from '../components/dashboard/RecentTransactionsWidget.vue';
+import TopSellingWidget from '../components/dashboard/TopSellingWidget.vue';
 
 const greeting = ref('Selamat Pagi');
 const user = ref({
