@@ -51,7 +51,7 @@
                   <div v-if="expandedCategory === category.id" 
                        class="flex items-center gap-3 w-full pt-6 mt-6 border-t border-outline-variant/20 animate-in fade-in slide-in-from-top-2" 
                        @click.stop>
-                    <button class="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-surface-container-highest text-on-surface rounded-full font-label text-sm font-semibold hover:bg-surface-variant transition-colors">
+                    <button @click.stop="openEditModal(category)" class="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-surface-container-highest text-on-surface rounded-full font-label text-sm font-semibold hover:bg-surface-variant transition-colors cursor-pointer">
                       <span class="material-symbols-outlined text-[18px]">edit</span> Edit Details
                     </button>
                     <button class="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-error/10 text-error rounded-full font-label text-sm font-semibold hover:bg-error/20 transition-colors">
@@ -202,6 +202,73 @@
       </div>
     </div>
   </div>
+
+  <!-- MODAL OVERLAY (Edit Category) -->
+  <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-on-surface/20 backdrop-blur-[4px]">
+    <!-- Modal Container -->
+    <div class="bg-surface w-full max-w-md rounded-xl shadow-[0_32px_64px_-16px_rgba(27,28,24,0.1)] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <!-- Header -->
+      <div class="px-8 py-6 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-lowest">
+        <h2 class="font-headline text-2xl text-on-surface font-medium">Edit Category</h2>
+        <button @click="closeEditModal" class="text-on-surface-variant hover:bg-surface-container-high p-2 rounded-full transition-colors cursor-pointer">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <!-- Body -->
+      <div class="p-8 flex flex-col gap-8 bg-surface-container-lowest overflow-y-auto">
+        <!-- Category Name -->
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-bold text-on-surface-variant uppercase tracking-wider">Category Name</label>
+          <input v-model="selectedCategoryToEdit.name" class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 text-on-surface font-medium focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all" type="text" />
+        </div>
+        <!-- Icon Selection -->
+        <div class="flex flex-col gap-3">
+          <label class="text-sm font-bold text-on-surface-variant uppercase tracking-wider flex justify-between">
+            Category Icon
+            <span class="text-primary normal-case font-medium cursor-pointer hover:underline">View all</span>
+          </label>
+          <div class="grid grid-cols-5 gap-3">
+            <button aria-label="restaurant" class="w-14 h-14 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-md transition-transform hover:scale-105 cursor-pointer">
+              <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+            </button>
+            <button aria-label="local_cafe" class="w-14 h-14 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest flex items-center justify-center transition-colors cursor-pointer">
+              <span class="material-symbols-outlined">local_cafe</span>
+            </button>
+            <button aria-label="icecream" class="w-14 h-14 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest flex items-center justify-center transition-colors cursor-pointer">
+              <span class="material-symbols-outlined">icecream</span>
+            </button>
+            <button aria-label="lunch_dining" class="w-14 h-14 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest flex items-center justify-center transition-colors cursor-pointer">
+              <span class="material-symbols-outlined">lunch_dining</span>
+            </button>
+            <button aria-label="local_bar" class="w-14 h-14 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest flex items-center justify-center transition-colors cursor-pointer">
+              <span class="material-symbols-outlined">local_bar</span>
+            </button>
+          </div>
+        </div>
+        <!-- Accent Color Selection -->
+        <div class="flex flex-col gap-3">
+          <label class="text-sm font-bold text-on-surface-variant uppercase tracking-wider">Accent Color</label>
+          <div class="flex gap-4">
+            <button class="w-10 h-10 rounded-full bg-primary relative flex items-center justify-center outline outline-2 outline-offset-2 outline-primary transition-all cursor-pointer">
+              <span class="material-symbols-outlined text-white text-sm font-bold">check</span>
+            </button>
+            <button class="w-10 h-10 rounded-full bg-tertiary-container hover:scale-110 transition-transform cursor-pointer border border-black/10"></button>
+            <button class="w-10 h-10 rounded-full bg-secondary-container hover:scale-110 transition-transform cursor-pointer border border-black/10"></button>
+            <button class="w-10 h-10 rounded-full bg-error-container hover:scale-110 transition-transform cursor-pointer border border-black/10"></button>
+          </div>
+        </div>
+      </div>
+      <!-- Footer Actions -->
+      <div class="px-8 py-6 bg-surface-container flex justify-end gap-4 rounded-b-xl border-t border-outline-variant/10">
+        <button @click="closeEditModal" class="px-6 py-3 rounded-full text-on-surface font-bold hover:bg-surface-container-highest transition-colors cursor-pointer">
+          Cancel
+        </button>
+        <button @click="closeEditModal" class="px-6 py-3 rounded-full bg-primary text-white font-bold hover:bg-primary-container transition-colors shadow-sm shadow-primary/20 cursor-pointer">
+          Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -224,6 +291,19 @@ const categories = ref([
 
 const expandedCategory = ref<number | null>(null);
 const showAddModal = ref(false);
+
+const showEditModal = ref(false);
+const selectedCategoryToEdit = ref<any>(null);
+
+const openEditModal = (cat: any) => {
+  selectedCategoryToEdit.value = { ...cat };
+  showEditModal.value = true;
+};
+
+const closeEditModal = () => {
+  showEditModal.value = false;
+  selectedCategoryToEdit.value = null;
+};
 
 const toggleExpand = (id: number) => {
   // Toggle: jika yang diklik sudah terbuka, tutup. Jika belum, buka.
