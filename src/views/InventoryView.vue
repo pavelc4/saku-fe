@@ -157,7 +157,7 @@
               <button @click="openEditModal(item)" class="px-5 py-2 text-white text-sm font-medium transition-colors hover:opacity-90 flex items-center cursor-pointer" style="border-radius: 10px; background-color: #c96442;">
                 Edit Product
               </button>
-              <button class="px-5 py-2 text-white text-sm font-medium transition-colors hover:opacity-90 flex items-center cursor-pointer" style="border-radius: 10px; background-color: #b53333;">
+              <button @click="openDeleteModal(item)" class="px-5 py-2 text-white text-sm font-medium transition-colors hover:opacity-90 flex items-center cursor-pointer" style="border-radius: 10px; background-color: #b53333;">
                 Delete Product
               </button>
             </div>
@@ -366,6 +366,28 @@
         </div>
       </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div v-if="isDeleteModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-on-background/20 backdrop-blur-md p-4">
+      <div class="bg-surface-container-low rounded-xl w-full max-w-[440px] p-8 md:p-10 relative overflow-hidden" style="box-shadow: 0 24px 64px -12px rgba(27,28,24,0.15), 0 0 0 1px rgba(220,193,184,0.1);">
+        <div class="mb-6 w-14 h-14 rounded-full bg-error-container/50 flex items-center justify-center text-error">
+          <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">delete_forever</span>
+        </div>
+        <h2 class="font-headline text-[2rem] leading-tight font-medium text-on-surface mb-4 tracking-tight">Hapus Produk?</h2>
+        <p class="font-body text-base text-on-surface-variant leading-relaxed mb-10">
+          Tindakan ini bersifat permanen. Menghapus produk ini akan menghilangkannya secara permanen dari seluruh riwayat inventaris dan sistem POS Anda.
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-end gap-3 w-full">
+          <button @click="closeDeleteModal" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-surface-container-highest text-on-surface font-body font-semibold hover:bg-surface-variant transition-colors duration-200 cursor-pointer" type="button">
+            Batal
+          </button>
+          <button @click="confirmDelete" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-error text-on-error font-body font-semibold shadow-sm hover:opacity-90 hover:shadow-md transition-all duration-200 relative overflow-hidden group cursor-pointer" type="button">
+            <span class="relative z-10 flex items-center gap-2">Hapus Permanen</span>
+            <div class="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -446,6 +468,26 @@ const saveProduct = () => {
     inventoryItems.value[index] = { ...editingProduct.value };
   }
   closeEditModal();
+};
+
+const isDeleteModalOpen = ref(false);
+const productToDelete = ref<any>(null);
+
+const openDeleteModal = (item: any) => {
+  productToDelete.value = item;
+  isDeleteModalOpen.value = true;
+};
+
+const closeDeleteModal = () => {
+  isDeleteModalOpen.value = false;
+  productToDelete.value = null;
+};
+
+const confirmDelete = () => {
+  if (productToDelete.value) {
+    inventoryItems.value = inventoryItems.value.filter(i => i.sku !== productToDelete.value.sku);
+  }
+  closeDeleteModal();
 };
 
 const toggleExpand = (sku: string) => {
