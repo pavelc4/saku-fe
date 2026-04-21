@@ -154,7 +154,7 @@
 
             <!-- Expanded Actions Area -->
             <div v-if="expandedItem === item.sku" class="border-t border-surface-container-highest/50 p-4 lg:px-6 flex justify-end gap-3 bg-surface-container-low/30 rounded-b-lg" @click.stop>
-              <button class="px-5 py-2 text-white text-sm font-medium transition-colors hover:opacity-90 flex items-center cursor-pointer" style="border-radius: 10px; background-color: #c96442;">
+              <button @click="openEditModal(item)" class="px-5 py-2 text-white text-sm font-medium transition-colors hover:opacity-90 flex items-center cursor-pointer" style="border-radius: 10px; background-color: #c96442;">
                 Edit Product
               </button>
               <button class="px-5 py-2 text-white text-sm font-medium transition-colors hover:opacity-90 flex items-center cursor-pointer" style="border-radius: 10px; background-color: #b53333;">
@@ -164,6 +164,109 @@
           </div>
         </div>
       </main>
+    </div>
+
+    <!-- Edit Product Modal -->
+    <div v-if="isEditModalOpen" class="fixed inset-0 bg-on-background/20 backdrop-blur-md z-50 flex items-center justify-center p-4">
+      <!-- Modal Card -->
+      <div class="bg-surface-container-lowest w-full max-w-2xl rounded-[32px] shadow-[0_32px_64px_-12px_rgba(27,28,24,0.08)] flex flex-col overflow-hidden max-h-[90vh]">
+        <!-- Modal Header -->
+        <div class="px-8 pt-8 pb-6 bg-surface-container-low flex justify-between items-start">
+          <div>
+            <h2 class="text-3xl font-headline text-on-background font-medium mb-2">Edit Produk</h2>
+            <p class="text-sm font-label text-on-surface-variant">Update detail produk dan ketersediaan stok.</p>
+          </div>
+          <button @click="closeEditModal" class="text-on-surface-variant hover:bg-surface-variant p-2 rounded-full transition-colors flex items-center justify-center cursor-pointer" type="button">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        
+        <!-- Modal Body (Form) -->
+        <div class="p-8 overflow-y-auto flex-1 custom-scrollbar">
+          <form class="space-y-8" @submit.prevent="saveProduct">
+            <!-- Basic Info Group -->
+            <div class="space-y-6">
+              <h3 class="text-sm font-headline font-semibold text-primary uppercase tracking-wider">Informasi Dasar</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="col-span-1 md:col-span-2">
+                  <label class="block text-sm font-medium text-on-background mb-2">Nama Produk</label>
+                  <input v-model="editingProduct.name" class="w-full bg-surface border-0 border-b-2 border-surface-variant focus:border-primary focus:bg-surface-container-lowest focus:ring-0 px-4 py-3 rounded-t-lg transition-colors text-on-background font-body placeholder:text-on-surface-variant/50" type="text"/>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-on-background mb-2">SKU</label>
+                  <input v-model="editingProduct.sku" class="w-full bg-surface border-0 border-b-2 border-surface-variant focus:border-primary focus:bg-surface-container-lowest focus:ring-0 px-4 py-3 rounded-t-lg transition-colors text-on-background font-body font-mono text-sm opacity-60 cursor-not-allowed" type="text" disabled/>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-on-background mb-2">Kategori</label>
+                  <div class="relative">
+                    <select v-model="editingProduct.category" class="w-full bg-surface border-0 border-b-2 border-surface-variant focus:border-primary focus:bg-surface-container-lowest focus:ring-0 px-4 py-3 rounded-t-lg transition-colors text-on-background font-body appearance-none pr-10">
+                      <option value="Minuman / Kopi">Minuman / Kopi</option>
+                      <option value="Minuman / Teh">Minuman / Teh</option>
+                      <option value="Makanan / Pastry">Makanan / Pastry</option>
+                      <option value="Merchandise">Merchandise</option>
+                    </select>
+                    <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Inventory & Pricing Group -->
+            <div class="space-y-6 pt-2">
+              <h3 class="text-sm font-headline font-semibold text-primary uppercase tracking-wider">Inventaris & Harga</h3>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <label class="block text-sm font-medium text-on-background mb-2">Unit</label>
+                  <div class="relative">
+                    <select class="w-full bg-surface border-0 border-b-2 border-surface-variant focus:border-primary focus:bg-surface-container-lowest focus:ring-0 px-4 py-3 rounded-t-lg transition-colors text-on-background font-body appearance-none pr-10">
+                      <option value="pcs">Pcs</option>
+                      <option value="kg">Kg</option>
+                      <option value="gram">Gram</option>
+                      <option value="liter">Liter</option>
+                    </select>
+                    <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-on-background mb-2">Stok Tersedia</label>
+                  <input v-model="editingProduct.stock" class="w-full bg-surface border-0 border-b-2 border-surface-variant focus:border-primary focus:bg-surface-container-lowest focus:ring-0 px-4 py-3 rounded-t-lg transition-colors text-on-background font-body text-right" type="number"/>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-on-background mb-2">Harga Jual</label>
+                  <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-medium">Rp</span>
+                    <input class="w-full bg-surface border-0 border-b-2 border-surface-variant focus:border-primary focus:bg-surface-container-lowest focus:ring-0 pl-12 pr-4 py-3 rounded-t-lg transition-colors text-on-background font-body text-right" type="text" placeholder="85.000"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Status Group -->
+            <div class="pt-4 flex items-center justify-between bg-surface-container-low p-4 rounded-xl border border-outline-variant/20">
+              <div>
+                <p class="text-base font-medium text-on-background">Status Produk</p>
+                <p class="text-sm text-on-surface-variant">Produk aktif dapat dilihat dan dibeli di POS.</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input v-model="editingProduct.active" class="sr-only peer" type="checkbox"/>
+                <div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                <span class="ml-3 text-sm font-medium text-primary">Aktif</span>
+              </label>
+            </div>
+          </form>
+        </div>
+        
+        <!-- Modal Footer (Actions) -->
+        <div class="px-8 py-6 bg-surface-container-low flex justify-end items-center space-x-4">
+          <button @click="closeEditModal" class="px-6 py-3 rounded-full text-on-background font-medium hover:bg-surface-variant transition-colors text-sm cursor-pointer" type="button">
+            Batal
+          </button>
+          <button @click="saveProduct" class="px-8 py-3 rounded-full bg-primary text-on-primary font-medium shadow-[0_4px_12px_rgba(154,64,33,0.2)] hover:bg-primary-container transition-all text-sm flex items-center space-x-2 cursor-pointer" type="button">
+            <span class="material-symbols-outlined text-lg">save</span>
+            <span>Simpan Perubahan</span>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -188,6 +291,26 @@ const tabs = ref([
 ]);
 
 const expandedItem = ref<string | null>(null);
+
+const isEditModalOpen = ref(false);
+const editingProduct = ref<any>({});
+
+const openEditModal = (item: any) => {
+  editingProduct.value = { ...item };
+  isEditModalOpen.value = true;
+};
+
+const closeEditModal = () => {
+  isEditModalOpen.value = false;
+};
+
+const saveProduct = () => {
+  const index = inventoryItems.value.findIndex(i => i.sku === editingProduct.value.sku);
+  if (index !== -1) {
+    inventoryItems.value[index] = { ...editingProduct.value };
+  }
+  closeEditModal();
+};
 
 const toggleExpand = (sku: string) => {
   if (expandedItem.value === sku) {
@@ -248,5 +371,15 @@ const inventoryItems = ref([
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--color-surface-variant, #e3e3dc);
+  border-radius: 20px;
 }
 </style>
