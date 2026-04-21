@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Home from '../views/Home.vue'
+import DashboardView from '../views/DashboardView.vue'
 import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
 
@@ -8,6 +9,11 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     name: 'home',
     component: Home
+  },
+  {
+    path: '/dashboard',
+    name: 'dashboard',
+    component: DashboardView
   },
   {
     path: '/login',

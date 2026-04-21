@@ -5,7 +5,7 @@ import Navbar from './components/layout/Navbar.vue'
 import Footer from './components/layout/Footer.vue'
 
 const route = useRoute()
-const hideLayout = computed(() => route.path === '/register' || route.path === '/login')
+const hideLayout = computed(() => ['/register', '/login', '/dashboard'].includes(route.path))
 </script>
 
 <template>

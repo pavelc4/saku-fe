@@ -20,6 +20,11 @@
   --color-surface-container-highest: #e3e3dc;
   --color-error: #ba1a1a;
   --color-near-black: #141413;
+  --color-secondary-container: #f8d9ce;
+  --color-on-secondary-container: #755d55;
+  --color-tertiary-container: #008283;
+  --color-inverse-surface: #30312c;
+  --color-inverse-on-surface: #f2f1ea;
 
   --radius-soft: 32px;
 
