@@ -3,6 +3,7 @@ import Home from '../views/Home.vue'
 import DashboardView from '../views/DashboardView.vue'
 import SettingsView from '../views/SettingsView.vue'
 import SalesView from '../views/SalesView.vue'
+import InventoryView from '../views/InventoryView.vue'
 import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
 
@@ -21,6 +22,11 @@ const routes: RouteRecordRaw[] = [
     path: '/sales',
     name: 'sales',
     component: SalesView
+  },
+  {
+    path: '/inventory',
+    name: 'inventory',
+    component: InventoryView
   },
   {
     path: '/settings',
