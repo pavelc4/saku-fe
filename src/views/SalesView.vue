@@ -11,8 +11,9 @@
       <!-- Main Content Area -->
       <main class="flex-1 bg-surface rounded-tl-[32px] overflow-hidden flex p-12 gap-8 relative shadow-[-8px_-8px_32px_rgba(27,28,24,0.02)] border-none">
         
-        <!-- Left Column: Products -->
-        <div class="flex-1 flex flex-col min-w-0">
+        <template v-if="isSessionOpen">
+          <!-- Left Column: Products -->
+          <div class="flex-1 flex flex-col min-w-0">
           <!-- Filter Tabs -->
           <div class="flex items-center gap-3 mb-8 overflow-x-auto no-scrollbar pb-2">
             <button v-for="cat in categories" :key="cat.id" 
@@ -107,12 +108,26 @@
               <span class="material-symbols-outlined text-sm">arrow_forward</span>
             </button>
           </div>
+          </div>
+        </template>
+
+        <!-- Closed Session State -->
+        <div v-else class="flex-1 flex flex-col items-center justify-center text-center">
+          <div class="w-24 h-24 rounded-full bg-surface-container-highest flex items-center justify-center text-primary mb-6">
+            <span class="material-symbols-outlined text-5xl" style="font-variation-settings: 'FILL' 1;">storefront</span>
+          </div>
+          <h2 class="text-3xl font-headline text-on-surface font-medium mb-2">Kasir Ditutup</h2>
+          <p class="text-on-surface-variant max-w-md mb-8 text-lg">Anda harus membuka shift kasir terlebih dahulu sebelum dapat memproses transaksi baru.</p>
+          <button @click="isModalOpen = true" class="bg-primary hover:bg-primary-container text-on-primary font-body font-medium text-lg py-4 px-8 rounded-full transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary cursor-pointer flex items-center gap-2">
+            <span class="material-symbols-outlined text-2xl">vpn_key</span>
+            Buka Shift Sekarang
+          </button>
         </div>
       </main>
     </div>
 
     <!-- Modal Buka Shift (Open Session) -->
-    <div v-if="!isSessionOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-inverse-surface/40 backdrop-blur-md">
+    <div v-if="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-inverse-surface/40 backdrop-blur-md" @click.self="isModalOpen = false">
       <!-- Modal Container -->
       <div class="bg-surface-bright rounded-xl shadow-[0_32px_64px_-12px_rgba(27,28,24,0.15)] w-full max-w-md p-10 transform transition-all relative overflow-hidden">
         <!-- Decorative Accent -->
@@ -153,9 +168,9 @@
               Buka Sesi Sekarang
             </button>
             <div class="mt-4 text-center">
-              <router-link to="/dashboard" class="text-sm font-body font-medium text-on-surface-variant hover:text-on-surface transition-colors py-2 px-4 rounded-lg hover:bg-surface-container-highest inline-block">
-                Kembali ke Dashboard
-              </router-link>
+              <button type="button" @click="isModalOpen = false" class="text-sm font-body font-medium text-on-surface-variant hover:text-on-surface transition-colors py-2 px-4 rounded-lg hover:bg-surface-container-highest inline-block cursor-pointer">
+                Batalkan
+              </button>
             </div>
           </div>
         </form>
@@ -176,11 +191,13 @@ const user = ref({
 });
 
 const isSessionOpen = ref(false);
+const isModalOpen = ref(false);
 const initialCash = ref('500.000');
 const cashierName = ref('Elena R.');
 
 const openSession = () => {
   isSessionOpen.value = true;
+  isModalOpen.value = false;
 };
 
 const activeCategory = ref('semua');
