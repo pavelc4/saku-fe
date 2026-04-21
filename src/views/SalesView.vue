@@ -206,12 +206,3 @@ const formatCurrency = (value: number) => {
 };
 </script>
 
-<style scoped>
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-</style>

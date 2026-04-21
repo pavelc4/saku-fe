@@ -542,22 +542,3 @@ const inventoryItems = ref([
 ]);
 </script>
 
-<style scoped>
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: var(--color-surface-variant, #e3e3dc);
-  border-radius: 20px;
-}
-</style>
