@@ -6,6 +6,7 @@ import SalesView from '../views/SalesView.vue'
 import InventoryView from '../views/InventoryView.vue'
 import AiInsightsView from '../views/AiInsightsView.vue'
 import CategoriesView from '../views/CategoriesView.vue'
+import NotificationsView from '../views/NotificationsView.vue'
 import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
 
@@ -34,6 +35,11 @@ const routes: RouteRecordRaw[] = [
     path: '/categories',
     name: 'categories',
     component: CategoriesView
+  },
+  {
+    path: '/notifications',
+    name: 'notifications',
+    component: NotificationsView
   },
   {
     path: '/ai-insights',

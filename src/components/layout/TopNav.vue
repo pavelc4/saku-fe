@@ -83,9 +83,9 @@
         </div>
         <!-- Footer / Action Area -->
         <div class="p-4 bg-surface-container-low rounded-b-xl shrink-0 flex justify-center border-t border-outline-variant/10">
-          <button class="text-sm font-label font-medium text-secondary hover:text-on-surface transition-colors focus:outline-none cursor-pointer">
+          <router-link to="/notifications" @click="showNotifications = false" class="text-sm font-label font-medium text-secondary hover:text-on-surface transition-colors focus:outline-none cursor-pointer">
             View All Notifications
-          </button>
+          </router-link>
         </div>
       </div>
     </div>
