@@ -5,7 +5,7 @@ import Navbar from './components/layout/Navbar.vue'
 import Footer from './components/layout/Footer.vue'
 
 const route = useRoute()
-const hideLayout = computed(() => ['/register', '/login', '/dashboard', '/settings', '/sales', '/inventory', '/ai-insights', '/categories'].includes(route.path))
+const hideLayout = computed(() => ['/register', '/login', '/dashboard', '/settings', '/sales', '/inventory', '/ai-insights', '/categories', '/notifications'].includes(route.path))
 </script>
 
 <template>
