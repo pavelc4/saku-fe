@@ -127,51 +127,49 @@
     </div>
 
     <!-- Modal Buka Shift (Open Session) -->
-    <div v-if="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-inverse-surface/40 backdrop-blur-md" @click.self="isModalOpen = false">
+    <div v-if="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-on-surface/30 backdrop-blur-[4px] transition-opacity" @click.self="isModalOpen = false">
       <!-- Modal Container -->
-      <div class="bg-surface-bright rounded-xl shadow-[0_32px_64px_-12px_rgba(27,28,24,0.15)] w-full max-w-md p-10 transform transition-all relative overflow-hidden">
-        <!-- Decorative Accent -->
-        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-primary-container opacity-80"></div>
+      <div class="bg-surface-container-lowest rounded-xl p-10 max-w-[520px] w-full mx-4 shadow-[0_48px_100px_-24px_rgba(27,28,24,0.15)] flex flex-col gap-10 transform transition-transform scale-100 relative overflow-hidden">
+        <!-- Subtle decorative gradient orb in background -->
+        <div class="absolute -top-24 -right-24 w-64 h-64 bg-primary-container/10 rounded-full blur-3xl pointer-events-none"></div>
+        
         <!-- Header -->
-        <div class="text-center mb-10 mt-2">
-          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-container-highest mb-6 text-primary">
+        <div>
+          <div class="w-16 h-16 rounded-full bg-primary-container/30 flex items-center justify-center mb-6 text-primary">
             <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">vpn_key</span>
           </div>
-          <h2 class="text-3xl font-headline text-on-surface font-medium mb-2 tracking-tight">Buka Shift</h2>
-          <p class="text-sm text-on-surface-variant font-body">Terminal 01 • Evening Shift</p>
+          <h2 class="font-headline text-4xl text-on-surface tracking-tight mb-2">Buka Shift Kasir</h2>
+          <p class="font-body text-on-surface-variant text-base">Masukkan modal awal uang fisik dan nama kasir yang bertugas.</p>
         </div>
-        <!-- Form -->
-        <form class="space-y-8" @submit.prevent="openSession">
-          <!-- Field 1: Cash in Drawer -->
-          <div class="relative">
-            <label class="block text-sm font-medium text-on-surface mb-2 font-body ml-1" for="modal-awal">Modal Awal (Cash in Drawer)</label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <span class="text-on-surface-variant font-medium">Rp</span>
-              </div>
-              <input v-model="initialCash" class="block w-full pl-12 pr-4 py-4 bg-surface-container-lowest border-0 rounded-lg text-lg text-on-surface font-body shadow-sm ring-1 ring-inset ring-outline-variant/30 focus:ring-2 focus:ring-inset focus:ring-primary focus:bg-surface-bright transition-colors outline-none" id="modal-awal" name="modal-awal" placeholder="0" type="text"/>
+        
+        <!-- Form Content -->
+        <form class="flex flex-col gap-8" @submit.prevent="openSession">
+          <!-- Input: Cash in Drawer -->
+          <div class="flex flex-col gap-3">
+            <label class="font-label text-sm font-semibold text-on-surface-variant uppercase tracking-wider" for="modal-awal">Modal Awal (Cash in Drawer)</label>
+            <div class="relative flex items-center">
+              <span class="absolute left-5 font-body text-on-surface-variant font-medium">Rp</span>
+              <input v-model="initialCash" class="w-full bg-surface-container-low hover:bg-surface-container transition-colors border-0 rounded-lg pl-14 pr-5 py-4 font-body text-on-surface text-lg placeholder:text-on-surface-variant/50 focus:ring-0 focus:bg-surface-container-highest outline-none" id="modal-awal" placeholder="0" type="text"/>
             </div>
           </div>
-          <!-- Field 2: Nama Kasir -->
-          <div class="relative">
-            <label class="block text-sm font-medium text-on-surface mb-2 font-body ml-1" for="nama-kasir">Nama Kasir</label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-on-surface-variant">
-                <span class="material-symbols-outlined text-lg">person</span>
-              </div>
-              <input v-model="cashierName" class="block w-full pl-12 pr-4 py-4 bg-surface-container-lowest border-0 rounded-lg text-base text-on-surface font-body shadow-sm ring-1 ring-inset ring-outline-variant/30 focus:ring-2 focus:ring-inset focus:ring-primary focus:bg-surface-bright transition-colors outline-none" id="nama-kasir" name="nama-kasir" placeholder="Masukkan nama..." type="text"/>
+          
+          <!-- Input: Nama Kasir -->
+          <div class="flex flex-col gap-3">
+            <label class="font-label text-sm font-semibold text-on-surface-variant uppercase tracking-wider" for="nama-kasir">Nama Kasir</label>
+            <div class="relative flex items-center">
+              <span class="absolute left-5 material-symbols-outlined text-on-surface-variant text-[20px]">person</span>
+              <input v-model="cashierName" class="w-full bg-surface-container-low hover:bg-surface-container transition-colors border-0 rounded-lg pl-14 pr-5 py-4 font-body text-on-surface text-lg placeholder:text-on-surface-variant/50 focus:ring-0 focus:bg-surface-container-highest outline-none" id="nama-kasir" placeholder="Masukkan nama kasir" type="text"/>
             </div>
           </div>
+          
           <!-- Actions -->
-          <div class="pt-6">
-            <button type="submit" class="w-full bg-primary hover:bg-primary-container text-on-primary font-body font-medium text-lg py-4 px-6 rounded-full transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary cursor-pointer">
-              Buka Sesi Sekarang
+          <div class="flex items-center justify-end gap-4 mt-4 pt-6 border-t border-outline-variant/10">
+            <button type="button" @click="isModalOpen = false" class="px-8 py-3 rounded-full font-label font-semibold text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer">
+              Batal
             </button>
-            <div class="mt-4 text-center">
-              <button type="button" @click="isModalOpen = false" class="text-sm font-body font-medium text-on-surface-variant hover:text-on-surface transition-colors py-2 px-4 rounded-lg hover:bg-surface-container-highest inline-block cursor-pointer">
-                Batalkan
-              </button>
-            </div>
+            <button type="submit" class="px-8 py-3 rounded-full font-label font-semibold bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container shadow-[0_8px_16px_-4px_rgba(154,64,33,0.2)] transition-all cursor-pointer">
+              Buka Sesi
+            </button>
           </div>
         </form>
       </div>
