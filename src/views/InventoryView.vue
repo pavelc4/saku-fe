@@ -15,7 +15,7 @@
             <h2 class="font-headline text-4xl font-semibold text-on-surface tracking-tight mb-2">Manajemen Inventaris</h2>
             <p class="text-on-surface-variant font-medium">Kelola dan pantau stok produk Anda.</p>
           </div>
-          <button class="bg-primary text-white font-medium px-6 py-3 rounded-full hover:bg-primary-container transition-colors flex items-center justify-center gap-2 shadow-[0_4px_24px_-4px_rgba(154,64,33,0.3)] cursor-pointer">
+          <button @click="openAddModal" class="bg-primary text-white font-medium px-6 py-3 rounded-full hover:bg-primary-container transition-colors flex items-center justify-center gap-2 shadow-[0_4px_24px_-4px_rgba(154,64,33,0.3)] cursor-pointer">
             <span class="material-symbols-outlined">add</span>
             Tambah Produk
           </button>
@@ -268,6 +268,104 @@
         </div>
       </div>
     </div>
+
+    <!-- Add Product Modal -->
+    <div v-if="isAddModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-on-surface/20 backdrop-blur-[2px]">
+      <div class="bg-surface-container-lowest w-full max-w-2xl rounded-xl shadow-[0_32px_64px_-16px_rgba(27,28,24,0.15)] overflow-hidden flex flex-col max-h-[90vh]">
+        <div class="px-8 py-6 bg-surface-container-lowest flex justify-between items-center z-10">
+          <div>
+            <h2 class="font-headline text-3xl font-medium text-on-surface tracking-tight">Tambah Produk Baru</h2>
+            <p class="text-on-surface-variant text-sm mt-1">Enter details for the new inventory item.</p>
+          </div>
+          <button @click="closeAddModal" class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-highest transition-colors focus:outline-none focus:ring-2 focus:ring-outline-variant/20 cursor-pointer">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        
+        <div class="px-8 py-6 overflow-y-auto flex-1 bg-surface-container-lowest custom-scrollbar">
+          <form class="space-y-8" @submit.prevent="addProduct">
+            <div class="space-y-6">
+              <div>
+                <label class="block text-sm font-semibold text-on-surface mb-2 font-label">Product Name</label>
+                <input v-model="newProduct.name" class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3.5 text-on-surface placeholder:text-on-surface-variant/50 focus:ring-0 focus:bg-surface-container-lowest focus:shadow-[0_0_0_2px_rgba(220,193,184,0.2)] transition-all font-body text-base" placeholder="e.g. Artisan Sourdough Loaf" type="text" required />
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-semibold text-on-surface mb-2 font-label">SKU (Unique Code)</label>
+                  <input v-model="newProduct.sku" class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3.5 text-on-surface placeholder:text-on-surface-variant/50 focus:ring-0 focus:bg-surface-container-lowest focus:shadow-[0_0_0_2px_rgba(220,193,184,0.2)] transition-all font-body text-base font-mono" placeholder="e.g. BKD-SRD-001" type="text" required />
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-on-surface mb-2 font-label">Category</label>
+                  <div class="relative">
+                    <select v-model="newProduct.category" class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3.5 text-on-surface appearance-none focus:ring-0 focus:bg-surface-container-lowest focus:shadow-[0_0_0_2px_rgba(220,193,184,0.2)] transition-all font-body text-base pr-10" required>
+                      <option disabled value="">Select category</option>
+                      <option value="Makanan / Pastry">Makanan / Pastry</option>
+                      <option value="Minuman / Kopi">Minuman / Kopi</option>
+                      <option value="Minuman / Teh">Minuman / Teh</option>
+                      <option value="Merchandise">Merchandise</option>
+                    </select>
+                    <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-6 border-t-[1px] border-surface-variant/0">
+              <h3 class="font-headline text-xl text-on-surface mb-4">Inventory Settings</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-semibold text-on-surface mb-2 font-label">Harga Jual</label>
+                  <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-body">Rp</span>
+                    <input v-model="newProduct.price" class="w-full bg-surface-container-low border-none rounded-lg pl-12 pr-4 py-3.5 text-on-surface placeholder:text-on-surface-variant/50 focus:ring-0 focus:bg-surface-container-lowest focus:shadow-[0_0_0_2px_rgba(220,193,184,0.2)] transition-all font-body text-base" placeholder="0" type="number" />
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-on-surface mb-2 font-label">Initial Stock</label>
+                  <input v-model="newProduct.stock" class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3.5 text-on-surface placeholder:text-on-surface-variant/50 focus:ring-0 focus:bg-surface-container-lowest focus:shadow-[0_0_0_2px_rgba(220,193,184,0.2)] transition-all font-body text-base" min="0" placeholder="0" type="number" />
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-on-surface mb-2 font-label">Unit</label>
+                  <div class="relative">
+                    <select class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3.5 text-on-surface appearance-none focus:ring-0 focus:bg-surface-container-lowest focus:shadow-[0_0_0_2px_rgba(220,193,184,0.2)] transition-all font-body text-base pr-10">
+                      <option value="pcs">Pcs</option>
+                      <option value="box">Box</option>
+                      <option value="kg">Kg</option>
+                      <option value="liter">Liter</option>
+                    </select>
+                    <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-6 pb-2">
+              <div class="flex items-center justify-between p-4 rounded-lg bg-surface-container-low">
+                <div>
+                  <h4 class="font-semibold text-on-surface font-label text-sm">Product Status</h4>
+                  <p class="text-xs text-on-surface-variant mt-0.5">Active products are visible in the POS.</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input v-model="newProduct.active" class="sr-only peer" type="checkbox" />
+                  <div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                  <span class="ms-3 text-sm font-medium text-on-surface-variant hidden">Active</span>
+                </label>
+              </div>
+            </div>
+          </form>
+        </div>
+        
+        <div class="px-8 py-6 bg-surface-container-lowest flex justify-end gap-4 z-10">
+          <button @click="closeAddModal" class="px-6 py-3 rounded-full text-on-surface font-semibold text-sm hover:bg-surface-container-highest transition-colors font-label cursor-pointer" type="button">
+            Batal
+          </button>
+          <button @click="addProduct" class="px-8 py-3 rounded-full text-on-primary font-semibold text-sm bg-primary shadow-sm hover:bg-primary-container transition-all relative overflow-hidden font-label cursor-pointer" type="button">
+            <span class="relative z-10">Simpan Produk</span>
+            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/10 to-transparent pointer-events-none"></div>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -291,6 +389,44 @@ const tabs = ref([
 ]);
 
 const expandedItem = ref<string | null>(null);
+
+const isAddModalOpen = ref(false);
+const newProduct = ref({
+  name: '',
+  sku: '',
+  category: '',
+  stock: 0,
+  maxStock: 50,
+  price: '',
+  active: true,
+  image: '',
+  icon: 'inventory_2'
+});
+
+const openAddModal = () => {
+  isAddModalOpen.value = true;
+};
+
+const closeAddModal = () => {
+  isAddModalOpen.value = false;
+  newProduct.value = {
+    name: '',
+    sku: '',
+    category: '',
+    stock: 0,
+    maxStock: 50,
+    price: '',
+    active: true,
+    image: '',
+    icon: 'inventory_2'
+  };
+};
+
+const addProduct = () => {
+  if (!newProduct.value.name || !newProduct.value.sku || !newProduct.value.category) return;
+  inventoryItems.value.unshift({ ...newProduct.value });
+  closeAddModal();
+};
 
 const isEditModalOpen = ref(false);
 const editingProduct = ref<any>({});
