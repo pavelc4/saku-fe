@@ -4,6 +4,7 @@ import DashboardView from '../views/DashboardView.vue'
 import SettingsView from '../views/SettingsView.vue'
 import SalesView from '../views/SalesView.vue'
 import InventoryView from '../views/InventoryView.vue'
+import AiInsightsView from '../views/AiInsightsView.vue'
 import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
 
@@ -27,6 +28,11 @@ const routes: RouteRecordRaw[] = [
     path: '/inventory',
     name: 'inventory',
     component: InventoryView
+  },
+  {
+    path: '/ai-insights',
+    name: 'ai-insights',
+    component: AiInsightsView
   },
   {
     path: '/settings',

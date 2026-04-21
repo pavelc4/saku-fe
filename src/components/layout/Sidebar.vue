@@ -49,7 +49,7 @@ const navItems = ref([
   { name: 'Dashboard', icon: 'dashboard', path: '/dashboard' },
   { name: 'Sales', icon: 'shopping_cart', path: '/sales' },
   { name: 'Inventory', icon: 'inventory_2', path: '/inventory' },
-  { name: 'AI Insights', icon: 'auto_awesome', path: '/insights' },
+  { name: 'AI Insights', icon: 'auto_awesome', path: '/ai-insights' },
   { name: 'Staff', icon: 'groups', path: '/staff' },
 ]);
 
