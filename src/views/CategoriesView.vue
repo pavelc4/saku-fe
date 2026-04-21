@@ -16,7 +16,7 @@
             <div class="lg:col-span-2 space-y-6">
               <div class="flex items-center justify-between mb-4">
                 <h3 class="font-headline text-2xl text-on-surface">Categories</h3>
-                <button class="flex items-center gap-2 bg-primary text-on-primary px-5 py-2.5 rounded-full font-label text-sm font-semibold hover:bg-primary-container transition-all shadow-sm active:scale-95 cursor-pointer">
+                <button @click="showAddModal = true" class="flex items-center gap-2 bg-primary text-on-primary px-5 py-2.5 rounded-full font-label text-sm font-semibold hover:bg-primary-container transition-all shadow-sm active:scale-95 cursor-pointer">
                   <span class="material-symbols-outlined text-sm">add</span> Add Category
                 </button>
               </div>
@@ -109,6 +109,99 @@
       </main>
     </div>
   </div>
+
+  <!-- MODAL OVERLAY -->
+  <div v-if="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center bg-on-surface/30 backdrop-blur-[4px] transition-opacity">
+    <!-- MODAL DIALOG -->
+    <div class="bg-surface-container-lowest rounded-xl p-10 max-w-[520px] w-full mx-4 shadow-[0_48px_100px_-24px_rgba(27,28,24,0.15)] flex flex-col gap-10 transform transition-transform scale-100 relative overflow-hidden">
+      <!-- Subtle decorative gradient orb in background -->
+      <div class="absolute -top-24 -right-24 w-64 h-64 bg-primary-container/10 rounded-full blur-3xl pointer-events-none"></div>
+      
+      <!-- Header -->
+      <div>
+        <h2 class="font-headline text-4xl text-on-surface tracking-tight mb-2">Tambah Kategori Baru</h2>
+        <p class="font-body text-on-surface-variant text-base">Atur katalog produk Anda dengan kategori yang spesifik.</p>
+      </div>
+      
+      <!-- Form Content -->
+      <div class="flex flex-col gap-8">
+        <!-- Input: Nama Kategori -->
+        <div class="flex flex-col gap-3">
+          <label class="font-label text-sm font-semibold text-on-surface-variant uppercase tracking-wider" for="categoryName">Nama Kategori</label>
+          <input class="w-full bg-surface-container-low hover:bg-surface-container transition-colors border-0 rounded-lg px-5 py-4 font-body text-on-surface text-lg placeholder:text-on-surface-variant/50 focus:ring-0 focus:bg-surface-container-highest" id="categoryName" placeholder="Misal: Dessert atau Coffee" type="text" />
+        </div>
+        
+        <!-- Input: Ikon Kategori -->
+        <div class="flex flex-col gap-3">
+          <label class="font-label text-sm font-semibold text-on-surface-variant uppercase tracking-wider">Ikon Kategori</label>
+          <div class="grid grid-cols-6 gap-3">
+            <button class="aspect-square rounded-full bg-primary-container text-on-primary-container flex items-center justify-center transition-colors cursor-pointer" type="button">
+              <span class="material-symbols-outlined" data-icon="local_cafe" data-weight="fill" style="font-variation-settings: 'FILL' 1;">local_cafe</span>
+            </button>
+            <button class="aspect-square rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors flex items-center justify-center cursor-pointer" type="button">
+              <span class="material-symbols-outlined" data-icon="restaurant">restaurant</span>
+            </button>
+            <button class="aspect-square rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors flex items-center justify-center cursor-pointer" type="button">
+              <span class="material-symbols-outlined" data-icon="local_pizza">local_pizza</span>
+            </button>
+            <button class="aspect-square rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors flex items-center justify-center cursor-pointer" type="button">
+              <span class="material-symbols-outlined" data-icon="cake">cake</span>
+            </button>
+            <button class="aspect-square rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors flex items-center justify-center cursor-pointer" type="button">
+              <span class="material-symbols-outlined" data-icon="icecream">icecream</span>
+            </button>
+            <button class="aspect-square rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors flex items-center justify-center cursor-pointer" type="button">
+              <span class="material-symbols-outlined" data-icon="local_bar">local_bar</span>
+            </button>
+            <button class="aspect-square rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors flex items-center justify-center cursor-pointer" type="button">
+              <span class="material-symbols-outlined" data-icon="bakery_dining">bakery_dining</span>
+            </button>
+            <button class="aspect-square rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors flex items-center justify-center cursor-pointer" type="button">
+              <span class="material-symbols-outlined" data-icon="fastfood">fastfood</span>
+            </button>
+            <button class="aspect-square rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors flex items-center justify-center cursor-pointer" type="button">
+              <span class="material-symbols-outlined" data-icon="ramen_dining">ramen_dining</span>
+            </button>
+            <button class="aspect-square rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors flex items-center justify-center cursor-pointer" type="button">
+              <span class="material-symbols-outlined" data-icon="kebab_dining">kebab_dining</span>
+            </button>
+            <button class="aspect-square rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors flex items-center justify-center cursor-pointer" type="button">
+              <span class="material-symbols-outlined" data-icon="tapas">tapas</span>
+            </button>
+            <button class="aspect-square rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors flex items-center justify-center cursor-pointer" type="button">
+              <span class="material-symbols-outlined" data-icon="liquor">liquor</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Input: Warna Aksen (Color Picker) -->
+        <div class="flex flex-col gap-3">
+          <label class="font-label text-sm font-semibold text-on-surface-variant uppercase tracking-wider">Warna Aksen</label>
+          <div class="flex gap-4 items-center">
+            <button aria-label="Select primary color" class="w-10 h-10 rounded-full bg-primary relative flex items-center justify-center cursor-pointer" type="button">
+              <span class="absolute inset-[-6px] rounded-full border-2 border-primary/30"></span>
+              <span class="material-symbols-outlined text-white text-sm" data-icon="check">check</span>
+            </button>
+            <button aria-label="Select tertiary color" class="w-10 h-10 rounded-full bg-tertiary hover:scale-110 transition-transform cursor-pointer" type="button"></button>
+            <button aria-label="Select secondary color" class="w-10 h-10 rounded-full bg-secondary hover:scale-110 transition-transform cursor-pointer" type="button"></button>
+            <button aria-label="Select earth brown color" class="w-10 h-10 rounded-full bg-[#8b5a2b] hover:scale-110 transition-transform cursor-pointer" type="button"></button>
+            <button aria-label="Select olive green color" class="w-10 h-10 rounded-full bg-[#556b2f] hover:scale-110 transition-transform cursor-pointer" type="button"></button>
+            <button aria-label="Select warm red color" class="w-10 h-10 rounded-full bg-[#cd5c5c] hover:scale-110 transition-transform cursor-pointer" type="button"></button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Actions -->
+      <div class="flex items-center justify-end gap-4 mt-4 pt-6 border-t-0">
+        <button @click="showAddModal = false" class="px-8 py-3 rounded-full font-label font-semibold text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer" type="button">
+          Batal
+        </button>
+        <button @click="showAddModal = false" class="px-8 py-3 rounded-full font-label font-semibold bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container shadow-[0_8px_16px_-4px_rgba(154,64,33,0.2)] transition-all cursor-pointer" type="button">
+          Tambah Kategori
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -130,6 +223,7 @@ const categories = ref([
 ]);
 
 const expandedCategory = ref<number | null>(null);
+const showAddModal = ref(false);
 
 const toggleExpand = (id: number) => {
   // Toggle: jika yang diklik sudah terbuka, tutup. Jika belum, buka.
