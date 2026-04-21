@@ -19,9 +19,6 @@
     </ul>
     
     <div class="mt-auto space-y-4">
-      <button class="w-full py-4 bg-primary text-on-primary rounded-full font-body font-medium hover:bg-primary-container transition-colors shadow-[0_4px_32px_rgba(27,28,24,0.06)] cursor-pointer">
-        New Sale
-      </button>
       <ul class="space-y-1">
         <li v-for="item in footerItems" :key="item.name">
           <router-link :to="item.path" :class="[
@@ -55,6 +52,5 @@ const navItems = ref([
 
 const footerItems = ref([
   { name: 'Settings', icon: 'settings', path: '/settings' },
-  { name: 'Support', icon: 'help', path: '/support' },
 ]);
 </script>
