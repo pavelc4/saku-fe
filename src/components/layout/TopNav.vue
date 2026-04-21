@@ -9,6 +9,9 @@
         <span class="material-symbols-outlined">notifications</span>
         <span class="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary"></span>
       </button>
+      <button v-if="showCloseShift" @click="$emit('close-shift')" class="font-body font-semibold text-primary hover:bg-surface-container-highest transition-colors px-4 py-2 bg-surface-container rounded-full cursor-pointer hidden md:block">
+        Tutup Shift
+      </button>
       <button class="h-10 w-10 rounded-full bg-surface-container-highest flex items-center justify-center text-primary font-headline font-medium hover:opacity-80 transition-opacity overflow-hidden">
         <img v-if="user.avatar" :src="user.avatar" alt="User Profile" class="w-full h-full object-cover" />
       </button>
@@ -96,8 +99,11 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 
 defineProps<{
-  user: { name: string; avatar: string }
+  user: { name: string; avatar: string },
+  showCloseShift?: boolean
 }>();
+
+defineEmits(['close-shift']);
 
 const showNotifications = ref(false);
 const navContainer = ref<HTMLElement | null>(null);

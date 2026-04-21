@@ -6,7 +6,7 @@
     <!-- Right Side Area -->
     <div class="flex-1 flex flex-col min-w-0 h-screen relative z-10">
       <!-- TopNavBar -->
-      <TopNav :user="user" />
+      <TopNav :user="user" :showCloseShift="isSessionOpen" @close-shift="isCloseModalOpen = true" />
 
       <!-- Main Content Area -->
       <main class="flex-1 bg-surface rounded-tl-[32px] overflow-hidden flex p-12 gap-8 relative shadow-[-8px_-8px_32px_rgba(27,28,24,0.02)] border-none">
@@ -174,6 +174,67 @@
         </form>
       </div>
     </div>
+
+    <!-- Modal Tutup Sesi (Close Session) -->
+    <div v-if="isCloseModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-on-surface/20 backdrop-blur-sm" @click.self="isCloseModalOpen = false">
+      <!-- Modal Container -->
+      <div class="bg-surface-bright rounded-lg shadow-[0_16px_48px_rgba(27,28,24,0.06)] w-full max-w-2xl overflow-hidden flex flex-col relative border border-outline-variant/20">
+        <!-- Modal Header -->
+        <div class="px-10 py-8 bg-surface-container-low flex justify-between items-start">
+          <div>
+            <h2 class="font-headline font-semibold text-3xl text-on-surface mb-2">Tutup Sesi Aktif</h2>
+            <p class="font-body text-on-surface-variant text-sm">Terminal 01 • {{ cashierName || user.name }}</p>
+          </div>
+          <button @click="isCloseModalOpen = false" class="text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer">
+            <span class="material-symbols-outlined text-2xl">close</span>
+          </button>
+        </div>
+        
+        <!-- Modal Body -->
+        <div class="px-10 py-10 flex flex-col gap-8 bg-surface-bright">
+          <!-- Summary Stats -->
+          <div class="grid grid-cols-2 gap-6">
+            <div class="bg-surface-container-low p-6 rounded-lg flex flex-col gap-2">
+              <span class="font-label text-sm text-on-surface-variant uppercase tracking-wider">Total Penjualan Sistem</span>
+              <span class="font-headline text-3xl text-on-surface">{{ formatCurrency(totalSales) }}</span>
+            </div>
+            <div class="bg-surface-container-highest p-6 rounded-lg flex flex-col gap-2">
+              <span class="font-label text-sm text-on-surface-variant uppercase tracking-wider">Total Uang Tunai Diharapkan</span>
+              <span class="font-headline text-3xl text-on-surface">{{ formatCurrency(expectedCash) }}</span>
+            </div>
+          </div>
+          
+          <!-- Input Section -->
+          <div class="flex flex-col gap-4 mt-4">
+            <label class="font-headline text-xl text-on-surface" for="cash-input">Uang Tunai Fisik di Laci</label>
+            <div class="relative flex items-center bg-surface-container-low rounded-lg p-1 focus-within:bg-surface-container-lowest focus-within:ring-1 focus-within:ring-outline-variant/20 transition-all">
+              <span class="pl-6 font-headline text-2xl text-on-surface-variant">Rp</span>
+              <input v-model="actualCash" class="w-full bg-transparent border-none focus:ring-0 font-headline text-3xl text-on-surface py-6 px-4 outline-none" id="cash-input" placeholder="0" type="text" />
+            </div>
+          </div>
+          
+          <!-- Discrepancy Indicator -->
+          <div class="flex items-center justify-between p-6 bg-surface-container-lowest border border-outline-variant/20 rounded-lg">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined" :class="discrepancyClass.iconColor">{{ discrepancyIcon }}</span>
+              <span class="font-label font-medium" :class="discrepancyClass.textColor">Selisih</span>
+            </div>
+            <span class="font-headline text-2xl" :class="discrepancyClass.textColor">{{ formatCurrency(discrepancyAmount) }}</span>
+          </div>
+        </div>
+        
+        <!-- Modal Footer -->
+        <div class="px-10 py-8 bg-surface-container-low flex justify-end gap-4 mt-auto">
+          <button @click="isCloseModalOpen = false" class="px-8 py-4 rounded-xl font-body font-medium text-on-surface bg-surface-container-highest hover:bg-surface-variant transition-colors cursor-pointer">
+            Batal
+          </button>
+          <button @click="closeSession" class="px-8 py-4 rounded-xl font-body font-medium text-on-primary bg-primary hover:bg-surface-tint transition-all shadow-[0_4px_12px_rgba(154,64,33,0.2)] flex items-center gap-2 cursor-pointer">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">print</span>
+            Tutup Sesi & Cetak Laporan
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -190,12 +251,47 @@ const user = ref({
 
 const isSessionOpen = ref(false);
 const isModalOpen = ref(false);
+const isCloseModalOpen = ref(false);
+
 const initialCash = ref('500.000');
 const cashierName = ref('Elena R.');
+
+const totalSales = ref(4250000);
+const expectedCash = ref(1550000);
+const actualCash = ref('1.550.000');
+
+const actualCashValue = computed(() => {
+  return parseInt(actualCash.value.replace(/\D/g, '')) || 0;
+});
+
+const discrepancyAmount = computed(() => {
+  return actualCashValue.value - expectedCash.value;
+});
+
+const discrepancyClass = computed(() => {
+  if (discrepancyAmount.value === 0) {
+    return { iconColor: 'text-tertiary', textColor: 'text-tertiary' };
+  } else if (discrepancyAmount.value > 0) {
+    return { iconColor: 'text-primary', textColor: 'text-primary' };
+  } else {
+    return { iconColor: 'text-error', textColor: 'text-error' };
+  }
+});
+
+const discrepancyIcon = computed(() => {
+  if (discrepancyAmount.value === 0) return 'check_circle';
+  if (discrepancyAmount.value > 0) return 'add_circle';
+  return 'error';
+});
 
 const openSession = () => {
   isSessionOpen.value = true;
   isModalOpen.value = false;
+};
+
+const closeSession = () => {
+  isCloseModalOpen.value = false;
+  isSessionOpen.value = false;
 };
 
 const activeCategory = ref('semua');
