@@ -176,63 +176,65 @@
     </div>
 
     <!-- Modal Tutup Sesi (Close Session) -->
-    <div v-if="isCloseModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-on-surface/20 backdrop-blur-sm" @click.self="isCloseModalOpen = false">
+    <div v-if="isCloseModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-on-surface/30 backdrop-blur-[4px] transition-opacity" @click.self="isCloseModalOpen = false">
       <!-- Modal Container -->
-      <div class="bg-surface-bright rounded-lg shadow-[0_16px_48px_rgba(27,28,24,0.06)] w-full max-w-2xl overflow-hidden flex flex-col relative border border-outline-variant/20">
-        <!-- Modal Header -->
-        <div class="px-10 py-8 bg-surface-container-low flex justify-between items-start">
-          <div>
-            <h2 class="font-headline font-semibold text-3xl text-on-surface mb-2">Tutup Sesi Aktif</h2>
-            <p class="font-body text-on-surface-variant text-sm">Terminal 01 • {{ cashierName || user.name }}</p>
-          </div>
-          <button @click="isCloseModalOpen = false" class="text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer">
-            <span class="material-symbols-outlined text-2xl">close</span>
-          </button>
-        </div>
+      <div class="bg-surface-container-lowest rounded-xl p-10 max-w-[520px] w-full mx-4 shadow-[0_48px_100px_-24px_rgba(27,28,24,0.15)] flex flex-col gap-10 transform transition-transform scale-100 relative overflow-hidden">
+        <!-- Subtle decorative gradient orb in background -->
+        <div class="absolute -top-24 -right-24 w-64 h-64 bg-primary-container/10 rounded-full blur-3xl pointer-events-none"></div>
         
-        <!-- Modal Body -->
-        <div class="px-10 py-10 flex flex-col gap-8 bg-surface-bright">
+        <!-- Header -->
+        <div>
+          <div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mb-6 text-on-surface">
+            <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">storefront</span>
+          </div>
+          <h2 class="font-headline text-4xl text-on-surface tracking-tight mb-2">Tutup Sesi Aktif</h2>
+          <p class="font-body text-on-surface-variant text-base">Terminal 01 • {{ cashierName || user.name }}</p>
+        </div>
+
+        <!-- Body -->
+        <div class="flex flex-col gap-8">
           <!-- Summary Stats -->
-          <div class="grid grid-cols-2 gap-6">
-            <div class="bg-surface-container-low p-6 rounded-lg flex flex-col gap-2">
-              <span class="font-label text-sm text-on-surface-variant uppercase tracking-wider">Total Penjualan Sistem</span>
-              <span class="font-headline text-3xl text-on-surface">{{ formatCurrency(totalSales) }}</span>
+          <div class="flex gap-4">
+            <div class="bg-surface-container-low p-5 rounded-xl flex-1 flex flex-col gap-1">
+              <span class="font-label text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Penjualan Sistem</span>
+              <span class="font-headline text-2xl text-on-surface">{{ formatCurrency(totalSales) }}</span>
             </div>
-            <div class="bg-surface-container-highest p-6 rounded-lg flex flex-col gap-2">
-              <span class="font-label text-sm text-on-surface-variant uppercase tracking-wider">Total Uang Tunai Diharapkan</span>
-              <span class="font-headline text-3xl text-on-surface">{{ formatCurrency(expectedCash) }}</span>
-            </div>
-          </div>
-          
-          <!-- Input Section -->
-          <div class="flex flex-col gap-4 mt-4">
-            <label class="font-headline text-xl text-on-surface" for="cash-input">Uang Tunai Fisik di Laci</label>
-            <div class="relative flex items-center bg-surface-container-low rounded-lg p-1 focus-within:bg-surface-container-lowest focus-within:ring-1 focus-within:ring-outline-variant/20 transition-all">
-              <span class="pl-6 font-headline text-2xl text-on-surface-variant">Rp</span>
-              <input v-model="actualCash" class="w-full bg-transparent border-none focus:ring-0 font-headline text-3xl text-on-surface py-6 px-4 outline-none" id="cash-input" placeholder="0" type="text" />
+            <div class="bg-surface-container-high p-5 rounded-xl flex-1 flex flex-col gap-1">
+              <span class="font-label text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Tunai Diharapkan</span>
+              <span class="font-headline text-2xl text-on-surface">{{ formatCurrency(expectedCash) }}</span>
             </div>
           </div>
           
+          <!-- Input -->
+          <div class="flex flex-col gap-3">
+            <label class="font-label text-sm font-semibold text-on-surface-variant uppercase tracking-wider" for="cash-input">Uang Tunai Fisik di Laci</label>
+            <div class="relative flex items-center">
+              <span class="absolute left-5 font-headline text-xl text-on-surface-variant">Rp</span>
+              <input v-model="actualCash" class="w-full bg-surface-container-low hover:bg-surface-container transition-colors border-0 rounded-lg pl-14 pr-5 py-4 font-headline text-2xl text-on-surface placeholder:text-on-surface-variant/50 focus:ring-0 focus:bg-surface-container-highest outline-none" id="cash-input" placeholder="0" type="text" />
+            </div>
+          </div>
+
           <!-- Discrepancy Indicator -->
-          <div class="flex items-center justify-between p-6 bg-surface-container-lowest border border-outline-variant/20 rounded-lg">
+          <div class="flex items-center justify-between p-5 bg-surface-container-low rounded-xl">
             <div class="flex items-center gap-3">
               <span class="material-symbols-outlined" :class="discrepancyClass.iconColor">{{ discrepancyIcon }}</span>
-              <span class="font-label font-medium" :class="discrepancyClass.textColor">Selisih</span>
+              <span class="font-label font-medium text-sm" :class="discrepancyClass.textColor">Selisih</span>
             </div>
-            <span class="font-headline text-2xl" :class="discrepancyClass.textColor">{{ formatCurrency(discrepancyAmount) }}</span>
+            <span class="font-headline text-xl" :class="discrepancyClass.textColor">{{ formatCurrency(discrepancyAmount) }}</span>
           </div>
         </div>
-        
-        <!-- Modal Footer -->
-        <div class="px-10 py-8 bg-surface-container-low flex justify-end gap-4 mt-auto">
-          <button @click="isCloseModalOpen = false" class="px-8 py-4 rounded-xl font-body font-medium text-on-surface bg-surface-container-highest hover:bg-surface-variant transition-colors cursor-pointer">
+
+        <!-- Actions -->
+        <div class="flex items-center justify-end gap-4 mt-4 pt-6 border-t border-outline-variant/10">
+          <button @click="isCloseModalOpen = false" class="px-8 py-3 rounded-full font-label font-semibold text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer">
             Batal
           </button>
-          <button @click="closeSession" class="px-8 py-4 rounded-xl font-body font-medium text-on-primary bg-primary hover:bg-surface-tint transition-all shadow-[0_4px_12px_rgba(154,64,33,0.2)] flex items-center gap-2 cursor-pointer">
-            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">print</span>
-            Tutup Sesi & Cetak Laporan
+          <button @click="closeSession" class="px-8 py-3 rounded-full font-label font-semibold bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container shadow-[0_8px_16px_-4px_rgba(154,64,33,0.2)] transition-all cursor-pointer flex items-center gap-2">
+            <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">print</span>
+            Tutup Sesi
           </button>
         </div>
+
       </div>
     </div>
   </div>
