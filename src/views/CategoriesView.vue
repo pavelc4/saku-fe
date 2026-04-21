@@ -30,91 +30,40 @@
 
               <!-- Category Cards -->
               <div class="space-y-4">
-                <!-- Category Item 1 -->
-                <div class="bg-surface-container-low rounded-lg p-6 flex items-center justify-between group hover:bg-surface-container transition-colors">
-                  <div class="flex items-center gap-5">
-                    <div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
-                      <span class="material-symbols-outlined">restaurant</span>
+                <!-- Category Item -->
+                <div v-for="category in categories" :key="category.id" 
+                     :class="['rounded-lg p-6 group transition-colors cursor-pointer',
+                              expandedCategory === category.id 
+                                ? 'flex flex-col items-start gap-6 border border-primary/20 bg-surface-container' 
+                                : 'flex items-center justify-between bg-surface-container-low hover:bg-surface-container']"
+                     @click="toggleExpand(category.id)">
+                     
+                  <div :class="['flex items-center justify-between', expandedCategory === category.id ? 'w-full' : '']">
+                    <div class="flex items-center gap-5">
+                      <div :class="['w-12 h-12 rounded-full flex items-center justify-center', category.iconBg, category.iconText]">
+                        <span class="material-symbols-outlined">{{ category.icon }}</span>
+                      </div>
+                      <div>
+                        <h4 class="font-headline text-xl text-on-surface">{{ category.name }}</h4>
+                        <p class="font-body text-sm text-on-surface-variant mt-1">{{ category.items }} active items</p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 class="font-headline text-xl text-on-surface">Makanan Utama</h4>
-                      <p class="font-body text-sm text-on-surface-variant mt-1">42 active items</p>
+                    
+                    <div class="flex items-center gap-6" @click.stop>
+                      <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" class="sr-only peer" v-model="category.active" />
+                        <div class="w-11 h-6 bg-surface-dim peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                      </label>
                     </div>
                   </div>
-                  <div class="flex items-center gap-6">
-                    <button class="text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover:opacity-100 cursor-pointer">
-                      <span class="material-symbols-outlined">edit</span>
+                  
+                  <div v-if="expandedCategory === category.id" class="flex items-center gap-3 w-full pt-4 border-t border-outline-variant/30" @click.stop>
+                    <button class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-surface-container-highest text-on-surface rounded-full font-label text-sm font-semibold hover:bg-surface-variant transition-colors cursor-pointer">
+                      <span class="material-symbols-outlined text-[18px]">edit</span> Edit Details
                     </button>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                      <input checked type="checkbox" class="sr-only peer" />
-                      <div class="w-11 h-6 bg-surface-dim peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                    </label>
-                  </div>
-                </div>
-
-                <!-- Category Item 2 -->
-                <div class="bg-surface-container-low rounded-lg p-6 flex items-center justify-between group hover:bg-surface-container transition-colors">
-                  <div class="flex items-center gap-5">
-                    <div class="w-12 h-12 rounded-full bg-tertiary-container flex items-center justify-center text-on-tertiary-container">
-                      <span class="material-symbols-outlined">local_cafe</span>
-                    </div>
-                    <div>
-                      <h4 class="font-headline text-xl text-on-surface">Minuman Dingin</h4>
-                      <p class="font-body text-sm text-on-surface-variant mt-1">28 active items</p>
-                    </div>
-                  </div>
-                  <div class="flex items-center gap-6">
-                    <button class="text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover:opacity-100 cursor-pointer">
-                      <span class="material-symbols-outlined">edit</span>
+                    <button class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-error/10 text-error rounded-full font-label text-sm font-semibold hover:bg-error/20 transition-colors cursor-pointer">
+                      <span class="material-symbols-outlined text-[18px]">delete</span> Delete Category
                     </button>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                      <input checked type="checkbox" class="sr-only peer" />
-                      <div class="w-11 h-6 bg-surface-dim peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                    </label>
-                  </div>
-                </div>
-
-                <!-- Category Item 3 -->
-                <div class="bg-surface-container-low rounded-lg p-6 flex items-center justify-between group hover:bg-surface-container transition-colors">
-                  <div class="flex items-center gap-5">
-                    <div class="w-12 h-12 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant">
-                      <span class="material-symbols-outlined">tapas</span>
-                    </div>
-                    <div>
-                      <h4 class="font-headline text-xl text-on-surface">Cemilan Ringan</h4>
-                      <p class="font-body text-sm text-on-surface-variant mt-1">15 active items</p>
-                    </div>
-                  </div>
-                  <div class="flex items-center gap-6">
-                    <button class="text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover:opacity-100 cursor-pointer">
-                      <span class="material-symbols-outlined">edit</span>
-                    </button>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" class="sr-only peer" />
-                      <div class="w-11 h-6 bg-surface-dim peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                    </label>
-                  </div>
-                </div>
-
-                <!-- Category Item 4 -->
-                <div class="bg-surface-container-low rounded-lg p-6 flex items-center justify-between group hover:bg-surface-container transition-colors">
-                  <div class="flex items-center gap-5">
-                    <div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
-                      <span class="material-symbols-outlined">cake</span>
-                    </div>
-                    <div>
-                      <h4 class="font-headline text-xl text-on-surface">Dessert</h4>
-                      <p class="font-body text-sm text-on-surface-variant mt-1">8 active items</p>
-                    </div>
-                  </div>
-                  <div class="flex items-center gap-6">
-                    <button class="text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover:opacity-100 cursor-pointer">
-                      <span class="material-symbols-outlined">edit</span>
-                    </button>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                      <input checked type="checkbox" class="sr-only peer" />
-                      <div class="w-11 h-6 bg-surface-dim peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                    </label>
                   </div>
                 </div>
               </div>
@@ -181,4 +130,21 @@ const user = ref({
   email: 'alex.r@saku.com',
   avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCQ2rNzAZRHA7G3Zrxdz0OBPJDQIlsXNluygqsZj_8Q8AoxgNcKgak88YwAZviKRpduq7UZxDTaL6O5XHkxOBXZnhRmfLBAeKlFuoimfrBNZ_u7eB4ZKYVi0xEMUfhUT3Ja7dai2ptCOjXjymWISfUb1xKHGVDTj9VJ7RonBdEZWd_P3bQ3sfMLa74LqcbRpmMurDurqwXvf6NSBpEqxxJAl3Asbq41nrhYk4SldlPDxJ_UFvBJuYyk50EPUNvRst5V-DO_hDtf2lE'
 });
+
+const categories = ref([
+  { id: 1, name: 'Makanan Utama', icon: 'restaurant', iconBg: 'bg-secondary-container', iconText: 'text-on-secondary-container', items: 42, active: true },
+  { id: 2, name: 'Minuman Dingin', icon: 'local_cafe', iconBg: 'bg-tertiary-container', iconText: 'text-on-tertiary-container', items: 28, active: true },
+  { id: 3, name: 'Cemilan Ringan', icon: 'tapas', iconBg: 'bg-surface-variant', iconText: 'text-on-surface-variant', items: 15, active: false },
+  { id: 4, name: 'Dessert', icon: 'cake', iconBg: 'bg-secondary-container', iconText: 'text-on-secondary-container', items: 8, active: true },
+]);
+
+const expandedCategory = ref<number | null>(null);
+
+const toggleExpand = (id: number) => {
+  if (expandedCategory.value === id) {
+    expandedCategory.value = null;
+  } else {
+    expandedCategory.value = id;
+  }
+};
 </script>
