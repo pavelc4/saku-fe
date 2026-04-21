@@ -7,7 +7,7 @@ import { RouterLink } from 'vue-router'
     <RouterLink to="/" class="font-headline text-3xl font-medium tracking-tight text-primary">Saku.</RouterLink>
     
     <div class="flex items-center gap-6">
-      <RouterLink to="/" class="font-headline text-lg text-near-black hover:text-primary transition-colors duration-200 hidden sm:block">Login</RouterLink>
+      <RouterLink to="/login" class="font-headline text-lg text-near-black hover:text-primary transition-colors duration-200 hidden sm:block">Login</RouterLink>
       <RouterLink to="/register" class="bg-near-black text-surface px-6 py-2.5 rounded-full font-body font-medium shadow-md hover:shadow-lg transition-all duration-200">Register</RouterLink>
     </div>
 
