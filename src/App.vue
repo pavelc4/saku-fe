@@ -1,19 +1,15 @@
 <script setup>
+import { useRoute } from 'vue-router'
+import { computed } from 'vue'
 import Navbar from './components/layout/Navbar.vue'
 import Footer from './components/layout/Footer.vue'
-import Hero from './components/sections/Hero.vue'
-import Features from './components/sections/Features.vue'
-import Team from './components/sections/Team.vue'
+
+const route = useRoute()
+const hideLayout = computed(() => route.path === '/register')
 </script>
 
 <template>
-  <Navbar />
-  
-  <main class="flex-grow">
-    <Hero />
-    <Features />
-    <Team />
-  </main>
-
-  <Footer />
+  <Navbar v-if="!hideLayout" />
+  <router-view />
+  <Footer v-if="!hideLayout" />
 </template>
