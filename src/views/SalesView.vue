@@ -110,6 +110,57 @@
         </div>
       </main>
     </div>
+
+    <!-- Modal Buka Shift (Open Session) -->
+    <div v-if="!isSessionOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-inverse-surface/40 backdrop-blur-md">
+      <!-- Modal Container -->
+      <div class="bg-surface-bright rounded-xl shadow-[0_32px_64px_-12px_rgba(27,28,24,0.15)] w-full max-w-md p-10 transform transition-all relative overflow-hidden">
+        <!-- Decorative Accent -->
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-primary-container opacity-80"></div>
+        <!-- Header -->
+        <div class="text-center mb-10 mt-2">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-container-highest mb-6 text-primary">
+            <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">vpn_key</span>
+          </div>
+          <h2 class="text-3xl font-headline text-on-surface font-medium mb-2 tracking-tight">Buka Shift</h2>
+          <p class="text-sm text-on-surface-variant font-body">Terminal 01 • Evening Shift</p>
+        </div>
+        <!-- Form -->
+        <form class="space-y-8" @submit.prevent="openSession">
+          <!-- Field 1: Cash in Drawer -->
+          <div class="relative">
+            <label class="block text-sm font-medium text-on-surface mb-2 font-body ml-1" for="modal-awal">Modal Awal (Cash in Drawer)</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <span class="text-on-surface-variant font-medium">Rp</span>
+              </div>
+              <input v-model="initialCash" class="block w-full pl-12 pr-4 py-4 bg-surface-container-lowest border-0 rounded-lg text-lg text-on-surface font-body shadow-sm ring-1 ring-inset ring-outline-variant/30 focus:ring-2 focus:ring-inset focus:ring-primary focus:bg-surface-bright transition-colors outline-none" id="modal-awal" name="modal-awal" placeholder="0" type="text"/>
+            </div>
+          </div>
+          <!-- Field 2: Nama Kasir -->
+          <div class="relative">
+            <label class="block text-sm font-medium text-on-surface mb-2 font-body ml-1" for="nama-kasir">Nama Kasir</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-on-surface-variant">
+                <span class="material-symbols-outlined text-lg">person</span>
+              </div>
+              <input v-model="cashierName" class="block w-full pl-12 pr-4 py-4 bg-surface-container-lowest border-0 rounded-lg text-base text-on-surface font-body shadow-sm ring-1 ring-inset ring-outline-variant/30 focus:ring-2 focus:ring-inset focus:ring-primary focus:bg-surface-bright transition-colors outline-none" id="nama-kasir" name="nama-kasir" placeholder="Masukkan nama..." type="text"/>
+            </div>
+          </div>
+          <!-- Actions -->
+          <div class="pt-6">
+            <button type="submit" class="w-full bg-primary hover:bg-primary-container text-on-primary font-body font-medium text-lg py-4 px-6 rounded-full transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary cursor-pointer">
+              Buka Sesi Sekarang
+            </button>
+            <div class="mt-4 text-center">
+              <router-link to="/dashboard" class="text-sm font-body font-medium text-on-surface-variant hover:text-on-surface transition-colors py-2 px-4 rounded-lg hover:bg-surface-container-highest inline-block">
+                Kembali ke Dashboard
+              </router-link>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -123,6 +174,14 @@ const user = ref({
   email: 'elena.r@saku.com',
   avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAhZiiGyoCOsuYv_MGbEOcbH36vmbAaGDdfjR8hJfA58lU8laEpfOvbbiAz4Hgq0-9tQD0aPsQhqNQ-H6T3hZ_MDCbLsMFL5EAlm6ZRipKB_JasZ99qnihhZlGJV-GYTq9K_96gE0TLSOytb_BX0BUV28Irld42gHVRUPPmmuYx2aNM4GUa_IEczq5smFqdhFHayQ8g7oE71Efsd-LykeTpw53mXR90TlZXa1eQsjF56o238LqGAmNbvwz8Ogwnn_Cpe2Cj4wMnjH4'
 });
+
+const isSessionOpen = ref(false);
+const initialCash = ref('500.000');
+const cashierName = ref('Elena R.');
+
+const openSession = () => {
+  isSessionOpen.value = true;
+};
 
 const activeCategory = ref('semua');
 const categories = ref([
