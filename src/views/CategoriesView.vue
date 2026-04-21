@@ -54,7 +54,7 @@
                     <button @click.stop="openEditModal(category)" class="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-surface-container-highest text-on-surface rounded-full font-label text-sm font-semibold hover:bg-surface-variant transition-colors cursor-pointer">
                       <span class="material-symbols-outlined text-[18px]">edit</span> Edit Details
                     </button>
-                    <button class="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-error/10 text-error rounded-full font-label text-sm font-semibold hover:bg-error/20 transition-colors">
+                    <button @click.stop="openDeleteModal(category)" class="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-error/10 text-error rounded-full font-label text-sm font-semibold hover:bg-error/20 transition-colors cursor-pointer">
                       <span class="material-symbols-outlined text-[18px]">delete</span> Delete Category
                     </button>
                   </div>
@@ -269,6 +269,33 @@
       </div>
     </div>
   </div>
+
+  <!-- MODAL OVERLAY (Delete Category) -->
+  <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-inverse-surface/40 backdrop-blur-[2px]">
+    <!-- Confirmation Modal -->
+    <div class="bg-[#f5f4ed] dark:bg-surface-container-low w-full max-w-[480px] rounded-[32px] p-10 shadow-[0_32px_64px_rgba(27,28,24,0.12)] border border-outline-variant/30 flex flex-col transform transition-all">
+      <!-- Icon/Header -->
+      <div class="w-16 h-16 rounded-full bg-error-container/50 flex items-center justify-center mb-6 self-start">
+        <span class="material-symbols-outlined text-error text-3xl" style="font-variation-settings: 'FILL' 1;">warning</span>
+      </div>
+      <!-- Content -->
+      <h2 class="font-headline text-3xl font-medium text-on-surface mb-4 leading-tight text-balance">
+        Hapus Kategori?
+      </h2>
+      <p class="text-on-surface-variant text-[15px] leading-relaxed mb-10 font-body">
+        Apakah Anda yakin ingin menghapus kategori "{{ selectedCategoryToDelete?.name }}"? Semua produk di kategori ini akan dipindahkan ke kategori "Tanpa Kategori".
+      </p>
+      <!-- Actions -->
+      <div class="flex flex-col sm:flex-row justify-end items-center gap-4 mt-auto">
+        <button @click="closeDeleteModal" class="w-full sm:w-auto px-8 py-4 rounded-full bg-surface-container-highest text-on-surface font-medium hover:bg-surface-variant transition-colors duration-200 cursor-pointer">
+          Batal
+        </button>
+        <button @click="confirmDeleteCategory" class="w-full sm:w-auto px-8 py-4 rounded-full bg-[#b53333] text-white font-medium hover:bg-[#9a2b2b] transition-colors duration-200 shadow-sm cursor-pointer">
+          Hapus Kategori
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -303,6 +330,26 @@ const openEditModal = (cat: any) => {
 const closeEditModal = () => {
   showEditModal.value = false;
   selectedCategoryToEdit.value = null;
+};
+
+const showDeleteModal = ref(false);
+const selectedCategoryToDelete = ref<any>(null);
+
+const openDeleteModal = (cat: any) => {
+  selectedCategoryToDelete.value = { ...cat };
+  showDeleteModal.value = true;
+};
+
+const closeDeleteModal = () => {
+  showDeleteModal.value = false;
+  selectedCategoryToDelete.value = null;
+};
+
+const confirmDeleteCategory = () => {
+  if (selectedCategoryToDelete.value) {
+    categories.value = categories.value.filter(c => c.id !== selectedCategoryToDelete.value.id);
+  }
+  closeDeleteModal();
 };
 
 const toggleExpand = (id: number) => {
