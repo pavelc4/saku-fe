@@ -1,18 +1,24 @@
 import apiClient from './client'
 
 export const posApi = {
-  openSession: (data: { opening_balance: number }) =>
-    apiClient.post('/pos/sessions/open', data),
+  openSession: (data: { opening_cash: number }) =>
+    apiClient.post('/pos/session/open', data),
 
-  closeSession: (sessionId: string, data: { closing_balance: number }) =>
-    apiClient.post(`/pos/sessions/${sessionId}/close`, data),
+  closeSession: (data: { closing_cash: number | null }) =>
+    apiClient.post('/pos/session/close', data),
 
   getActiveSession: () =>
-    apiClient.get('/pos/sessions/active'),
+    apiClient.get('/pos/session'),
 
-  createTransaction: (data: object) =>
-    apiClient.post('/pos/transactions', data),
+  createTransaction: (data: {
+    items: { product_id: string; quantity: number }[];
+    payment_method: 'cash' | 'transfer' | 'qris';
+    note?: string;
+    category_id?: string;
+    discount?: number;
+    discount_type?: 'none' | 'fixed' | 'percent';
+  }) => apiClient.post('/pos/checkout', data),
 
-  getTransactions: (params?: { page?: number; limit?: number }) =>
+  getTransactions: (params?: { page?: number; limit?: number; session_id?: string }) =>
     apiClient.get('/pos/transactions', { params }),
 }

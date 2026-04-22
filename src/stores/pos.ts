@@ -24,7 +24,7 @@ export const usePosStore = defineStore('pos', () => {
     loading.value = true
     error.value = null
     try {
-      const res = await posApi.openSession({ opening_balance: openingBalance })
+      const res = await posApi.openSession({ opening_cash: openingBalance })
       activeSession.value = res.data?.data
       return true
     } catch (err: any) {
@@ -40,7 +40,7 @@ export const usePosStore = defineStore('pos', () => {
     loading.value = true
     error.value = null
     try {
-      await posApi.closeSession(activeSession.value.id, { closing_balance: closingBalance })
+      await posApi.closeSession({ closing_cash: closingBalance })
       activeSession.value = null
       return true
     } catch (err: any) {
@@ -51,15 +51,13 @@ export const usePosStore = defineStore('pos', () => {
     }
   }
 
-  async function checkout(items: any[], paymentMethod: string, amountPaid: number) {
+  async function checkout(items: any[], paymentMethod: 'cash' | 'transfer' | 'qris') {
     loading.value = true
     error.value = null
     try {
       const res = await posApi.createTransaction({
-        session_id: activeSession.value?.id,
         items,
         payment_method: paymentMethod,
-        amount_paid: amountPaid,
       })
       return res.data?.data
     } catch (err: any) {

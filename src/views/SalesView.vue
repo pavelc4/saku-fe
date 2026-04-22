@@ -323,8 +323,8 @@ const checkoutSuccess = ref(false);
 const checkout = async () => {
   if (!cart.value.length) return;
   isCheckoutLoading.value = true;
-  const items = cart.value.map(i => ({ product_id: i.id, quantity: i.quantity, price: i.price }));
-  const result = await posStore.checkout(items, 'cash', total.value);
+  const items = cart.value.map(i => ({ product_id: i.id, quantity: i.quantity }));
+  const result = await posStore.checkout(items, 'cash');
   if (result) {
     cartStore.clearCart();
     checkoutSuccess.value = true;
