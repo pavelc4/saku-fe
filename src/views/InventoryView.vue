@@ -550,6 +550,7 @@ const saveProduct = async () => {
   // Upload new photo if exists
   if (ok && editProductImage.value) {
     await productsApi.uploadPhoto(editingProduct.value.id, editProductImage.value);
+    await productsStore.fetchProducts();
   }
   
   editLoading.value = false;
