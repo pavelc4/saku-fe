@@ -410,6 +410,11 @@ const filteredItems = computed(() => {
   return productsStore.items.filter(p => p.category_id === activeTab.value);
 });
 
+const expandedItem = ref<string | null>(null);
+const toggleExpand = (sku: string) => {
+  expandedItem.value = expandedItem.value === sku ? null : sku;
+};
+
 const formatCurrency = (val: number) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val || 0);
 
