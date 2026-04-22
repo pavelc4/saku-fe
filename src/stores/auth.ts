@@ -7,8 +7,8 @@ const R2_PUBLIC_URL = import.meta.env.VITE_R2_PUBLIC_URL || ''
 export function getR2Url(path: string) {
   if (!path) return ''
   if (path.startsWith('http')) return path
-  // Fetch from custom CDN domain
-  return `https://cdn.pavelc4-dev.xyz/${path}`
+  if (R2_PUBLIC_URL) return `${R2_PUBLIC_URL}/${path}`
+  return ''
 }
 
 export const useAuthStore = defineStore('auth', () => {
