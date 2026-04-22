@@ -58,6 +58,7 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = null
     user.value = null
     localStorage.removeItem('saku_token')
+    window.location.href = '/login'
   }
 
   // Auto fetch user on init if token exists
