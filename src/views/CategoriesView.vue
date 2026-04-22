@@ -69,7 +69,7 @@
                   <div>
                     <label class="block font-label text-xs uppercase tracking-widest font-bold text-on-surface-variant mb-3">Base Tax Rate (%)</label>
                     <div class="relative group">
-                      <input class="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3.5 font-body text-on-surface focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all outline-none" type="number" value="11.00" />
+                      <input v-model.number="settings.tax_rate" class="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3.5 font-body text-on-surface focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all outline-none" type="number" step="0.1" />
                       <span class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant material-symbols-outlined text-xl">percent</span>
                     </div>
                     <p class="font-body text-[11px] text-on-surface-variant mt-2 px-1">Applied globally unless overridden per item.</p>
@@ -90,15 +90,15 @@
                     <label class="flex items-center justify-between cursor-pointer group p-1">
                       <span class="font-label text-sm font-semibold text-on-surface">Auto-sync Inventory</span>
                       <div class="relative inline-flex items-center">
-                        <input checked type="checkbox" class="sr-only peer" />
+                        <input v-model="settings.auto_sync_inventory" type="checkbox" class="sr-only peer" />
                         <div class="w-11 h-6 bg-surface-dim peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                       </div>
                     </label>
                   </div>
 
                   <div class="pt-8">
-                    <button class="w-full bg-near-black text-white hover:bg-on-surface-variant py-4 rounded-full font-label font-bold text-sm transition-all active:scale-[0.98] shadow-md">
-                      Save Configuration
+                    <button @click="saveSettings" :disabled="settingsLoading" class="w-full bg-near-black text-white hover:bg-on-surface-variant py-4 rounded-full font-label font-bold text-sm transition-all active:scale-[0.98] shadow-md disabled:opacity-50">
+                      {{ settingsLoading ? 'Menyimpan...' : 'Save Configuration' }}
                     </button>
                   </div>
                 </div>
@@ -304,11 +304,40 @@ import Sidebar from '../components/layout/Sidebar.vue';
 import TopNav from '../components/layout/TopNav.vue';
 import { useAuthStore } from '../stores/auth';
 import { useCategoriesStore } from '../stores/categories';
+import { settingsApi } from '../api/settings';
 
 const authStore = useAuthStore();
 const categoriesStore = useCategoriesStore();
 
 const user = computed(() => ({ name: authStore.user?.name || 'Admin', email: authStore.user?.email || '' }));
+
+// Global Settings
+const settingsLoading = ref(false);
+const settings = ref({
+  tax_rate: 11,
+  currency: 'IDR',
+  auto_sync_inventory: true,
+});
+
+const loadSettings = async () => {
+  try {
+    const res = await settingsApi.get();
+    if (res.data?.data) {
+      settings.value = res.data.data;
+    }
+  } catch (e) { console.error(e); }
+};
+
+const saveSettings = async () => {
+  settingsLoading.value = true;
+  try {
+    await settingsApi.update({
+      tax_rate: settings.value.tax_rate,
+      auto_sync_inventory: settings.value.auto_sync_inventory,
+    });
+  } catch (e) { console.error(e); }
+  settingsLoading.value = false;
+};
 
 const expandedCategory = ref<string | null>(null);
 const toggleExpand = (id: string) => {
@@ -364,5 +393,6 @@ const toggleActive = async (id: string, isActive: boolean) => {
 
 onMounted(() => {
   categoriesStore.fetchCategories();
+  loadSettings();
 });
 </script>

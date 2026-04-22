@@ -249,6 +249,7 @@ import { useProductsStore } from '../stores/products';
 import { useCategoriesStore } from '../stores/categories';
 import { usePosStore } from '../stores/pos';
 import { useCartStore } from '../stores/cart';
+import { settingsApi } from '../api/settings';
 
 const authStore = useAuthStore();
 const productsStore = useProductsStore();
@@ -342,6 +343,15 @@ onMounted(async () => {
     productsStore.fetchProducts(),
     categoriesStore.fetchCategories(),
   ]);
+  
+  // Load tax rate from settings
+  try {
+    const res = await settingsApi.get();
+    if (res.data?.data?.tax_rate) {
+      cartStore.setTaxRate(res.data.data.tax_rate);
+    }
+  } catch (e) { console.error(e); }
+  
   if (!isSessionOpen.value) isModalOpen.value = true;
 });
 </script>

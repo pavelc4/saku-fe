@@ -3,18 +3,25 @@ import { defineStore } from 'pinia'
 export const useCartStore = defineStore('cart', {
   state: () => ({
     items: [],
+    taxRate: 11, // default 11%
   }),
   
   getters: {
     totalItems: (state) => state.items.reduce((total, item) => total + item.quantity, 0),
     subtotal: (state) => state.items.reduce((total, item) => total + (item.price * item.quantity), 0),
-    tax: (state) => state.items.reduce((total, item) => total + (item.price * item.quantity), 0) * 0.1, // Misal pajak 10%
+    tax() {
+      return this.subtotal * (this.taxRate / 100)
+    },
     totalPrice() {
       return this.subtotal + this.tax
     }
   },
 
   actions: {
+    setTaxRate(rate) {
+      this.taxRate = rate || 11
+    },
+
     addToCart(product) {
       const existingItem = this.items.find(item => item.id === product.id)
       if (existingItem) {
