@@ -94,10 +94,10 @@
                 <span>Subtotal</span>
                 <span>{{ formatCurrency(subtotal) }}</span>
               </div>
-              <div class="flex justify-between text-sm text-secondary">
-                <span>Tax (10%)</span>
-                <span>{{ formatCurrency(tax) }}</span>
-              </div>
+               <div class="flex justify-between text-sm text-secondary">
+                 <span>Tax ({{ taxRate }}%)</span>
+                 <span>{{ formatCurrency(tax) }}</span>
+               </div>
               <div class="flex justify-between items-end pt-3">
                 <span class="font-headline text-lg text-on-surface">Total</span>
                 <span class="font-headline text-3xl font-bold text-primary tracking-tight">{{ formatCurrency(total) }}</span>
@@ -304,6 +304,7 @@ const products = computed(() => {
 });
 
 const cart = computed(() => cartStore.items);
+const taxRate = computed(() => cartStore.taxRate);
 
 const addToCart = (product: any) => cartStore.addToCart(product);
 const increaseQty = (index: number) => {
