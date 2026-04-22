@@ -55,7 +55,6 @@ const navItems = ref([
   { name: 'Categories', icon: 'category', path: '/categories' },
   { name: 'Notifications', icon: 'notifications', path: '/notifications' },
   { name: 'AI', icon: 'auto_awesome', path: '/ai-insights' },
-  { name: 'Staff', icon: 'groups', path: '/staff' },
 ]);
 
 const footerItems = ref([
