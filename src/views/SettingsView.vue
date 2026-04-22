@@ -12,7 +12,7 @@
             <h2 class="text-4xl font-headline font-medium text-on-surface mb-2">User Settings</h2>
             <p class="text-secondary font-body">Manage your profile, security, and preferences.</p>
           </div>
-          
+
           <!-- 1. Profile Header -->
           <section class="bg-surface-container-lowest rounded-lg p-8 shadow-[0_8px_48px_rgba(27,28,24,0.04)]">
             <h3 class="text-2xl font-headline font-medium text-on-surface mb-8">Profile Details</h3>
@@ -31,7 +31,7 @@
               </div>
             </div>
           </section>
-          
+
           <!-- 2. Account Information -->
           <section class="bg-surface-container-lowest rounded-lg p-8 shadow-[0_8px_48px_rgba(27,28,24,0.04)]">
             <h3 class="text-2xl font-headline font-medium text-on-surface mb-8">Account Information</h3>
@@ -53,8 +53,45 @@
               </div>
             </form>
           </section>
-          
-          <!-- 3. Security -->
+
+          <!-- 3. Global Defaults -->
+          <section class="bg-surface-container-lowest rounded-lg p-8 shadow-[0_8px_48px_rgba(27,28,24,0.04)]">
+            <h3 class="text-2xl font-headline font-medium text-on-surface mb-8">Global Defaults</h3>
+            <p class="text-on-surface-variant font-body mb-6">Settings that apply across the entire system unless overridden per item.</p>
+            <form class="space-y-6" @submit.prevent="saveGlobalDefaults">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Base Tax Rate -->
+                <div class="space-y-2">
+                  <label class="block text-sm font-label font-medium text-on-surface-variant" for="taxRate">Base Tax Rate (%)</label>
+                  <input v-model.number="settings.tax_rate" class="w-full bg-surface-container border-transparent focus:border-outline-variant focus:bg-surface-container-lowest text-on-surface rounded-xl py-3 px-4 transition-colors font-label focus:ring-0" id="taxRate" type="number" min="0" step="0.01" />
+                  <p class="text-xs text-secondary font-body">Applied globally unless overridden per item.</p>
+                </div>
+
+                <!-- Default Currency -->
+                <div class="space-y-2">
+                  <label class="block text-sm font-label font-medium text-on-surface-variant" for="currency">Default Currency</label>
+                  <input v-model="settings.currency" class="w-full bg-surface-container border-transparent focus:border-outline-variant focus:bg-surface-container-lowest text-on-surface rounded-xl py-3 px-4 transition-colors font-label focus:ring-0" id="currency" type="text" />
+                  <p class="text-xs text-secondary font-body">Used for all transactions unless specified otherwise.</p>
+                </div>
+
+                <!-- Auto-sync Inventory -->
+                <div class="space-y-4">
+                  <div class="flex items-center">
+                    <input v-model="settings.auto_sync_inventory" class="h-4 w-4 rounded border-surface-container-highest text-primary focus:ring-primary" type="checkbox" />
+                    <span class="ml-3 text-sm font-label font-medium text-on-surface">Auto-sync Inventory</span>
+                  </div>
+                  <p class="text-xs text-secondary font-body ml-5">Automatically adjust inventory levels when sales are made.</p>
+                </div>
+              </div>
+              <div class="pt-4 flex justify-end">
+                <button class="bg-primary text-on-primary font-label font-medium px-8 py-3 rounded-full hover:bg-surface-tint shadow-[0_4px_16px_rgba(154,64,33,0.2)] transition-all hover:shadow-[0_8px_24px_rgba(154,64,33,0.3)] cursor-pointer" type="submit">
+                  Save Settings
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <!-- 4. Security -->
           <section class="bg-surface-container-lowest rounded-lg p-8 shadow-[0_8px_48px_rgba(27,28,24,0.04)]">
             <div class="flex items-center gap-3 mb-8">
               <span class="material-symbols-outlined text-primary">lock</span>
@@ -80,8 +117,8 @@
               </div>
             </form>
           </section>
-          
-          <!-- 4. Danger Zone -->
+
+          <!-- 5. Danger Zone -->
           <section class="bg-error-container/30 rounded-lg p-8 shadow-[0_8px_48px_rgba(186,26,26,0.02)]">
             <h3 class="text-2xl font-headline font-medium text-error mb-4">Danger Zone</h3>
             <p class="text-on-surface-variant font-body mb-6">Once you delete your account, there is no going back. Please be certain.</p>
@@ -90,7 +127,7 @@
             </button>
           </section>
         </div>
-        
+
         <div class="h-12"></div>
       </main>
     </div>
@@ -104,67 +141,105 @@ import TopNav from '../components/layout/TopNav.vue';
 import { useAuthStore } from '../stores/auth';
 import { usersApi } from '../api/users';
 import { authApi } from '../api/auth';
+import { settingsApi } from '../api/settings';
 
 const authStore = useAuthStore();
 
-const user = computed(() => authStore.user)
+const user = computed(() => authStore.user);
 
-const profileForm = ref({ name: '', email: '' })
-const passwords = ref({ current: '', new: '', confirm: '' })
-const saveLoading = ref(false)
-const saveSuccess = ref(false)
-const saveError = ref<string | null>(null)
-const passwordError = ref<string | null>(null)
-const passwordSuccess = ref(false)
+// Profile form
+const profileForm = ref({ name: '', email: '' });
+const saveLoading = ref(false);
+const saveSuccess = ref(false);
+const saveError = ref<string | null>(null);
+
+// Password form
+const passwords = ref({ current: '', new: '', confirm: '' });
+const passwordError = ref<string | null>(null);
+const passwordSuccess = ref(false);
+
+// Global defaults
+const settings = ref({
+  tax_rate: 0,
+  currency: '',
+  auto_sync_inventory: false
+});
+const saveSettingsLoading = ref(false);
+const saveSettingsSuccess = ref(false);
+const saveSettingsError = ref<string | null>(null);
 
 async function saveProfile() {
-  saveLoading.value = true
-  saveError.value = null
-  saveSuccess.value = false
+  saveLoading.value = true;
+  saveError.value = null;
+  saveSuccess.value = false;
   try {
-    await usersApi.updateProfile({ name: profileForm.value.name, email: profileForm.value.email })
-    await authStore.fetchMe()
-    saveSuccess.value = true
-    setTimeout(() => saveSuccess.value = false, 3000)
+    await usersApi.updateProfile({ name: profileForm.value.name, email: profileForm.value.email });
+    await authStore.fetchMe();
+    saveSuccess.value = true;
+    setTimeout(() => saveSuccess.value = false, 3000);
   } catch (err: any) {
-    saveError.value = err.response?.data?.error?.message || 'Gagal menyimpan profil'
+    saveError.value = err.response?.data?.error?.message || 'Gagal menyimpan profil';
   } finally {
-    saveLoading.value = false
+    saveLoading.value = false;
+  }
+}
+
+async function saveGlobalDefaults() {
+  saveSettingsLoading.value = true;
+  saveSettingsError.value = null;
+  saveSettingsSuccess.value = false;
+  try {
+    await settingsApi.update(settings.value);
+    saveSettingsSuccess.value = true;
+    setTimeout(() => saveSettingsSuccess.value = false, 3000);
+  } catch (err: any) {
+    saveSettingsError.value = err.response?.data?.error?.message || 'Gagal menyimpan pengaturan';
+  } finally {
+    saveSettingsLoading.value = false;
   }
 }
 
 async function updatePassword() {
-  passwordError.value = null
-  passwordSuccess.value = false
+  passwordError.value = null;
+  passwordSuccess.value = false;
   if (passwords.value.new !== passwords.value.confirm) {
-    passwordError.value = 'Password baru tidak cocok'
-    return
+    passwordError.value = 'Password baru tidak cocok';
+    return;
   }
   if (passwords.value.new.length < 8) {
-    passwordError.value = 'Password minimal 8 karakter'
-    return
+    passwordError.value = 'Password minimal 8 karakter';
+    return;
   }
   try {
-    await usersApi.updateProfile({ name: profileForm.value.name } as any)
-    passwordSuccess.value = true
-    passwords.value = { current: '', new: '', confirm: '' }
-    setTimeout(() => passwordSuccess.value = false, 3000)
+    // Note: The updatePassword endpoint might be different, but using updateProfile for now as in original
+    await usersApi.updateProfile({ name: profileForm.value.name } as any);
+    passwordSuccess.value = true;
+    passwords.value = { current: '', new: '', confirm: '' };
+    setTimeout(() => passwordSuccess.value = false, 3000);
   } catch (err: any) {
-    passwordError.value = err.response?.data?.error?.message || 'Gagal mengubah password'
+    passwordError.value = err.response?.data?.error?.message || 'Gagal mengubah password';
   }
 }
 
 async function deleteAccount() {
   if (confirm('Apakah Anda yakin ingin menghapus akun? Tindakan ini tidak dapat dibatalkan.')) {
-    await authStore.logout()
+    await authStore.logout();
   }
 }
 
 onMounted(() => {
   if (authStore.user) {
-    profileForm.value.name = authStore.user.name || ''
-    profileForm.value.email = authStore.user.email || ''
+    profileForm.value.name = authStore.user.name || '';
+    profileForm.value.email = authStore.user.email || '';
   }
-})
+  
+  // Load global defaults
+  settingsApi.get().then((response) => {
+    if (response.data) {
+      settings.value = response.data;
+    }
+  }).catch((err) => {
+    console.error('Failed to load settings:', err);
+  });
+});
 </script>
-
