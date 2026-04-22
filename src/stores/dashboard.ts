@@ -28,11 +28,19 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
       metrics.value = summaryRes.data?.data
       recentTransactions.value = transRes.data?.data?.items || transRes.data?.data || []
-      dailyInsight.value = dailyRes.data?.data
+      
+      const dailyData = dailyRes.data?.data || {}
+      dailyInsight.value = dailyData
+      topSelling.value = (dailyData.top_sold_items || []).slice(0, 5).map((item: any) => ({
+        id: item.product_id || item.id || '',
+        name: item.name || 'Unknown',
+        sold: item.qty || item.quantity || 0,
+        revenue: item.total || 0,
+        image_url: '',
+      }))
 
       const products = productsRes.data?.data?.items || productsRes.data?.data || []
       lowStock.value = products.filter((p: any) => p.stock <= 5 && p.stock > 0).slice(0, 5)
-      topSelling.value = products.filter((p: any) => p.stock === 0).slice(0, 5)
 
       const posSummary = posSummaryRes.data?.data
       weeklyRevenue.value = posSummary?.daily_income 

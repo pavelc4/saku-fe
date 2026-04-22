@@ -24,7 +24,7 @@
           </div>
           <!-- Progress Bar -->
           <div class="h-1.5 w-full bg-surface-container-highest rounded-full mt-2 overflow-hidden">
-            <div class="h-full bg-primary rounded-full" :style="{ width: `${(product.sold / maxSold) * 100}%` }"></div>
+            <div class="h-full bg-primary rounded-full" :style="{ width: `${(product.sold / product.maxSold) * 100}%` }"></div>
           </div>
         </div>
       </div>
@@ -38,13 +38,20 @@ import { useDashboardStore } from '../../stores/dashboard'
 
 const dashboardStore = useDashboardStore()
 
-const topProducts = computed(() =>
-  dashboardStore.topSelling.map(p => ({
+const formatCurrency = (val: number) =>
+  new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val || 0)
+
+const topProducts = computed(() => {
+  const items = dashboardStore.topSelling
+  const maxSold = Math.max(...items.map((p: any) => p.sold || 0), 1)
+  return items.map((p: any) => ({
     id: p.id,
     name: p.name,
-    sold: 0,
+    sold: p.sold || 0,
+    revenue: p.revenue || 0,
     image: p.image_url || '',
     initials: p.name?.slice(0, 2).toUpperCase() || 'PR',
+    maxSold,
   }))
-)
+})
 </script>
