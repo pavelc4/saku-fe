@@ -101,7 +101,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center p-4 lg:px-6">
               <div class="col-span-1 lg:col-span-4 flex items-center gap-4">
                 <template v-if="item.image">
-                  <img :src="item.image" :alt="item.name" class="w-12 h-12 rounded-lg object-cover" />
+                  <img :src="getR2Url(item.image)" :alt="item.name" class="w-12 h-12 rounded-lg object-cover" />
                 </template>
                 <template v-else>
                   <div class="w-12 h-12 rounded-lg bg-surface-container-highest flex items-center justify-center text-on-surface-variant">
