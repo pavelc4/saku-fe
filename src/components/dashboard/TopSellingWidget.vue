@@ -40,8 +40,9 @@ const dashboardStore = useDashboardStore()
 
 const topProducts = computed(() =>
   dashboardStore.topSelling.map(p => ({
+    id: p.id,
     name: p.name,
-    sold: p.sold || 0,
+    sold: 0,
     image: p.image_url || '',
     initials: p.name?.slice(0, 2).toUpperCase() || 'PR',
   }))
