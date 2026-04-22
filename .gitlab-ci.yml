@@ -1,0 +1,42 @@
+stages:
+  - test
+  - build
+
+variables:
+  VITE_API_URL: "http://localhost:8787"
+
+# FE Unit Tests
+fe:test:
+  stage: test
+  image: oven/bun:latest
+  cache:
+    key: fe-$CI_COMMIT_REF_SLUG
+    paths:
+      - node_modules/
+  script:
+    - bun install
+    - bun run test
+  artifacts:
+    when: always
+    reports:
+      junit: test-results.xml
+
+# FE Build
+fe:build:
+  stage: build
+  image: oven/bun:latest
+  needs: [fe:test]
+  cache:
+    key: fe-$CI_COMMIT_REF_SLUG
+    paths:
+      - node_modules/
+  script:
+    - bun install
+    - bun run build
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 week
+  only:
+    - main
+    - master

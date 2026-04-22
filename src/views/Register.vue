@@ -101,9 +101,13 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
+
+const router = useRouter()
+const authStore = useAuthStore()
 
 const form = ref({
   fullName: '',
@@ -112,8 +116,12 @@ const form = ref({
 })
 
 const showPassword = ref(false)
-const handleRegister = () => {
-  console.log('Mengirim data registrasi ke backend:', form.value)
-  alert(`Selamat datang di Saku, ${form.value.fullName}!`)
+const successMessage = ref('')
+
+async function handleRegister() {
+  const success = await authStore.register(form.value.fullName, form.value.email, form.value.password)
+  if (success) {
+    successMessage.value = 'Registrasi berhasil! Silakan cek email Anda untuk verifikasi.'
+  }
 }
 </script>

@@ -83,8 +83,14 @@
               <label class="text-sm text-on-surface-variant font-medium select-none cursor-pointer" for="remember">Ingat sesi saya</label>
             </div>
 
-            <button class="w-full py-4 bg-primary text-on-primary rounded-xl font-bold text-lg shadow-lg shadow-primary/20 hover:bg-surface-tint active:scale-[0.98] transition-all flex items-center justify-center gap-2" type="submit">
-              Masuk Sekarang
+            <!-- Error Message -->
+            <div v-if="authStore.error" class="p-4 bg-error/10 text-error rounded-xl text-sm font-medium">
+              {{ authStore.error }}
+            </div>
+
+            <button :disabled="authStore.loading" class="w-full py-4 bg-primary text-on-primary rounded-xl font-bold text-lg shadow-lg shadow-primary/20 hover:bg-surface-tint active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed" type="submit">
+              <span v-if="authStore.loading">Memproses...</span>
+              <span v-else>Masuk Sekarang</span>
               <span class="material-symbols-outlined text-xl">arrow_forward</span>
             </button>
           </form>
@@ -120,3 +126,24 @@
     </main>
   </div>
 </template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
+
+const router = useRouter()
+const authStore = useAuthStore()
+
+const email = ref('')
+const password = ref('')
+const showPassword = ref(false)
+const rememberMe = ref(false)
+
+async function handleLogin() {
+  const success = await authStore.login(email.value, password.value)
+  if (success) {
+    router.push({ name: 'dashboard' })
+  }
+}
+</script>

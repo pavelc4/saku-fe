@@ -19,53 +19,76 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/dashboard',
     name: 'dashboard',
-    component: DashboardView
+    component: DashboardView,
+    meta: { requiresAuth: true }
   },
   {
     path: '/sales',
     name: 'sales',
-    component: SalesView
+    component: SalesView,
+    meta: { requiresAuth: true }
   },
   {
     path: '/inventory',
     name: 'inventory',
-    component: InventoryView
+    component: InventoryView,
+    meta: { requiresAuth: true }
   },
   {
     path: '/categories',
     name: 'categories',
-    component: CategoriesView
+    component: CategoriesView,
+    meta: { requiresAuth: true }
   },
   {
     path: '/notifications',
     name: 'notifications',
-    component: NotificationsView
+    component: NotificationsView,
+    meta: { requiresAuth: true }
   },
   {
     path: '/ai-insights',
     name: 'ai-insights',
-    component: AiInsightsView
+    component: AiInsightsView,
+    meta: { requiresAuth: true }
   },
   {
     path: '/settings',
     name: 'settings',
-    component: SettingsView
+    component: SettingsView,
+    meta: { requiresAuth: true }
   },
   {
     path: '/login',
     name: 'login',
-    component: Login
+    component: Login,
+    meta: { guestOnly: true }
   },
   {
     path: '/register',
     name: 'register',
-    component: Register
+    component: Register,
+    meta: { guestOnly: true }
   }
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+router.beforeEach((to, _from, next) => {
+  const token = localStorage.getItem('saku_token')
+
+  if (to.meta.requiresAuth && !token) {
+    return next({ name: 'login' })
+  }
+
+  if (to.meta.guestOnly && token) {
+    return next({ name: 'dashboard' })
+  }
+
+  next()
 })
 
 export default router
