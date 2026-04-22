@@ -20,7 +20,7 @@ export const useCategoriesStore = defineStore('categories', () => {
     }
   }
 
-  async function createCategory(data: { name: string; description?: string }) {
+  async function createCategory(data: { name: string; color?: string }) {
     loading.value = true
     error.value = null
     try {
@@ -32,6 +32,17 @@ export const useCategoriesStore = defineStore('categories', () => {
       return false
     } finally {
       loading.value = false
+    }
+  }
+
+  async function toggleActive(id: string, isActive: boolean) {
+    try {
+      await categoriesApi.update(id, { is_active: isActive })
+      const idx = items.value.findIndex(c => c.id === id)
+      if (idx !== -1) items.value[idx].is_active = isActive
+      return true
+    } catch (err: any) {
+      return false
     }
   }
 
@@ -66,5 +77,5 @@ export const useCategoriesStore = defineStore('categories', () => {
     }
   }
 
-  return { items, loading, error, fetchCategories, createCategory, updateCategory, deleteCategory }
+  return { items, loading, error, fetchCategories, createCategory, updateCategory, deleteCategory, toggleActive }
 })

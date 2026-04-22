@@ -42,7 +42,7 @@
                     
                     <div class="flex items-center" @click.stop>
                       <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" class="sr-only peer" v-model="category.active" />
+                        <input type="checkbox" class="sr-only peer" :checked="category.is_active !== false" @change="toggleActive(category.id, !category.is_active)" />
                         <div class="w-11 h-6 bg-outline-variant/50 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                       </label>
                     </div>
@@ -128,7 +128,7 @@
         <!-- Input: Nama Kategori -->
         <div class="flex flex-col gap-3">
           <label class="font-label text-sm font-semibold text-on-surface-variant uppercase tracking-wider" for="categoryName">Nama Kategori</label>
-          <input class="w-full bg-surface-container-low hover:bg-surface-container transition-colors border-0 rounded-lg px-5 py-4 font-body text-on-surface text-lg placeholder:text-on-surface-variant/50 focus:ring-0 focus:bg-surface-container-highest" id="categoryName" placeholder="Misal: Dessert atau Coffee" type="text" />
+          <input v-model="newCategoryName" class="w-full bg-surface-container-low hover:bg-surface-container transition-colors border-0 rounded-lg px-5 py-4 font-body text-on-surface text-lg placeholder:text-on-surface-variant/50 focus:ring-0 focus:bg-surface-container-highest" id="categoryName" placeholder="Misal: Dessert atau Coffee" type="text" />
         </div>
         
         <!-- Input: Ikon Kategori -->
@@ -196,8 +196,8 @@
         <button @click="showAddModal = false" class="px-8 py-3 rounded-full font-label font-semibold text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer" type="button">
           Batal
         </button>
-        <button @click="showAddModal = false" class="px-8 py-3 rounded-full font-label font-semibold bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container shadow-[0_8px_16px_-4px_rgba(154,64,33,0.2)] transition-all cursor-pointer" type="button">
-          Tambah Kategori
+        <button @click="addCategory" :disabled="addLoading" class="px-8 py-3 rounded-full font-label font-semibold bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container shadow-[0_8px_16px_-4px_rgba(154,64,33,0.2)] transition-all cursor-pointer disabled:opacity-50" type="button">
+          {{ addLoading ? 'Menyimpan...' : 'Tambah Kategori' }}
         </button>
       </div>
     </div>
@@ -263,8 +263,8 @@
         <button @click="closeEditModal" class="px-6 py-3 rounded-full text-on-surface font-bold hover:bg-surface-container-highest transition-colors cursor-pointer">
           Cancel
         </button>
-        <button @click="closeEditModal" class="px-6 py-3 rounded-full bg-primary text-white font-bold hover:bg-primary-container transition-colors shadow-sm shadow-primary/20 cursor-pointer">
-          Save Changes
+        <button @click="saveEditCategory" :disabled="editLoading" class="px-6 py-3 rounded-full bg-primary text-white font-bold hover:bg-primary-container transition-colors shadow-sm shadow-primary/20 cursor-pointer disabled:opacity-50">
+          {{ editLoading ? 'Menyimpan...' : 'Save Changes' }}
         </button>
       </div>
     </div>
@@ -290,8 +290,8 @@
         <button @click="closeDeleteModal" class="w-full sm:w-auto px-8 py-4 rounded-full bg-surface-container-highest text-on-surface font-medium hover:bg-surface-variant transition-colors duration-200 cursor-pointer">
           Batal
         </button>
-        <button @click="confirmDeleteCategory" class="w-full sm:w-auto px-8 py-4 rounded-full bg-[#b53333] text-white font-medium hover:bg-[#9a2b2b] transition-colors duration-200 shadow-sm cursor-pointer">
-          Hapus Kategori
+        <button @click="confirmDeleteCategory" :disabled="deleteLoading" class="w-full sm:w-auto px-8 py-4 rounded-full bg-[#b53333] text-white font-medium hover:bg-[#9a2b2b] transition-colors duration-200 shadow-sm cursor-pointer disabled:opacity-50">
+          {{ deleteLoading ? 'Menghapus...' : 'Hapus Kategori' }}
         </button>
       </div>
     </div>
@@ -317,36 +317,49 @@ const toggleExpand = (id: string) => {
 
 // Add Modal
 const showAddModal = ref(false);
-const newCategory = ref({ name: '', icon: 'local_cafe', color: '#c96442' });
+const newCategoryName = ref('');
+const addLoading = ref(false);
 const addCategory = async () => {
-  const ok = await categoriesStore.createCategory({ name: newCategory.value.name });
+  if (!newCategoryName.value.trim()) return;
+  addLoading.value = true;
+  const ok = await categoriesStore.createCategory({ name: newCategoryName.value, color: '#c96442' });
+  addLoading.value = false;
   if (ok) {
     showAddModal.value = false;
-    newCategory.value = { name: '', icon: 'local_cafe', color: '#c96442' };
+    newCategoryName.value = '';
   }
 };
 
 // Edit Modal
 const showEditModal = ref(false);
+const editLoading = ref(false);
 const selectedCategoryToEdit = ref<any>(null);
 const openEditModal = (cat: any) => { selectedCategoryToEdit.value = { ...cat }; showEditModal.value = true; };
 const closeEditModal = () => { showEditModal.value = false; selectedCategoryToEdit.value = null; };
 const saveEditCategory = async () => {
   if (!selectedCategoryToEdit.value) return;
+  editLoading.value = true;
   const ok = await categoriesStore.updateCategory(selectedCategoryToEdit.value.id, { name: selectedCategoryToEdit.value.name });
+  editLoading.value = false;
   if (ok) closeEditModal();
 };
 
 // Delete Modal
 const showDeleteModal = ref(false);
+const deleteLoading = ref(false);
 const selectedCategoryToDelete = ref<any>(null);
 const openDeleteModal = (cat: any) => { selectedCategoryToDelete.value = { ...cat }; showDeleteModal.value = true; };
 const closeDeleteModal = () => { showDeleteModal.value = false; selectedCategoryToDelete.value = null; };
 const confirmDeleteCategory = async () => {
-  if (selectedCategoryToDelete.value) {
-    await categoriesStore.deleteCategory(selectedCategoryToDelete.value.id);
-  }
+  if (!selectedCategoryToDelete.value) return;
+  deleteLoading.value = true;
+  await categoriesStore.deleteCategory(selectedCategoryToDelete.value.id);
+  deleteLoading.value = false;
   closeDeleteModal();
+};
+
+const toggleActive = async (id: string, isActive: boolean) => {
+  await categoriesStore.toggleActive(id, isActive);
 };
 
 onMounted(() => {
