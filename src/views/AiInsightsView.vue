@@ -83,11 +83,11 @@
           <div class="max-w-3xl mx-auto relative">
             <div class="absolute inset-0 bg-surface-container-lowest/80 backdrop-blur-xl rounded-full shadow-[0_16px_48px_rgba(27,28,24,0.08)]"></div>
             <div class="relative flex items-center p-2 pl-6">
-              <input class="flex-1 bg-transparent border-none text-on-surface placeholder:text-secondary focus:ring-0 text-lg font-body py-4 outline-none" placeholder="Ask your consultant..." type="text"/>
+              <input v-model="advisorQuestion" @keyup.enter="askAdvisor" class="flex-1 bg-transparent border-none text-on-surface placeholder:text-secondary focus:ring-0 text-lg font-body py-4 outline-none" placeholder="Ask your consultant..." type="text"/>
               <button class="w-12 h-12 rounded-full flex items-center justify-center text-secondary hover:bg-surface-container-highest transition-colors mr-2 cursor-pointer">
                 <span class="material-symbols-outlined">attach_file</span>
               </button>
-              <button class="w-14 h-14 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-full flex items-center justify-center hover:opacity-90 transition-opacity shadow-[0_8px_24px_rgba(154,64,33,0.3)] cursor-pointer">
+              <button @click="askAdvisor" :disabled="advisorLoading || !advisorQuestion.trim()" class="w-14 h-14 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-full flex items-center justify-center hover:opacity-90 transition-opacity shadow-[0_8px_24px_rgba(154,64,33,0.3)] cursor-pointer disabled:opacity-50">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">arrow_upward</span>
               </button>
             </div>
