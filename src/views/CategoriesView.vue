@@ -134,42 +134,13 @@
         <!-- Input: Ikon Kategori -->
         <div class="flex flex-col gap-3">
           <label class="font-label text-sm font-semibold text-on-surface-variant uppercase tracking-wider">Ikon Kategori</label>
-          <div class="grid grid-cols-6 gap-3">
-            <button class="aspect-square rounded-full bg-primary-container text-on-primary-container flex items-center justify-center transition-colors cursor-pointer" type="button">
-              <span class="material-symbols-outlined" data-icon="local_cafe" data-weight="fill" style="font-variation-settings: 'FILL' 1;">local_cafe</span>
-            </button>
-            <button class="aspect-square rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors flex items-center justify-center cursor-pointer" type="button">
-              <span class="material-symbols-outlined" data-icon="restaurant">restaurant</span>
-            </button>
-            <button class="aspect-square rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors flex items-center justify-center cursor-pointer" type="button">
-              <span class="material-symbols-outlined" data-icon="local_pizza">local_pizza</span>
-            </button>
-            <button class="aspect-square rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors flex items-center justify-center cursor-pointer" type="button">
-              <span class="material-symbols-outlined" data-icon="cake">cake</span>
-            </button>
-            <button class="aspect-square rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors flex items-center justify-center cursor-pointer" type="button">
-              <span class="material-symbols-outlined" data-icon="icecream">icecream</span>
-            </button>
-            <button class="aspect-square rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors flex items-center justify-center cursor-pointer" type="button">
-              <span class="material-symbols-outlined" data-icon="local_bar">local_bar</span>
-            </button>
-            <button class="aspect-square rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors flex items-center justify-center cursor-pointer" type="button">
-              <span class="material-symbols-outlined" data-icon="bakery_dining">bakery_dining</span>
-            </button>
-            <button class="aspect-square rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors flex items-center justify-center cursor-pointer" type="button">
-              <span class="material-symbols-outlined" data-icon="fastfood">fastfood</span>
-            </button>
-            <button class="aspect-square rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors flex items-center justify-center cursor-pointer" type="button">
-              <span class="material-symbols-outlined" data-icon="ramen_dining">ramen_dining</span>
-            </button>
-            <button class="aspect-square rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors flex items-center justify-center cursor-pointer" type="button">
-              <span class="material-symbols-outlined" data-icon="kebab_dining">kebab_dining</span>
-            </button>
-            <button class="aspect-square rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors flex items-center justify-center cursor-pointer" type="button">
-              <span class="material-symbols-outlined" data-icon="tapas">tapas</span>
-            </button>
-            <button class="aspect-square rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors flex items-center justify-center cursor-pointer" type="button">
-              <span class="material-symbols-outlined" data-icon="liquor">liquor</span>
+          <div class="grid grid-cols-8 gap-2">
+            <button v-for="icon in categoryIcons" :key="icon"
+              @click="newCategoryIcon = icon"
+              :class="['aspect-square rounded-xl flex items-center justify-center transition-all cursor-pointer',
+                newCategoryIcon === icon ? 'bg-primary text-on-primary shadow-md scale-105' : 'bg-surface-container hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface']"
+              type="button">
+              <span class="material-symbols-outlined text-xl">{{ icon }}</span>
             </button>
           </div>
         </div>
@@ -177,16 +148,13 @@
         <!-- Input: Warna Aksen (Color Picker) -->
         <div class="flex flex-col gap-3">
           <label class="font-label text-sm font-semibold text-on-surface-variant uppercase tracking-wider">Warna Aksen</label>
-          <div class="flex gap-4 items-center">
-            <button aria-label="Select primary color" class="w-10 h-10 rounded-full bg-primary relative flex items-center justify-center cursor-pointer" type="button">
-              <span class="absolute inset-[-6px] rounded-full border-2 border-primary/30"></span>
-              <span class="material-symbols-outlined text-white text-sm" data-icon="check">check</span>
+          <div class="flex gap-3 flex-wrap">
+            <button v-for="color in categoryColors" :key="color.value"
+              @click="newCategoryColor = color.value"
+              :class="['w-10 h-10 rounded-full transition-all cursor-pointer',
+                newCategoryColor === color.value ? 'ring-2 ring-offset-2 ring-primary scale-110' : 'hover:scale-110']"
+              :style="{ backgroundColor: color.value }">
             </button>
-            <button aria-label="Select tertiary color" class="w-10 h-10 rounded-full bg-tertiary hover:scale-110 transition-transform cursor-pointer" type="button"></button>
-            <button aria-label="Select secondary color" class="w-10 h-10 rounded-full bg-secondary hover:scale-110 transition-transform cursor-pointer" type="button"></button>
-            <button aria-label="Select earth brown color" class="w-10 h-10 rounded-full bg-[#8b5a2b] hover:scale-110 transition-transform cursor-pointer" type="button"></button>
-            <button aria-label="Select olive green color" class="w-10 h-10 rounded-full bg-[#556b2f] hover:scale-110 transition-transform cursor-pointer" type="button"></button>
-            <button aria-label="Select warm red color" class="w-10 h-10 rounded-full bg-[#cd5c5c] hover:scale-110 transition-transform cursor-pointer" type="button"></button>
           </div>
         </div>
       </div>
@@ -227,34 +195,26 @@
             Category Icon
             <span class="text-primary normal-case font-medium cursor-pointer hover:underline">View all</span>
           </label>
-          <div class="grid grid-cols-5 gap-3">
-            <button aria-label="restaurant" class="w-14 h-14 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-md transition-transform hover:scale-105 cursor-pointer">
-              <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">restaurant</span>
-            </button>
-            <button aria-label="local_cafe" class="w-14 h-14 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest flex items-center justify-center transition-colors cursor-pointer">
-              <span class="material-symbols-outlined">local_cafe</span>
-            </button>
-            <button aria-label="icecream" class="w-14 h-14 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest flex items-center justify-center transition-colors cursor-pointer">
-              <span class="material-symbols-outlined">icecream</span>
-            </button>
-            <button aria-label="lunch_dining" class="w-14 h-14 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest flex items-center justify-center transition-colors cursor-pointer">
-              <span class="material-symbols-outlined">lunch_dining</span>
-            </button>
-            <button aria-label="local_bar" class="w-14 h-14 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest flex items-center justify-center transition-colors cursor-pointer">
-              <span class="material-symbols-outlined">local_bar</span>
+          <div class="grid grid-cols-8 gap-2">
+            <button v-for="icon in categoryIcons" :key="icon"
+              @click="selectedCategoryToEdit.icon = icon"
+              :class="['aspect-square rounded-xl flex items-center justify-center transition-all cursor-pointer',
+                selectedCategoryToEdit.icon === icon ? 'bg-primary text-on-primary shadow-md scale-105' : 'bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface']"
+              type="button">
+              <span class="material-symbols-outlined text-xl">{{ icon }}</span>
             </button>
           </div>
         </div>
         <!-- Accent Color Selection -->
         <div class="flex flex-col gap-3">
           <label class="text-sm font-bold text-on-surface-variant uppercase tracking-wider">Accent Color</label>
-          <div class="flex gap-4">
-            <button class="w-10 h-10 rounded-full bg-primary relative flex items-center justify-center outline outline-2 outline-offset-2 outline-primary transition-all cursor-pointer">
-              <span class="material-symbols-outlined text-white text-sm font-bold">check</span>
+          <div class="flex gap-3 flex-wrap">
+            <button v-for="color in categoryColors" :key="color.value"
+              @click="selectedCategoryToEdit.color = color.value"
+              :class="['w-10 h-10 rounded-full transition-all cursor-pointer',
+                selectedCategoryToEdit.color === color.value ? 'ring-2 ring-offset-2 ring-primary scale-110' : 'hover:scale-110']"
+              :style="{ backgroundColor: color.value }">
             </button>
-            <button class="w-10 h-10 rounded-full bg-tertiary-container hover:scale-110 transition-transform cursor-pointer border border-black/10"></button>
-            <button class="w-10 h-10 rounded-full bg-secondary-container hover:scale-110 transition-transform cursor-pointer border border-black/10"></button>
-            <button class="w-10 h-10 rounded-full bg-error-container hover:scale-110 transition-transform cursor-pointer border border-black/10"></button>
           </div>
         </div>
       </div>
@@ -311,6 +271,29 @@ const categoriesStore = useCategoriesStore();
 
 const user = computed(() => ({ name: authStore.user?.name || 'Admin', email: authStore.user?.email || '' }));
 
+const categoryIcons = [
+  'local_cafe', 'restaurant', 'local_pizza', 'cake', 'icecream', 'local_bar',
+  'bakery_dining', 'fastfood', 'ramen_dining', 'kebab_dining', 'tapas', 'liquor',
+  'breakfast_dining', 'lunch_dining', 'dinner_dining', 'dining', 'set_meal', 'egg_alt',
+  'brunch_dining', 'spa', 'storefront', 'shopping_bag', 'local_mall', 'redeem',
+  'local_grocery_store', 'local_florist', 'local_florist', 'cleaning_services', 'wash', 'dry_cleaning'
+];
+
+const categoryColors = [
+  { name: 'Orange', value: '#c96442' },
+  { name: 'Coral', value: '#e07b67' },
+  { name: 'Teal', value: '#2d8a8a' },
+  { name: 'Green', value: '#556b2f' },
+  { name: 'Brown', value: '#8b5a2b' },
+  { name: 'Purple', value: '#6b4c8a' },
+  { name: 'Pink', value: '#b85c7a' },
+  { name: 'Blue', value: '#4a7eb5' },
+  { name: 'Red', value: '#cd5c5c' },
+  { name: 'Gold', value: '#d4a84b' },
+  { name: 'Mint', value: '#5cb3a3' },
+  { name: 'Lavender', value: '#9b8bb4' },
+];
+
 // Global Settings
 const settingsLoading = ref(false);
 const settings = ref({
@@ -348,15 +331,19 @@ const toggleExpand = (id: string) => {
 // Add Modal
 const showAddModal = ref(false);
 const newCategoryName = ref('');
+const newCategoryIcon = ref('local_cafe');
+const newCategoryColor = ref('#c96442');
 const addLoading = ref(false);
 const addCategory = async () => {
   if (!newCategoryName.value.trim()) return;
   addLoading.value = true;
-  const ok = await categoriesStore.createCategory({ name: newCategoryName.value, color: '#c96442' });
+  const ok = await categoriesStore.createCategory({ name: newCategoryName.value, icon: newCategoryIcon.value, color: newCategoryColor.value });
   addLoading.value = false;
   if (ok) {
     showAddModal.value = false;
     newCategoryName.value = '';
+    newCategoryIcon.value = 'local_cafe';
+    newCategoryColor.value = '#c96442';
   }
 };
 
@@ -364,12 +351,19 @@ const addCategory = async () => {
 const showEditModal = ref(false);
 const editLoading = ref(false);
 const selectedCategoryToEdit = ref<any>(null);
-const openEditModal = (cat: any) => { selectedCategoryToEdit.value = { ...cat }; showEditModal.value = true; };
+const openEditModal = (cat: any) => { 
+  selectedCategoryToEdit.value = { ...cat }; 
+  showEditModal.value = true; 
+};
 const closeEditModal = () => { showEditModal.value = false; selectedCategoryToEdit.value = null; };
 const saveEditCategory = async () => {
   if (!selectedCategoryToEdit.value) return;
   editLoading.value = true;
-  const ok = await categoriesStore.updateCategory(selectedCategoryToEdit.value.id, { name: selectedCategoryToEdit.value.name });
+  const ok = await categoriesStore.updateCategory(selectedCategoryToEdit.value.id, { 
+    name: selectedCategoryToEdit.value.name,
+    icon: selectedCategoryToEdit.value.icon,
+    color: selectedCategoryToEdit.value.color
+  });
   if (ok) {
     await categoriesStore.fetchCategories();
     closeEditModal();
