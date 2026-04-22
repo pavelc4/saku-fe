@@ -19,6 +19,18 @@
     </ul>
     
     <div class="mt-auto space-y-4">
+      <!-- User Info -->
+      <div class="flex items-center gap-3 px-4 py-3 rounded-full bg-surface-container-highest">
+        <img v-if="user && user.avatar" :src="getR2Url(user.avatar)" alt="User" class="w-10 h-10 rounded-full object-cover" />
+        <div v-else class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center">
+          <span class="material-symbols-outlined text-on-surface-variant">account_circle</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-medium text-on-surface text-sm truncate">{{ user?.name || 'User' }}</p>
+          <p class="text-xs text-on-surface-variant truncate">{{ user?.email || '' }}</p>
+        </div>
+      </div>
+      
       <ul class="space-y-1">
         <li v-for="item in footerItems" :key="item.name">
           <router-link :to="item.path" :class="[
@@ -41,12 +53,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
-import { useAuthStore } from '../../stores/auth';
+import { useAuthStore, getR2Url } from '../../stores/auth';
 
 const route = useRoute();
 const authStore = useAuthStore();
+const user = computed(() => authStore.user);
 
 const navItems = ref([
   { name: 'Dashboard', icon: 'dashboard', path: '/dashboard' },
