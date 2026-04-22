@@ -30,10 +30,10 @@
               <span class="material-symbols-outlined">category</span>
             </div>
             <div>
-              <span class="font-headline text-4xl font-medium text-on-surface">1,248</span>
+              <span class="font-headline text-4xl font-medium text-on-surface">{{ totalProducts }}</span>
               <div class="flex items-center gap-1 text-sm text-tertiary mt-1">
                 <span class="material-symbols-outlined text-[16px]">arrow_upward</span>
-                <span>+12 this week</span>
+                <span>Produk aktif</span>
               </div>
             </div>
           </div>
@@ -44,9 +44,9 @@
               <span class="material-symbols-outlined text-error">warning</span>
             </div>
             <div>
-              <span class="font-headline text-4xl font-medium text-error">24</span>
+              <span class="font-headline text-4xl font-medium text-error">{{ lowStockCount }}</span>
               <div class="text-sm text-on-surface-variant mt-1">
-                <span>Requires immediate attention</span>
+                <span>Perlu restock segera</span>
               </div>
             </div>
           </div>
@@ -57,9 +57,9 @@
               <span class="material-symbols-outlined">account_balance_wallet</span>
             </div>
             <div>
-              <span class="font-headline text-4xl font-medium text-on-surface">Rp 45.2M</span>
+              <span class="font-headline text-4xl font-medium text-on-surface">{{ formatCurrency(inventoryValue) }}</span>
               <div class="text-sm text-on-surface-variant mt-1">
-                <span>Estimated retail value</span>
+                <span>Total nilai stok</span>
               </div>
             </div>
           </div>
@@ -412,6 +412,13 @@ const filteredItems = computed(() => {
 
 const formatCurrency = (val: number) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val || 0);
+
+// Summary computed values
+const totalProducts = computed(() => productsStore.items.length);
+const lowStockCount = computed(() => productsStore.items.filter(p => p.stock > 0 && p.stock <= 5).length);
+const inventoryValue = computed(() => {
+  return productsStore.items.reduce((sum, p) => sum + (p.price * p.stock), 0);
+});
 
 // Add Modal
 const isAddModalOpen = ref(false);
