@@ -13,7 +13,8 @@
         Tutup Shift
       </button>
       <button class="h-10 w-10 rounded-full bg-surface-container-highest flex items-center justify-center text-primary font-headline font-medium hover:opacity-80 transition-opacity overflow-hidden">
-        <img v-if="user?.avatar" :src="getR2Url(user.avatar)" alt="User Profile" class="w-full h-full object-cover" />
+        <img v-if="user && user.avatar" :src="getR2Url(user.avatar)" alt="User Profile" class="w-full h-full object-cover" />
+        <span v-else-if="user" class="material-symbols-outlined text-on-surface-variant">account_circle</span>
       </button>
 
       <!-- Notification Center Card -->

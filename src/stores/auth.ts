@@ -55,11 +55,15 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function fetchMe() {
+    if (!token.value) return
+    loading.value = true
     try {
       const res = await authApi.getMe()
       user.value = res.data?.data
     } catch {
-      logout()
+      user.value = null
+    } finally {
+      loading.value = false
     }
   }
 
