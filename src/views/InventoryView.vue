@@ -550,11 +550,14 @@ const saveProduct = async () => {
   // Upload new photo if exists
   if (ok && editProductImage.value) {
     await productsApi.uploadPhoto(editingProduct.value.id, editProductImage.value);
+  }
+  
+  if (ok) {
     await productsStore.fetchProducts();
+    closeEditModal();
   }
   
   editLoading.value = false;
-  if (ok) closeEditModal();
 };
 
 // Delete Modal
