@@ -406,7 +406,7 @@ const tabs = computed(() => [
 
 const filteredItems = computed(() => {
   if (activeTab.value === 'semua') return productsStore.items;
-  if (activeTab.value === 'non-aktif') return productsStore.items.filter(p => !p.is_active);
+  if (activeTab.value === 'non-aktif') return productsStore.items.filter(p => !p.active);
   return productsStore.items.filter(p => p.category_id === activeTab.value);
 });
 
@@ -453,7 +453,14 @@ const addProduct = async () => {
 const isEditModalOpen = ref(false);
 const editLoading = ref(false);
 const editingProduct = ref<any>({});
-const openEditModal = (item: any) => { editingProduct.value = { ...item }; isEditModalOpen.value = true; };
+const openEditModal = (item: any) => {
+  editingProduct.value = {
+    ...item,
+    is_active: item.active,
+    product_category_id: item.category_id,
+  };
+  isEditModalOpen.value = true;
+};
 const closeEditModal = () => { isEditModalOpen.value = false; };
 const saveProduct = async () => {
   const payload = {

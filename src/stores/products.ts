@@ -19,7 +19,13 @@ export const useProductsStore = defineStore('products', () => {
     error.value = null
     try {
       const res = await productsApi.getAll({ search: search.value, category_id: activeCategoryId.value || undefined, ...params })
-      items.value = res.data?.data?.items || res.data?.data || []
+      const rawItems = res.data?.data?.items || res.data?.data || []
+      items.value = rawItems.map((p: any) => ({
+        ...p,
+        category_id: p.product_category_id,
+        category: p.category_name,
+        active: !!p.is_active,
+      }))
       if (res.data?.data?.meta) meta.value = res.data.data.meta
     } catch (err: any) {
       error.value = err.response?.data?.error?.message || 'Gagal memuat produk'
@@ -33,7 +39,13 @@ export const useProductsStore = defineStore('products', () => {
     error.value = null
     try {
       const res = await productsApi.create(data)
-      items.value.unshift(res.data?.data)
+      const p = res.data?.data
+      items.value.unshift({
+        ...p,
+        category_id: p.product_category_id,
+        category: p.category_name,
+        active: !!p.is_active,
+      })
       return true
     } catch (err: any) {
       error.value = err.response?.data?.error?.message || 'Gagal membuat produk'
@@ -43,13 +55,19 @@ export const useProductsStore = defineStore('products', () => {
     }
   }
 
-  async function updateProduct(id: string, data: object) {
+  async function updateProduct(id: string, data: any) {
     loading.value = true
     error.value = null
     try {
-      const res = await productsApi.update(id, data)
+      await productsApi.update(id, data)
       const idx = items.value.findIndex(p => p.id === id)
-      if (idx !== -1) items.value[idx] = res.data?.data
+      if (idx !== -1) {
+        items.value[idx] = {
+          ...items.value[idx],
+          ...data,
+          active: data.is_active,
+        }
+      }
       return true
     } catch (err: any) {
       error.value = err.response?.data?.error?.message || 'Gagal mengupdate produk'
