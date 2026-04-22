@@ -8,7 +8,7 @@ export function getR2Url(path: string) {
   if (!path) return ''
   if (path.startsWith('http')) return path
   if (R2_PUBLIC_URL) return `${R2_PUBLIC_URL}/${path}`
-  return `https://files.xtramanagersoftwares.tech/${path}`
+  return '' // Disable for now - custom domain SSL pending
 }
 
 export const useAuthStore = defineStore('auth', () => {
