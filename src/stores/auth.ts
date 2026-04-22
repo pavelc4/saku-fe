@@ -7,7 +7,10 @@ const R2_PUBLIC_URL = import.meta.env.VITE_R2_PUBLIC_URL || ''
 export function getR2Url(path: string) {
   if (!path) return ''
   if (path.startsWith('http')) return path
-  if (R2_PUBLIC_URL) return `${R2_PUBLIC_URL}/${path}`
+  if (R2_PUBLIC_URL) {
+    const ts = Date.now()
+    return `${R2_PUBLIC_URL}/${path}?t=${ts}`
+  }
   return ''
 }
 
