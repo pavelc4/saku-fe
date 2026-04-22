@@ -7,7 +7,8 @@ const R2_PUBLIC_URL = import.meta.env.VITE_R2_PUBLIC_URL || ''
 export function getR2Url(path: string) {
   if (!path) return ''
   if (path.startsWith('http')) return path
-  return '' // Disable R2 for now - not working in production
+  if (R2_PUBLIC_URL) return `${R2_PUBLIC_URL}/${path}`
+  return `https://files.xtramanagersoftwares.tech/${path}`
 }
 
 export const useAuthStore = defineStore('auth', () => {
