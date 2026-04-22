@@ -7,8 +7,8 @@ const R2_PUBLIC_URL = import.meta.env.VITE_R2_PUBLIC_URL || ''
 export function getR2Url(path: string) {
   if (!path) return ''
   if (path.startsWith('http')) return path
-  if (R2_PUBLIC_URL) return `${R2_PUBLIC_URL}/${path}`
-  return '' // Disable for now - custom domain SSL pending
+  // Fetch from fach worker /files endpoint
+  return `https://fach.pavelc4.workers.dev/files/${path}`
 }
 
 export const useAuthStore = defineStore('auth', () => {
