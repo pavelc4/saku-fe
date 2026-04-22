@@ -129,11 +129,71 @@
 </template>
 
 <script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
 import Sidebar from '../components/layout/Sidebar.vue'
 import TopNav from '../components/layout/TopNav.vue'
+import { useAuthStore } from '../stores/auth'
+import { useProductsStore } from '../stores/products'
+import { useTransactionsStore } from '../stores/transactions'
 
-const user = {
-  name: 'Manager',
-  avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC42qxSlIDRqedKHHTSkFU4bq4x7YFymJeGIovSijfKzcN0MTlQXzhWDAxiHva2NP9QZNMdiKwy8-IEI_ThlxH2iGxX2XHxIvpwE63yL-sTP6n72orPUcENulcZjbMNPS0IgqBz0crb3achTQCmF-xa6ly9DaD_7QzwQql5_yyu48WZTKREYFJ52ICU9WXIin3frbvkscNVYcG5xrjQ493dOofODJ-YV2cERFPN6yy2SIn23aYp3AkAUhDsZFLljjh-1-auRrxrz44'
-}
+const authStore = useAuthStore()
+const productsStore = useProductsStore()
+const transactionsStore = useTransactionsStore()
+
+const user = computed(() => ({ name: authStore.user?.name || 'Admin', email: authStore.user?.email || '' }))
+
+const notifications = computed(() => {
+  const notifs: any[] = []
+
+  // Low stock notifications
+  productsStore.lowStockItems.forEach(p => {
+    notifs.push({
+      id: `low-${p.id}`,
+      type: 'warning',
+      icon: 'warning',
+      title: 'Stok Hampir Habis',
+      message: `${p.name} tersisa ${p.stock} unit`,
+      time: 'Baru saja',
+      read: false,
+    })
+  })
+
+  // Out of stock notifications
+  productsStore.outOfStock.forEach(p => {
+    notifs.push({
+      id: `out-${p.id}`,
+      type: 'error',
+      icon: 'error',
+      title: 'Stok Habis',
+      message: `${p.name} sudah habis`,
+      time: 'Baru saja',
+      read: false,
+    })
+  })
+
+  // Recent transactions
+  transactionsStore.items.slice(0, 3).forEach(t => {
+    notifs.push({
+      id: `tx-${t.id}`,
+      type: 'info',
+      icon: 'receipt_long',
+      title: 'Transaksi Baru',
+      message: `Transaksi #${t.id?.slice(0, 8)} berhasil`,
+      time: t.created_at ? new Date(t.created_at).toLocaleString('id-ID') : '',
+      read: true,
+    })
+  })
+
+  return notifs
+})
+
+const unreadCount = computed(() => notifications.value.filter(n => !n.read).length)
+
+onMounted(async () => {
+  await Promise.all([
+    productsStore.fetchProducts(),
+    transactionsStore.fetchTransactions({ limit: 5 }),
+  ])
+})
 </script>
+

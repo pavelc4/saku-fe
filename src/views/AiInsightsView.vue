@@ -92,14 +92,66 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import Sidebar from '../components/layout/Sidebar.vue';
 import TopNav from '../components/layout/TopNav.vue';
+import { useAuthStore } from '../stores/auth';
+import { insightsApi } from '../api/insights';
 
-const user = ref({
-  name: 'Alex R.',
-  email: 'alex.r@saku.com',
-  avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAhZiiGyoCOsuYv_MGbEOcbH36vmbAaGDdfjR8hJfA58lU8laEpfOvbbiAz4Hgq0-9tQD0aPsQhqNQ-H6T3hZ_MDCbLsMFL5EAlm6ZRipKB_JasZ99qnihhZlGJV-GYTq9K_96gE0TLSOytb_BX0BUV28Irld42gHVRUPPmmuYx2aNM4GUa_IEczq5smFqdhFHayQ8g7oE71Efsd-LykeTpw53mXR90TlZXa1eQsjF56o238LqGAmNbvwz8Ogwnn_Cpe2Cj4wMnjH4'
-});
+const authStore = useAuthStore();
+const user = computed(() => ({ name: authStore.user?.name || 'Admin', email: authStore.user?.email || '' }));
+
+const loading = ref(false)
+const error = ref<string | null>(null)
+
+const monthly = ref<any>(null)
+const daily = ref<any>(null)
+const productIntel = ref<any>(null)
+const cashflow = ref<any>(null)
+
+const advisorQuestion = ref('')
+const advisorAnswer = ref<string | null>(null)
+const advisorLoading = ref(false)
+
+async function fetchInsights() {
+  loading.value = true
+  error.value = null
+  try {
+    const [m, d, p, c] = await Promise.all([
+      insightsApi.getMonthly(),
+      insightsApi.getDaily(),
+      insightsApi.getProductIntelligence(),
+      insightsApi.getCashflowPrediction(),
+    ])
+    monthly.value = m.data?.data
+    daily.value = d.data?.data
+    productIntel.value = p.data?.data
+    cashflow.value = c.data?.data
+  } catch (err: any) {
+    error.value = 'Gagal memuat insights'
+  } finally {
+    loading.value = false
+  }
+}
+
+async function askAdvisor() {
+  if (!advisorQuestion.value.trim()) return
+  advisorLoading.value = true
+  advisorAnswer.value = null
+  try {
+    const res = await insightsApi.askAdvisor(advisorQuestion.value)
+    advisorAnswer.value = res.data?.data?.answer || res.data?.data
+  } catch {
+    advisorAnswer.value = 'Gagal mendapatkan jawaban. Coba lagi.'
+  } finally {
+    advisorLoading.value = false
+  }
+}
+
+const formatCurrency = (val: number) =>
+  new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val || 0)
+
+onMounted(() => fetchInsights())
 </script>
+
 

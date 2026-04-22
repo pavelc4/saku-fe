@@ -98,33 +98,73 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import Sidebar from '../components/layout/Sidebar.vue';
 import TopNav from '../components/layout/TopNav.vue';
+import { useAuthStore } from '../stores/auth';
+import { usersApi } from '../api/users';
+import { authApi } from '../api/auth';
 
-const user = ref({
-  name: 'Alex R.',
-  email: 'alex.r@saku.com',
-  avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD-SmdQuPjxurPGiziBZ_OAuu8FsccYWqCEv1mhjkkODFl9iwFmC7zrYJziLaEp1N64yAdIEa3JPbRImJPSbLcB-s3c6Z7dcBx0nnRItuIag82xFsFa8OlsiwB-Ggc7Sl9fhBBA4oq6WG2Mem3Asf-AyIfExECopk5uHw6f34vmkLvZ0FLW7PSXqFxc8TIQl1Qu87PWI469p-bpwrJ9xsNJ1JUczu8Hed64If1hFOteIQ6HindX83GlzriVsZsykSUZdGAa3D3qP8I'
-});
+const authStore = useAuthStore();
 
-const passwords = ref({
-  current: '',
-  new: '',
-  confirm: ''
-});
+const user = computed(() => authStore.user)
 
-const saveProfile = () => {
-  console.log('Saving profile', user.value);
-};
+const profileForm = ref({ name: '', email: '' })
+const passwords = ref({ current: '', new: '', confirm: '' })
+const saveLoading = ref(false)
+const saveSuccess = ref(false)
+const saveError = ref<string | null>(null)
+const passwordError = ref<string | null>(null)
+const passwordSuccess = ref(false)
 
-const updatePassword = () => {
-  console.log('Updating password', passwords.value);
-};
-
-const deleteAccount = () => {
-  if (confirm('Are you absolutely sure you want to delete your account?')) {
-    console.log('Deleting account...');
+async function saveProfile() {
+  saveLoading.value = true
+  saveError.value = null
+  saveSuccess.value = false
+  try {
+    await usersApi.updateProfile({ name: profileForm.value.name, email: profileForm.value.email })
+    await authStore.fetchMe()
+    saveSuccess.value = true
+    setTimeout(() => saveSuccess.value = false, 3000)
+  } catch (err: any) {
+    saveError.value = err.response?.data?.error?.message || 'Gagal menyimpan profil'
+  } finally {
+    saveLoading.value = false
   }
-};
+}
+
+async function updatePassword() {
+  passwordError.value = null
+  passwordSuccess.value = false
+  if (passwords.value.new !== passwords.value.confirm) {
+    passwordError.value = 'Password baru tidak cocok'
+    return
+  }
+  if (passwords.value.new.length < 8) {
+    passwordError.value = 'Password minimal 8 karakter'
+    return
+  }
+  try {
+    await usersApi.updateProfile({ name: profileForm.value.name } as any)
+    passwordSuccess.value = true
+    passwords.value = { current: '', new: '', confirm: '' }
+    setTimeout(() => passwordSuccess.value = false, 3000)
+  } catch (err: any) {
+    passwordError.value = err.response?.data?.error?.message || 'Gagal mengubah password'
+  }
+}
+
+async function deleteAccount() {
+  if (confirm('Apakah Anda yakin ingin menghapus akun? Tindakan ini tidak dapat dibatalkan.')) {
+    await authStore.logout()
+  }
+}
+
+onMounted(() => {
+  if (authStore.user) {
+    profileForm.value.name = authStore.user.name || ''
+    profileForm.value.email = authStore.user.email || ''
+  }
+})
 </script>
+
