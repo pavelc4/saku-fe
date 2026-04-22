@@ -392,153 +392,72 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import Sidebar from '../components/layout/Sidebar.vue';
 import TopNav from '../components/layout/TopNav.vue';
+import { useAuthStore } from '../stores/auth';
+import { useProductsStore } from '../stores/products';
+import { useCategoriesStore } from '../stores/categories';
 
-const user = ref({
-  name: 'Alex R.',
-  email: 'alex.r@saku.com',
-  avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAhZiiGyoCOsuYv_MGbEOcbH36vmbAaGDdfjR8hJfA58lU8laEpfOvbbiAz4Hgq0-9tQD0aPsQhqNQ-H6T3hZ_MDCbLsMFL5EAlm6ZRipKB_JasZ99qnihhZlGJV-GYTq9K_96gE0TLSOytb_BX0BUV28Irld42gHVRUPPmmuYx2aNM4GUa_IEczq5smFqdhFHayQ8g7oE71Efsd-LykeTpw53mXR90TlZXa1eQsjF56o238LqGAmNbvwz8Ogwnn_Cpe2Cj4wMnjH4'
-});
+const authStore = useAuthStore();
+const productsStore = useProductsStore();
+const categoriesStore = useCategoriesStore();
+
+const user = computed(() => ({ name: authStore.user?.name || 'Admin', email: authStore.user?.email || '' }));
 
 const activeTab = ref('semua');
-const tabs = ref([
+const tabs = computed(() => [
   { id: 'semua', name: 'Semua' },
-  { id: 'makanan', name: 'Makanan' },
-  { id: 'minuman', name: 'Minuman' },
-  { id: 'non-aktif', name: 'Non-Aktif' }
+  ...categoriesStore.items.map(c => ({ id: c.id, name: c.name })),
+  { id: 'non-aktif', name: 'Non-Aktif' },
 ]);
 
-const expandedItem = ref<string | null>(null);
-
-const isAddModalOpen = ref(false);
-const newProduct = ref({
-  name: '',
-  sku: '',
-  category: '',
-  stock: 0,
-  maxStock: 50,
-  price: '',
-  active: true,
-  image: '',
-  icon: 'inventory_2'
+const filteredItems = computed(() => {
+  if (activeTab.value === 'semua') return productsStore.items;
+  if (activeTab.value === 'non-aktif') return productsStore.items.filter(p => !p.is_active);
+  return productsStore.items.filter(p => p.category_id === activeTab.value);
 });
 
-const openAddModal = () => {
-  isAddModalOpen.value = true;
-};
+const formatCurrency = (val: number) =>
+  new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val || 0);
 
+// Add Modal
+const isAddModalOpen = ref(false);
+const newProduct = ref({ name: '', sku: '', category_id: '', stock: 0, price: 0, is_active: true });
+const openAddModal = () => { isAddModalOpen.value = true; };
 const closeAddModal = () => {
   isAddModalOpen.value = false;
-  newProduct.value = {
-    name: '',
-    sku: '',
-    category: '',
-    stock: 0,
-    maxStock: 50,
-    price: '',
-    active: true,
-    image: '',
-    icon: 'inventory_2'
-  };
+  newProduct.value = { name: '', sku: '', category_id: '', stock: 0, price: 0, is_active: true };
+};
+const addProduct = async () => {
+  const ok = await productsStore.createProduct(newProduct.value);
+  if (ok) closeAddModal();
 };
 
-const addProduct = () => {
-  if (!newProduct.value.name || !newProduct.value.sku || !newProduct.value.category) return;
-  inventoryItems.value.unshift({ ...newProduct.value });
-  closeAddModal();
-};
-
+// Edit Modal
 const isEditModalOpen = ref(false);
 const editingProduct = ref<any>({});
-
-const openEditModal = (item: any) => {
-  editingProduct.value = { ...item };
-  isEditModalOpen.value = true;
+const openEditModal = (item: any) => { editingProduct.value = { ...item }; isEditModalOpen.value = true; };
+const closeEditModal = () => { isEditModalOpen.value = false; };
+const saveProduct = async () => {
+  const ok = await productsStore.updateProduct(editingProduct.value.id, editingProduct.value);
+  if (ok) closeEditModal();
 };
 
-const closeEditModal = () => {
-  isEditModalOpen.value = false;
-};
-
-const saveProduct = () => {
-  const index = inventoryItems.value.findIndex(i => i.sku === editingProduct.value.sku);
-  if (index !== -1) {
-    inventoryItems.value[index] = { ...editingProduct.value };
-  }
-  closeEditModal();
-};
-
+// Delete Modal
 const isDeleteModalOpen = ref(false);
 const productToDelete = ref<any>(null);
-
-const openDeleteModal = (item: any) => {
-  productToDelete.value = item;
-  isDeleteModalOpen.value = true;
-};
-
-const closeDeleteModal = () => {
-  isDeleteModalOpen.value = false;
-  productToDelete.value = null;
-};
-
-const confirmDelete = () => {
+const openDeleteModal = (item: any) => { productToDelete.value = item; isDeleteModalOpen.value = true; };
+const closeDeleteModal = () => { isDeleteModalOpen.value = false; productToDelete.value = null; };
+const confirmDelete = async () => {
   if (productToDelete.value) {
-    inventoryItems.value = inventoryItems.value.filter(i => i.sku !== productToDelete.value.sku);
+    await productsStore.deleteProduct(productToDelete.value.id);
   }
   closeDeleteModal();
 };
 
-const toggleExpand = (sku: string) => {
-  if (expandedItem.value === sku) {
-    expandedItem.value = null;
-  } else {
-    expandedItem.value = sku;
-  }
-};
-
-const inventoryItems = ref([
-  {
-    name: 'Artisan Butter Croissant',
-    sku: 'SKU-BAK-001',
-    category: 'Makanan / Pastry',
-    stock: 45,
-    maxStock: 60,
-    active: true,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCGLiu0g6ZIQ6bzaV2_mPqF-0o1bAxyfMhcbPshwmQv39Fh3-81SyQGabIP8-WuW2V4kGhlbTbLULQZqqpr13ouiWnbeEMADSty_wTyh_lS1D-xbbewFQKbd3LuLrP0GiE9uOVI9tDsy5HY6aSO_W0gHw8Y3P0sDq3k_YtZ5OLI9cxK27AdptKBbyYEjhOn3aUNdpgfED-tsC40H3M77XflgWq4qsiGBwp4ni0LW9ctvGIvdF2WTa2uQKi0GwjA8r3jZX86OCqsFas',
-    icon: ''
-  },
-  {
-    name: 'Ethiopian Yirgacheffe Beans (1kg)',
-    sku: 'SKU-COF-104',
-    category: 'Minuman / Kopi',
-    stock: 2,
-    maxStock: 24,
-    active: true,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDX4_ZSZpkA_zT-Vp8sY-sugKfN2LS-sFKYVNkniMGoNnz2vjMPtPVtU6iO2c9E511rtmvKC-im5pizb784j1XS7SgVMpkawWK6sEv5bYmndWk9Tu_UJSjYu0qMRGBhm4TpXgp1FIROUacKCIAQwtTD_jkOFGednQUPgWaOtJ9__siNkduWjvl_lqYOXMh49NRonVI-5IctuAQndWJMznFQhGYw-06gv7z-PzqbVqS1Py5NKyHd_qAgrMn9Fj-JzEfru6D7PMJJ-vU',
-    icon: ''
-  },
-  {
-    name: 'Matcha Powder Premium (500g)',
-    sku: 'SKU-TEA-042',
-    category: 'Minuman / Teh',
-    stock: 18,
-    maxStock: 50,
-    active: true,
-    image: '',
-    icon: 'local_drink'
-  },
-  {
-    name: 'Seasonal Berry Tart',
-    sku: 'SKU-BAK-089',
-    category: 'Makanan / Pastry',
-    stock: 0,
-    maxStock: 20,
-    active: false,
-    image: '',
-    icon: 'cake'
-  }
-]);
+onMounted(async () => {
+  await Promise.all([productsStore.fetchProducts(), categoriesStore.fetchCategories()]);
+});
 </script>
 

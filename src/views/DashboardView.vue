@@ -58,9 +58,9 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue';
 
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
 import Sidebar from '../components/layout/Sidebar.vue';
 import TopNav from '../components/layout/TopNav.vue';
 import InsightCard from '../components/dashboard/InsightCard.vue';
@@ -70,44 +70,52 @@ import LowStockWidget from '../components/dashboard/LowStockWidget.vue';
 import QuickActionWidget from '../components/dashboard/QuickActionWidget.vue';
 import RecentTransactionsWidget from '../components/dashboard/RecentTransactionsWidget.vue';
 import TopSellingWidget from '../components/dashboard/TopSellingWidget.vue';
+import { useAuthStore } from '../stores/auth';
+import { useDashboardStore } from '../stores/dashboard';
 
-const greeting = ref('Selamat Pagi');
-const user = ref({
-  name: 'Pemilik',
-  avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCvE2zqFsuHiT6pIwMG3cidJQePpr4_tTsj8TYlzCpOIj9pUeRh77x8o_qjEGgIeGrTHrhfAS5pkQZ1UXBNuED0lDlCxIi-0hhvSSmsd7WDlrWAz6P2JbrLPn5PgTYsU-yqHtaUcQIeVIBxHqPPvnYffVIRQM0zq4iIQ2SPlv_OWilWKo28of8_61oRHP3MuFuLI8S2Wt2PYtLoD_6tcv2_iO0QU-ijocgagoOy8FlX97bjv2Th06fobZ58G9RjKjN6Iy-Cz1TwcMg'
+const authStore = useAuthStore();
+const dashboardStore = useDashboardStore();
+
+const greeting = computed(() => {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Selamat Pagi';
+  if (hour < 15) return 'Selamat Siang';
+  if (hour < 18) return 'Selamat Sore';
+  return 'Selamat Malam';
 });
 
+const user = computed(() => ({
+  name: authStore.user?.name || 'Pemilik',
+  avatar: authStore.user?.avatar || '',
+}));
+
+const formatCurrency = (val: number) =>
+  new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val || 0);
+
+const netProfit = computed(() => formatCurrency(dashboardStore.metrics?.total_revenue || 0));
+const totalTransactions = computed(() => dashboardStore.metrics?.total_transactions || 0);
+
+const lowStockItems = computed(() =>
+  dashboardStore.lowStock.map(p => ({
+    name: p.name,
+    remaining: p.stock,
+    image: p.image_url || '',
+    initials: p.name?.slice(0, 2).toUpperCase() || '',
+    statusColor: p.stock === 0 ? 'text-error' : 'text-secondary',
+  }))
+);
+
 const chartData = ref([
-  { label: 'Mon', height: '30%', isToday: false },
-  { label: 'Tue', height: '50%', isToday: false },
-  { label: 'Wed', height: '40%', isToday: false },
-  { label: 'Thu', height: '70%', isToday: false },
-  { label: 'Fri', height: '90%', isToday: true },
-  { label: 'Sat', height: '20%', isToday: false },
-  { label: 'Sun', height: '10%', isToday: false },
+  { label: 'Sen', height: '30%', isToday: false },
+  { label: 'Sel', height: '50%', isToday: false },
+  { label: 'Rab', height: '40%', isToday: false },
+  { label: 'Kam', height: '70%', isToday: false },
+  { label: 'Jum', height: '90%', isToday: true },
+  { label: 'Sab', height: '20%', isToday: false },
+  { label: 'Min', height: '10%', isToday: false },
 ]);
 
-const lowStockItems = ref([
-  {
-    name: 'Terracotta Vases',
-    remaining: 2,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBPHFVXtqC7WzNNChdFFTZXyY4uz4hPR0TgrGXN4WwG_IHMerArfo2R6NQiUoqAtvGMwFDe8CvP7J9KPb002Mk0qU3WbHOntD3xDyTOECPMBQ1DGPka2tRfMmM27eMmchxq98WoJKo_7z0pp4zqe8phEkFFztU4TZMjJ9807xo-QOlr8BZ2CJPDar2mlX9q4qvz6cc6jtHMGWbNNKkcRs8uuNYD-6yBWIcrM7MfLl8remOkKknTwPOBDFqJGaveWUEATnOMvmzQttU',
-    initials: '',
-    statusColor: 'text-error'
-  },
-  {
-    name: 'Linen Napkin Set',
-    remaining: 5,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDQC9ntELFEhyRBxRRlMwhHg7JfdBSJlJtPhPdqAi2UshNlvlgFnBDyM7fRJug9trwiB0TSBU0dw5eGTY544FFPdvUM6q2GUCkZt-RIYyadDY_VYRaEAKIDZJaZli3_jAaJC0qKulm6YKFXkd6BzKKys3RcylIGZH2eywt8qHMVSP949uaXUO6N7-Jrcqsua3f4fQ59ihvRo7mXqzGHES7fAl6r28AE_uNOce1DU2PwvutyOOj3tNTpq7z0bmtC4Hgtf5NBuudtYFc',
-    initials: '',
-    statusColor: 'text-error'
-  },
-  {
-    name: 'Sandalwood Oil',
-    remaining: 8,
-    image: '',
-    initials: 'SO',
-    statusColor: 'text-secondary'
-  }
-]);
+onMounted(() => {
+  dashboardStore.fetchDashboard();
+});
 </script>

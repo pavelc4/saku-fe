@@ -299,61 +299,57 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import Sidebar from '../components/layout/Sidebar.vue';
 import TopNav from '../components/layout/TopNav.vue';
+import { useAuthStore } from '../stores/auth';
+import { useCategoriesStore } from '../stores/categories';
 
-const user = ref({
-  name: 'Dimas Dwi',
-  email: 'dimas@saku.id',
-  avatar: 'https://github.com/pavelc4.png'
-});
+const authStore = useAuthStore();
+const categoriesStore = useCategoriesStore();
 
-const categories = ref([
-  { id: 1, name: 'Makanan Utama', icon: 'restaurant', iconBg: 'bg-secondary-container', iconText: 'text-on-secondary-container', items: 42, active: true },
-  { id: 2, name: 'Minuman Dingin', icon: 'local_cafe', iconBg: 'bg-tertiary-container', iconText: 'text-on-tertiary-container', items: 28, active: true },
-  { id: 3, name: 'Cemilan Ringan', icon: 'tapas', iconBg: 'bg-surface-variant', iconText: 'text-on-surface-variant', items: 15, active: false },
-  { id: 4, name: 'Dessert', icon: 'cake', iconBg: 'bg-secondary-container', iconText: 'text-on-secondary-container', items: 8, active: true },
-]);
+const user = computed(() => ({ name: authStore.user?.name || 'Admin', email: authStore.user?.email || '' }));
 
-const expandedCategory = ref<number | null>(null);
+const expandedCategory = ref<string | null>(null);
+const toggleExpand = (id: string) => {
+  expandedCategory.value = expandedCategory.value === id ? null : id;
+};
+
+// Add Modal
 const showAddModal = ref(false);
+const newCategory = ref({ name: '', icon: 'local_cafe', color: '#c96442' });
+const addCategory = async () => {
+  const ok = await categoriesStore.createCategory({ name: newCategory.value.name });
+  if (ok) {
+    showAddModal.value = false;
+    newCategory.value = { name: '', icon: 'local_cafe', color: '#c96442' };
+  }
+};
 
+// Edit Modal
 const showEditModal = ref(false);
 const selectedCategoryToEdit = ref<any>(null);
-
-const openEditModal = (cat: any) => {
-  selectedCategoryToEdit.value = { ...cat };
-  showEditModal.value = true;
+const openEditModal = (cat: any) => { selectedCategoryToEdit.value = { ...cat }; showEditModal.value = true; };
+const closeEditModal = () => { showEditModal.value = false; selectedCategoryToEdit.value = null; };
+const saveEditCategory = async () => {
+  if (!selectedCategoryToEdit.value) return;
+  const ok = await categoriesStore.updateCategory(selectedCategoryToEdit.value.id, { name: selectedCategoryToEdit.value.name });
+  if (ok) closeEditModal();
 };
 
-const closeEditModal = () => {
-  showEditModal.value = false;
-  selectedCategoryToEdit.value = null;
-};
-
+// Delete Modal
 const showDeleteModal = ref(false);
 const selectedCategoryToDelete = ref<any>(null);
-
-const openDeleteModal = (cat: any) => {
-  selectedCategoryToDelete.value = { ...cat };
-  showDeleteModal.value = true;
-};
-
-const closeDeleteModal = () => {
-  showDeleteModal.value = false;
-  selectedCategoryToDelete.value = null;
-};
-
-const confirmDeleteCategory = () => {
+const openDeleteModal = (cat: any) => { selectedCategoryToDelete.value = { ...cat }; showDeleteModal.value = true; };
+const closeDeleteModal = () => { showDeleteModal.value = false; selectedCategoryToDelete.value = null; };
+const confirmDeleteCategory = async () => {
   if (selectedCategoryToDelete.value) {
-    categories.value = categories.value.filter(c => c.id !== selectedCategoryToDelete.value.id);
+    await categoriesStore.deleteCategory(selectedCategoryToDelete.value.id);
   }
   closeDeleteModal();
 };
 
-const toggleExpand = (id: number) => {
-  // Toggle: jika yang diklik sudah terbuka, tutup. Jika belum, buka.
-  expandedCategory.value = expandedCategory.value === id ? null : id;
-};
+onMounted(() => {
+  categoriesStore.fetchCategories();
+});
 </script>

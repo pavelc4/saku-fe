@@ -241,140 +241,107 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import Sidebar from '../components/layout/Sidebar.vue';
 import TopNav from '../components/layout/TopNav.vue';
+import { useAuthStore } from '../stores/auth';
+import { useProductsStore } from '../stores/products';
+import { useCategoriesStore } from '../stores/categories';
+import { usePosStore } from '../stores/pos';
+import { useCartStore } from '../stores/cart';
 
-const user = ref({
-  name: 'Elena R.',
-  email: 'elena.r@saku.com',
-  avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAhZiiGyoCOsuYv_MGbEOcbH36vmbAaGDdfjR8hJfA58lU8laEpfOvbbiAz4Hgq0-9tQD0aPsQhqNQ-H6T3hZ_MDCbLsMFL5EAlm6ZRipKB_JasZ99qnihhZlGJV-GYTq9K_96gE0TLSOytb_BX0BUV28Irld42gHVRUPPmmuYx2aNM4GUa_IEczq5smFqdhFHayQ8g7oE71Efsd-LykeTpw53mXR90TlZXa1eQsjF56o238LqGAmNbvwz8Ogwnn_Cpe2Cj4wMnjH4'
-});
+const authStore = useAuthStore();
+const productsStore = useProductsStore();
+const categoriesStore = useCategoriesStore();
+const posStore = usePosStore();
+const cartStore = useCartStore();
 
-const isSessionOpen = ref(false);
+const user = computed(() => ({ name: authStore.user?.name || 'Kasir', email: authStore.user?.email || '' }));
+
+const isSessionOpen = computed(() => !!posStore.activeSession);
 const isModalOpen = ref(false);
 const isCloseModalOpen = ref(false);
 
-const initialCash = ref('500.000');
-const cashierName = ref('Elena R.');
+const initialCash = ref(0);
+const actualCash = ref(0);
 
-const totalSales = ref(4250000);
-const expectedCash = ref(1550000);
-const actualCash = ref('1.550.000');
-
-const actualCashValue = computed(() => {
-  return parseInt(actualCash.value.replace(/\D/g, '')) || 0;
-});
-
-const discrepancyAmount = computed(() => {
-  return actualCashValue.value - expectedCash.value;
-});
-
+const expectedCash = computed(() => posStore.activeSession?.opening_cash || 0);
+const discrepancyAmount = computed(() => actualCash.value - expectedCash.value);
 const discrepancyClass = computed(() => {
-  if (discrepancyAmount.value === 0) {
-    return { iconColor: 'text-tertiary', textColor: 'text-tertiary' };
-  } else if (discrepancyAmount.value > 0) {
-    return { iconColor: 'text-primary', textColor: 'text-primary' };
-  } else {
-    return { iconColor: 'text-error', textColor: 'text-error' };
-  }
+  if (discrepancyAmount.value === 0) return { iconColor: 'text-tertiary', textColor: 'text-tertiary' };
+  if (discrepancyAmount.value > 0) return { iconColor: 'text-primary', textColor: 'text-primary' };
+  return { iconColor: 'text-error', textColor: 'text-error' };
 });
-
 const discrepancyIcon = computed(() => {
   if (discrepancyAmount.value === 0) return 'check_circle';
   if (discrepancyAmount.value > 0) return 'add_circle';
   return 'error';
 });
 
-const openSession = () => {
-  isSessionOpen.value = true;
-  isModalOpen.value = false;
+const openSession = async () => {
+  const ok = await posStore.openSession(initialCash.value);
+  if (ok) isModalOpen.value = false;
 };
 
-const closeSession = () => {
-  isCloseModalOpen.value = false;
-  isSessionOpen.value = false;
+const closeSession = async () => {
+  const ok = await posStore.closeSession(actualCash.value);
+  if (ok) {
+    isCloseModalOpen.value = false;
+    cartStore.clearCart();
+  }
 };
 
 const activeCategory = ref('semua');
-const categories = ref([
+const categories = computed(() => [
   { id: 'semua', name: 'Semua' },
-  { id: 'makanan', name: 'Makanan' },
-  { id: 'minuman', name: 'Minuman' },
-  { id: 'kopi-susu', name: 'Kopi Susu' },
-  { id: 'pastry', name: 'Pastry' }
+  ...categoriesStore.items.map(c => ({ id: c.id, name: c.name })),
 ]);
 
-const products = ref([
-  {
-    id: 1,
-    name: 'Artisan Latte',
-    description: 'Espresso with steamed milk and micro-foam',
-    price: 45000,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAj-qrcBjRL4IY6UdC58jqBPzw50I3aklK_P9Ecnv3aXDiK4JVu0MgNj0nDHIO5bPMpc11rBryDCXYrk78huoLLf2sEVK1rerdvbE782ADkDG2x7RVjhZjhLK2DpSOPzWtmfu411zctDioQI0REH5WRqVQPDD78rilDiXr8MXcWWmgYjgNUFTICv8C0-jQ_KEOvU7sgmuU1CrHoBs92ofVXVkEhb_5MVp9oJPbaV0wW04GvSSlCfL9rPnMh5CmgWUM6H_ollHLfbyc'
-  },
-  {
-    id: 2,
-    name: 'Butter Croissant',
-    description: 'Classic flaky French pastry',
-    price: 32000,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAgFTK5B_a1Kpoz0LtR53F3fj7x36li0UQWjB54YsCc_XHmsf3-ehjvWLAqPz4LIxlGkQ3gi9Pzatx3-VGofaVsBIklV12pCTfQ1rVL9vN1yyuD30miLnB9wC9gnBV6gv7NDRMmxCFuMUT-DGTPT_aJRBoM16fSYMkHLDwAf3hkrqXp_wj6UEbTO9kZ5roX6D6Hl0-wAp68_LuhRPhnD2gxnHbR8OeCjBlbN1Pzyy8yjJOnx7QF99WKZLOkXxhleDNGhoNsHxc3NH8'
-  },
-  {
-    id: 3,
-    name: 'Matcha Latte',
-    description: 'Premium Uji matcha with steamed milk',
-    price: 48000,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB3QzvbU2fGphg21SOoeKO1P-AzSD9T553j9Zeo4gIp4jgfLew0aMODDZ50VgR1l0gy0xwrKJ3WJ2lNYFn2Qd2yc9BK0M4CHUgE_aZV-jWVDc3f8HK3abCK3VOehL3__8IMWNGAV_HpsPxaJn97XSVMyOTb4QL4H0FJRWeUImvueMq8zLEokk_3eFbBEE1PDRjGaLFyYuZ4z-LG-sj8-ksFIVCHZzy-kvWow6xOk5hZhg-hdgx-GAfPDKzkqZcN4lPHf8zQZ846cYU'
-  }
-]);
+const products = computed(() => {
+  if (activeCategory.value === 'semua') return productsStore.items.filter(p => p.is_active !== false);
+  return productsStore.items.filter(p => p.category_id === activeCategory.value && p.is_active !== false);
+});
 
-const cart = ref([
-  { id: 1, name: 'Artisan Latte', notes: 'Oat Milk (+10k), Less Sugar', price: 55000, quantity: 2 },
-  { id: 2, name: 'Butter Croissant', notes: 'Warmed', price: 32000, quantity: 1 }
-]);
+const cart = computed(() => cartStore.items);
 
-const addToCart = (product: any) => {
-  const existing = cart.value.find(item => item.id === product.id && !item.notes);
-  if (existing) {
-    existing.quantity++;
-  } else {
-    cart.value.push({
-      id: product.id,
-      name: product.name,
-      notes: '',
-      price: product.price,
-      quantity: 1
-    });
-  }
-};
-
+const addToCart = (product: any) => cartStore.addToCart(product);
 const increaseQty = (index: number) => {
-  cart.value[index].quantity++;
+  const item = cart.value[index];
+  cartStore.updateQuantity(item.id, item.quantity + 1);
 };
-
 const decreaseQty = (index: number) => {
-  if (cart.value[index].quantity > 1) {
-    cart.value[index].quantity--;
-  } else {
-    cart.value.splice(index, 1);
+  const item = cart.value[index];
+  cartStore.updateQuantity(item.id, item.quantity - 1);
+};
+
+const subtotal = computed(() => cartStore.subtotal);
+const tax = computed(() => cartStore.tax);
+const total = computed(() => cartStore.totalPrice);
+
+const isCheckoutLoading = ref(false);
+const checkout = async () => {
+  if (!cart.value.length) return;
+  isCheckoutLoading.value = true;
+  const items = cart.value.map(i => ({ product_id: i.id, quantity: i.quantity, price: i.price }));
+  const result = await posStore.checkout(items, 'cash', total.value);
+  if (result) {
+    cartStore.clearCart();
+    alert('Transaksi berhasil!');
   }
+  isCheckoutLoading.value = false;
 };
 
-const subtotal = computed(() => {
-  return cart.value.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-});
+const formatCurrency = (value: number) =>
+  new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value || 0);
 
-const tax = computed(() => {
-  return subtotal.value * 0.1;
+onMounted(async () => {
+  await Promise.all([
+    posStore.fetchActiveSession(),
+    productsStore.fetchProducts(),
+    categoriesStore.fetchCategories(),
+  ]);
+  if (!isSessionOpen.value) isModalOpen.value = true;
 });
-
-const total = computed(() => {
-  return subtotal.value + tax.value;
-});
-
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value);
-};
 </script>
+
 
