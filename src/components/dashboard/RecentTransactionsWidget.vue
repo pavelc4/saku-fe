@@ -72,29 +72,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed } from 'vue'
+import { useDashboardStore } from '../../stores/dashboard'
 
-const isPopupOpen = ref(false);
+const dashboardStore = useDashboardStore()
 
-const transactions = ref([
-  { id: 1, orderNumber: '0045', time: '10:42 AM', items: 3, amount: 125000, status: 'Selesai', icon: 'receipt_long' },
-  { id: 2, orderNumber: '0044', time: '10:28 AM', items: 1, amount: 45000, status: 'Selesai', icon: 'receipt_long' },
-  { id: 3, orderNumber: '0043', time: '09:55 AM', items: 5, amount: 210000, status: 'Selesai', icon: 'receipt_long' },
-  { id: 4, orderNumber: '0042', time: '09:15 AM', items: 2, amount: 85000, status: 'Refund', icon: 'assignment_return' },
-]);
+const formatCurrency = (val: number) =>
+  new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val || 0)
 
-const allTransactions = ref([
-  { id: 1, orderNumber: '0045', time: '10:42 AM', items: 3, amount: 125000, status: 'Selesai', icon: 'receipt_long' },
-  { id: 2, orderNumber: '0044', time: '10:28 AM', items: 1, amount: 45000, status: 'Selesai', icon: 'receipt_long' },
-  { id: 3, orderNumber: '0043', time: '09:55 AM', items: 5, amount: 210000, status: 'Selesai', icon: 'receipt_long' },
-  { id: 4, orderNumber: '0042', time: '09:15 AM', items: 2, amount: 85000, status: 'Refund', icon: 'assignment_return' },
-  { id: 5, orderNumber: '0041', time: '08:50 AM', items: 4, amount: 185000, status: 'Selesai', icon: 'receipt_long' },
-  { id: 6, orderNumber: '0040', time: '08:30 AM', items: 2, amount: 95000, status: 'Selesai', icon: 'receipt_long' },
-  { id: 7, orderNumber: '0039', time: '08:15 AM', items: 1, amount: 35000, status: 'Selesai', icon: 'receipt_long' },
-  { id: 8, orderNumber: '0038', time: '07:45 AM', items: 6, amount: 310000, status: 'Selesai', icon: 'receipt_long' },
-]);
-
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value);
-};
+const transactions = computed(() =>
+  dashboardStore.recentTransactions.map(t => ({
+    id: t.id?.slice(0, 8) || '-',
+    customer: t.customer_name || 'Pelanggan',
+    amount: formatCurrency(t.total || t.amount || 0),
+    status: t.status || 'confirmed',
+    time: t.created_at ? new Date(t.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '-',
+  }))
+)
 </script>

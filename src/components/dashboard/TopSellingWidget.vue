@@ -33,45 +33,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { computed } from 'vue'
+import { useDashboardStore } from '../../stores/dashboard'
 
-const topProducts = ref([
-  { 
-    id: 1, 
-    name: 'Artisan Latte', 
-    sold: 142, 
-    revenue: 6390000, 
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAj-qrcBjRL4IY6UdC58jqBPzw50I3aklK_P9Ecnv3aXDiK4JVu0MgNj0nDHIO5bPMpc11rBryDCXYrk78huoLLf2sEVK1rerdvbE782ADkDG2x7RVjhZjhLK2DpSOPzWtmfu411zctDioQI0REH5WRqVQPDD78rilDiXr8MXcWWmgYjgNUFTICv8C0-jQ_KEOvU7sgmuU1CrHoBs92ofVXVkEhb_5MVp9oJPbaV0wW04GvSSlCfL9rPnMh5CmgWUM6H_ollHLfbyc',
-    icon: ''
-  },
-  { 
-    id: 2, 
-    name: 'Butter Croissant', 
-    sold: 98, 
-    revenue: 3136000, 
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAgFTK5B_a1Kpoz0LtR53F3fj7x36li0UQWjB54YsCc_XHmsf3-ehjvWLAqPz4LIxlGkQ3gi9Pzatx3-VGofaVsBIklV12pCTfQ1rVL9vN1yyuD30miLnB9wC9gnBV6gv7NDRMmxCFuMUT-DGTPT_aJRBoM16fSYMkHLDwAf3hkrqXp_wj6UEbTO9kZ5roX6D6Hl0-wAp68_LuhRPhnD2gxnHbR8OeCjBlbN1Pzyy8yjJOnx7QF99WKZLOkXxhleDNGhoNsHxc3NH8',
-    icon: ''
-  },
-  { 
-    id: 3, 
-    name: 'Matcha Powder', 
-    sold: 45, 
-    revenue: 2160000, 
-    image: '',
-    icon: 'local_drink'
-  }
-]);
+const dashboardStore = useDashboardStore()
 
-const maxSold = computed(() => {
-  return Math.max(...topProducts.value.map(p => p.sold));
-});
-
-const formatCurrency = (value: number) => {
-  if (value >= 1000000) {
-    return `Rp ${(value / 1000000).toFixed(1)}M`;
-  } else if (value >= 1000) {
-    return `Rp ${(value / 1000).toFixed(1)}K`;
-  }
-  return `Rp ${value}`;
-};
+const topProducts = computed(() =>
+  dashboardStore.topSelling.map(p => ({
+    name: p.name,
+    sold: p.sold || 0,
+    image: p.image_url || '',
+    initials: p.name?.slice(0, 2).toUpperCase() || 'PR',
+  }))
+)
 </script>

@@ -319,6 +319,7 @@ const tax = computed(() => cartStore.tax);
 const total = computed(() => cartStore.totalPrice);
 
 const isCheckoutLoading = ref(false);
+const checkoutSuccess = ref(false);
 const checkout = async () => {
   if (!cart.value.length) return;
   isCheckoutLoading.value = true;
@@ -326,7 +327,8 @@ const checkout = async () => {
   const result = await posStore.checkout(items, 'cash', total.value);
   if (result) {
     cartStore.clearCart();
-    alert('Transaksi berhasil!');
+    checkoutSuccess.value = true;
+    setTimeout(() => checkoutSuccess.value = false, 3000);
   }
   isCheckoutLoading.value = false;
 };

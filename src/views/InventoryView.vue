@@ -90,7 +90,7 @@
           </div>
           
           <!-- Rows -->
-          <div v-for="item in inventoryItems" :key="item.sku"
+          <div v-for="item in filteredItems" :key="item.id"
                :class="[
                  'bg-surface-container-lowest rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer group flex flex-col',
                  !item.active ? 'opacity-60 hover:opacity-100' : '',

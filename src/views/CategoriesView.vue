@@ -22,7 +22,7 @@
               </div>
 
               <div class="space-y-4">
-                <div v-for="category in categories" :key="category.id" 
+                <div v-for="category in categoriesStore.items" :key="category.id" 
                      @click="toggleExpand(category.id)"
                      :class="['rounded-2xl p-6 transition-all duration-300 cursor-pointer border',
                               expandedCategory === category.id 
