@@ -216,14 +216,5 @@ onMounted(() => {
     profileForm.value.name = authStore.user.name || '';
     profileForm.value.email = authStore.user.email || '';
   }
-  
-  // Load global defaults
-  settingsApi.get().then((response) => {
-    if (response.data) {
-      settings.value = response.data;
-    }
-  }).catch((err) => {
-    console.error('Failed to load settings:', err);
-  });
 });
 </script>
