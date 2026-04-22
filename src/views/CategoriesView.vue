@@ -370,8 +370,11 @@ const saveEditCategory = async () => {
   if (!selectedCategoryToEdit.value) return;
   editLoading.value = true;
   const ok = await categoriesStore.updateCategory(selectedCategoryToEdit.value.id, { name: selectedCategoryToEdit.value.name });
+  if (ok) {
+    await categoriesStore.fetchCategories();
+    closeEditModal();
+  }
   editLoading.value = false;
-  if (ok) closeEditModal();
 };
 
 // Delete Modal
@@ -386,6 +389,7 @@ const confirmDeleteCategory = async () => {
   await categoriesStore.deleteCategory(selectedCategoryToDelete.value.id);
   deleteLoading.value = false;
   closeDeleteModal();
+  await categoriesStore.fetchCategories();
 };
 
 const toggleActive = async (id: string, isActive: boolean) => {
