@@ -2,12 +2,13 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { authApi } from '../api/auth'
 
-const R2_PUBLIC_URL = import.meta.env.VITE_R2_PUBLIC_URL || 'https://saku.sineva.workers.dev'
+const R2_PUBLIC_URL = import.meta.env.VITE_R2_PUBLIC_URL || ''
 
 export function getR2Url(path: string) {
   if (!path) return ''
   if (path.startsWith('http')) return path
-  return `${R2_PUBLIC_URL}/${path}`
+  if (R2_PUBLIC_URL) return `${R2_PUBLIC_URL}/files/${path}`
+  return `/files/${path}`
 }
 
 export const useAuthStore = defineStore('auth', () => {

@@ -45,11 +45,11 @@
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-2">
                   <label class="block text-sm font-label font-medium text-on-surface-variant" for="fullName">Full Name</label>
-                  <input v-model="user.name" class="w-full bg-surface border border-surface-container-highest focus:border-primary focus:bg-surface-container-lowest text-on-surface rounded-xl py-3 px-4 transition-colors font-label focus:ring-2 focus:ring-primary/20" id="fullName" type="text" />
+                  <input v-model="profileForm.name" class="w-full bg-surface border border-surface-container-highest focus:border-primary focus:bg-surface-container-lowest text-on-surface rounded-xl py-3 px-4 transition-colors font-label focus:ring-2 focus:ring-primary/20" id="fullName" type="text" />
                 </div>
                 <div class="space-y-2">
                   <label class="block text-sm font-label font-medium text-on-surface-variant" for="emailAddress">Email Address</label>
-                  <input v-model="user.email" class="w-full bg-surface border border-surface-container-highest focus:border-primary focus:bg-surface-container-lowest text-on-surface rounded-xl py-3 px-4 transition-colors font-label focus:ring-2 focus:ring-primary/20" id="emailAddress" type="email" />
+                  <input v-model="profileForm.email" class="w-full bg-surface border border-surface-container-highest focus:border-primary focus:bg-surface-container-lowest text-on-surface rounded-xl py-3 px-4 transition-colors font-label focus:ring-2 focus:ring-primary/20" id="emailAddress" type="email" />
                 </div>
               </div>
               <div class="pt-4 flex justify-end">
