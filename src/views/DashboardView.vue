@@ -22,20 +22,20 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <MetricCard 
-                title="Net Profit" 
-                value="$4,250.00" 
+                title="Total Pendapatan" 
+                :value="formatCurrency(metrics?.income || 0)" 
                 icon="trending_up" 
                 iconColorClass="text-primary"
-                trendText="12% vs last week"
+                :trendText="`Bulan ini`"
                 trendIcon="arrow_upward"
                 trendTextColorClass="text-tertiary-container"
               />
               <MetricCard 
-                title="Proj. Cashflow" 
-                value="$12,800.00" 
+                title="Total Pengeluaran" 
+                :value="formatCurrency(metrics?.expense || 0)" 
                 icon="account_balance_wallet" 
                 iconColorClass="text-secondary"
-                trendText="End of Month Est."
+                :trendText="`Bulan ini`"
                 trendTextColorClass="text-on-surface-variant"
               />
             </div>
@@ -87,13 +87,15 @@ const greeting = computed(() => {
 const user = computed(() => ({
   name: authStore.user?.name || 'Pemilik',
   avatar: authStore.user?.avatar || '',
-}));
+}))
+
+const metrics = computed(() => dashboardStore.metrics)
 
 const formatCurrency = (val: number) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val || 0);
 
-const netProfit = computed(() => formatCurrency(dashboardStore.metrics?.total_revenue || 0));
-const totalTransactions = computed(() => dashboardStore.metrics?.total_transactions || 0);
+const netProfit = computed(() => formatCurrency(dashboardStore.metrics?.net || 0));
+const totalTransactions = computed(() => dashboardStore.metrics?.transaction_count || 0);
 
 const lowStockItems = computed(() =>
   dashboardStore.lowStock.map(p => ({
