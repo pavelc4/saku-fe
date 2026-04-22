@@ -7,11 +7,11 @@ export const productsApi = {
   getById: (id: string) =>
     apiClient.get(`/products/${id}`),
 
-  create: (data: FormData | object) =>
+  create: (data: object) =>
     apiClient.post('/products', data),
 
-  update: (id: string, data: FormData | object) =>
-    apiClient.put(`/products/${id}`, data),
+  update: (id: string, data: object) =>
+    apiClient.patch(`/products/${id}`, data),
 
   delete: (id: string) =>
     apiClient.delete(`/products/${id}`),

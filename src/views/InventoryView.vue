@@ -199,11 +199,8 @@
                 <div>
                   <label class="block text-sm font-medium text-on-background mb-2">Kategori</label>
                   <div class="relative">
-                    <select v-model="editingProduct.category" class="w-full bg-surface border-0 border-b-2 border-surface-variant focus:border-primary focus:bg-surface-container-lowest focus:ring-0 px-4 py-3 rounded-t-lg transition-colors text-on-background font-body appearance-none pr-10">
-                      <option value="Minuman / Kopi">Minuman / Kopi</option>
-                      <option value="Minuman / Teh">Minuman / Teh</option>
-                      <option value="Makanan / Pastry">Makanan / Pastry</option>
-                      <option value="Merchandise">Merchandise</option>
+                    <select v-model="editingProduct.product_category_id" class="w-full bg-surface border-0 border-b-2 border-surface-variant focus:border-primary focus:bg-surface-container-lowest focus:ring-0 px-4 py-3 rounded-t-lg transition-colors text-on-background font-body appearance-none pr-10">
+                      <option v-for="cat in categoriesStore.items" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
                     </select>
                     <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
                   </div>
@@ -248,7 +245,7 @@
                 <p class="text-sm text-on-surface-variant">Produk aktif dapat dilihat dan dibeli di POS.</p>
               </div>
               <label class="relative inline-flex items-center cursor-pointer">
-                <input v-model="editingProduct.active" class="sr-only peer" type="checkbox"/>
+                <input v-model="editingProduct.is_active" class="sr-only peer" type="checkbox"/>
                 <div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                 <span class="ml-3 text-sm font-medium text-primary">Aktif</span>
               </label>
@@ -261,9 +258,9 @@
           <button @click="closeEditModal" class="px-6 py-3 rounded-full text-on-background font-medium hover:bg-surface-variant transition-colors text-sm cursor-pointer" type="button">
             Batal
           </button>
-          <button @click="saveProduct" class="px-8 py-3 rounded-full bg-primary text-on-primary font-medium shadow-[0_4px_12px_rgba(154,64,33,0.2)] hover:bg-primary-container transition-all text-sm flex items-center space-x-2 cursor-pointer" type="button">
+          <button @click="saveProduct" :disabled="editLoading" class="px-8 py-3 rounded-full bg-primary text-on-primary font-medium shadow-[0_4px_12px_rgba(154,64,33,0.2)] hover:bg-primary-container transition-all text-sm flex items-center space-x-2 cursor-pointer disabled:opacity-50" type="button">
             <span class="material-symbols-outlined text-lg">save</span>
-            <span>Simpan Perubahan</span>
+            <span>{{ editLoading ? 'Menyimpan...' : 'Simpan Perubahan' }}</span>
           </button>
         </div>
       </div>
@@ -297,12 +294,9 @@
                 <div>
                   <label class="block text-sm font-semibold text-on-surface mb-2 font-label">Category</label>
                   <div class="relative">
-                    <select v-model="newProduct.category" class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3.5 text-on-surface appearance-none focus:ring-0 focus:bg-surface-container-lowest focus:shadow-[0_0_0_2px_rgba(220,193,184,0.2)] transition-all font-body text-base pr-10" required>
+                    <select v-model="newProduct.product_category_id" class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3.5 text-on-surface appearance-none focus:ring-0 focus:bg-surface-container-lowest focus:shadow-[0_0_0_2px_rgba(220,193,184,0.2)] transition-all font-body text-base pr-10" required>
                       <option disabled value="">Select category</option>
-                      <option value="Makanan / Pastry">Makanan / Pastry</option>
-                      <option value="Minuman / Kopi">Minuman / Kopi</option>
-                      <option value="Minuman / Teh">Minuman / Teh</option>
-                      <option value="Merchandise">Merchandise</option>
+                      <option v-for="cat in categoriesStore.items" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
                     </select>
                     <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
                   </div>
@@ -359,9 +353,8 @@
           <button @click="closeAddModal" class="px-6 py-3 rounded-full text-on-surface font-semibold text-sm hover:bg-surface-container-highest transition-colors font-label cursor-pointer" type="button">
             Batal
           </button>
-          <button @click="addProduct" class="px-8 py-3 rounded-full text-on-primary font-semibold text-sm bg-primary shadow-sm hover:bg-primary-container transition-all relative overflow-hidden font-label cursor-pointer" type="button">
-            <span class="relative z-10">Simpan Produk</span>
-            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/10 to-transparent pointer-events-none"></div>
+          <button @click="addProduct" :disabled="addLoading" class="px-8 py-3 rounded-full text-on-primary font-semibold text-sm bg-primary shadow-sm hover:bg-primary-container transition-all relative overflow-hidden font-label cursor-pointer disabled:opacity-50" type="button">
+            <span class="relative z-10">{{ addLoading ? 'Menyimpan...' : 'Simpan Produk' }}</span>
           </button>
         </div>
       </div>
@@ -381,9 +374,8 @@
           <button @click="closeDeleteModal" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-surface-container-highest text-on-surface font-body font-semibold hover:bg-surface-variant transition-colors duration-200 cursor-pointer" type="button">
             Batal
           </button>
-          <button @click="confirmDelete" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-error text-on-error font-body font-semibold shadow-sm hover:opacity-90 hover:shadow-md transition-all duration-200 relative overflow-hidden group cursor-pointer" type="button">
-            <span class="relative z-10 flex items-center gap-2">Hapus Permanen</span>
-            <div class="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
+          <button @click="confirmDelete" :disabled="deleteLoading" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-error text-on-error font-body font-semibold shadow-sm hover:opacity-90 hover:shadow-md transition-all duration-200 relative overflow-hidden group cursor-pointer disabled:opacity-50" type="button">
+            <span class="relative z-10 flex items-center gap-2">{{ deleteLoading ? 'Menghapus...' : 'Hapus Permanen' }}</span>
           </button>
         </div>
       </div>
@@ -423,36 +415,59 @@ const formatCurrency = (val: number) =>
 
 // Add Modal
 const isAddModalOpen = ref(false);
-const newProduct = ref({ name: '', sku: '', category_id: '', stock: 0, price: 0, is_active: true });
+const addLoading = ref(false);
+const newProduct = ref({ name: '', sku: '', product_category_id: '', stock: 0, price: 0, is_active: true });
 const openAddModal = () => { isAddModalOpen.value = true; };
 const closeAddModal = () => {
   isAddModalOpen.value = false;
-  newProduct.value = { name: '', sku: '', category_id: '', stock: 0, price: 0, is_active: true };
+  newProduct.value = { name: '', sku: '', product_category_id: '', stock: 0, price: 0, is_active: true };
 };
 const addProduct = async () => {
-  const ok = await productsStore.createProduct(newProduct.value);
+  const payload = {
+    name: newProduct.value.name,
+    sku: newProduct.value.sku || null,
+    product_category_id: newProduct.value.product_category_id || null,
+    stock: Number(newProduct.value.stock) || 0,
+    price: Number(newProduct.value.price) || 0,
+    is_active: newProduct.value.is_active,
+  };
+  addLoading.value = true;
+  const ok = await productsStore.createProduct(payload);
+  addLoading.value = false;
   if (ok) closeAddModal();
 };
 
 // Edit Modal
 const isEditModalOpen = ref(false);
+const editLoading = ref(false);
 const editingProduct = ref<any>({});
 const openEditModal = (item: any) => { editingProduct.value = { ...item }; isEditModalOpen.value = true; };
 const closeEditModal = () => { isEditModalOpen.value = false; };
 const saveProduct = async () => {
-  const ok = await productsStore.updateProduct(editingProduct.value.id, editingProduct.value);
+  const payload = {
+    name: editingProduct.value.name,
+    product_category_id: editingProduct.value.product_category_id || null,
+    stock: Number(editingProduct.value.stock) || 0,
+    price: Number(editingProduct.value.price) || 0,
+    is_active: editingProduct.value.is_active,
+  };
+  editLoading.value = true;
+  const ok = await productsStore.updateProduct(editingProduct.value.id, payload);
+  editLoading.value = false;
   if (ok) closeEditModal();
 };
 
 // Delete Modal
 const isDeleteModalOpen = ref(false);
+const deleteLoading = ref(false);
 const productToDelete = ref<any>(null);
 const openDeleteModal = (item: any) => { productToDelete.value = item; isDeleteModalOpen.value = true; };
 const closeDeleteModal = () => { isDeleteModalOpen.value = false; productToDelete.value = null; };
 const confirmDelete = async () => {
-  if (productToDelete.value) {
-    await productsStore.deleteProduct(productToDelete.value.id);
-  }
+  if (!productToDelete.value) return;
+  deleteLoading.value = true;
+  await productsStore.deleteProduct(productToDelete.value.id);
+  deleteLoading.value = false;
   closeDeleteModal();
 };
 
