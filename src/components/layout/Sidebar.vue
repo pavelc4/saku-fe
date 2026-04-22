@@ -63,6 +63,7 @@ const user = computed(() => authStore.user);
 
 const navItems = ref([
   { name: 'Dashboard', icon: 'dashboard', path: '/dashboard' },
+  { name: 'Transactions', icon: 'receipt_long', path: '/transactions' },
   { name: 'Sales', icon: 'shopping_cart', path: '/sales' },
   { name: 'Inventory', icon: 'inventory_2', path: '/inventory' },
   { name: 'Categories', icon: 'category', path: '/categories' },

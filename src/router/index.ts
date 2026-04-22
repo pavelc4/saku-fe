@@ -10,6 +10,7 @@ import NotificationsView from '../views/NotificationsView.vue'
 import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
 import OAuthSuccess from '../views/OAuthSuccess.vue'
+import TransactionsView from '../views/TransactionsView.vue'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -27,6 +28,12 @@ const routes: RouteRecordRaw[] = [
     path: '/sales',
     name: 'sales',
     component: SalesView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/transactions',
+    name: 'transactions',
+    component: TransactionsView,
     meta: { requiresAuth: true }
   },
   {
