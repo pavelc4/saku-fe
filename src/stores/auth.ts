@@ -2,6 +2,14 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { authApi } from '../api/auth'
 
+const R2_PUBLIC_URL = import.meta.env.VITE_R2_PUBLIC_URL || 'https://saku.sineva.workers.dev'
+
+export function getR2Url(path: string) {
+  if (!path) return ''
+  if (path.startsWith('http')) return path
+  return `${R2_PUBLIC_URL}/${path}`
+}
+
 export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(localStorage.getItem('saku_token'))
   const user = ref<any | null>(null)

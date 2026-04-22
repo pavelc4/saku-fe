@@ -11,7 +11,7 @@
           {{ index + 1 }}
         </div>
         <div class="w-12 h-12 rounded-lg overflow-hidden shrink-0">
-          <img v-if="product.image" :src="product.image" :alt="product.name" class="w-full h-full object-cover" />
+          <img v-if="product.image" :src="getR2Url(product.image)" :alt="product.name" class="w-full h-full object-cover" />
           <div v-else class="w-full h-full bg-surface-container-highest flex items-center justify-center text-on-surface-variant">
             <span class="material-symbols-outlined text-xl">{{ product.icon }}</span>
           </div>
@@ -35,6 +35,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useDashboardStore } from '../../stores/dashboard'
+import { getR2Url } from '../../stores/auth'
 
 const dashboardStore = useDashboardStore()
 

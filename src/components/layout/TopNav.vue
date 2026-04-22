@@ -13,7 +13,7 @@
         Tutup Shift
       </button>
       <button class="h-10 w-10 rounded-full bg-surface-container-highest flex items-center justify-center text-primary font-headline font-medium hover:opacity-80 transition-opacity overflow-hidden">
-        <img v-if="user.avatar" :src="user.avatar" alt="User Profile" class="w-full h-full object-cover" />
+        <img v-if="user.avatar" :src="getR2Url(user.avatar)" alt="User Profile" class="w-full h-full object-cover" />
       </button>
 
       <!-- Notification Center Card -->
@@ -97,6 +97,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
+import { getR2Url } from '../../stores/auth';
 
 defineProps<{
   user: { name: string; avatar: string },

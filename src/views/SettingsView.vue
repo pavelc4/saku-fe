@@ -18,16 +18,22 @@
             <h3 class="text-2xl font-headline font-medium text-on-surface mb-8">Profile Details</h3>
             <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
               <div class="relative group cursor-pointer shrink-0">
-                <img :src="user.avatar" alt="Profile Preview" class="w-32 h-32 rounded-full object-cover shadow-[0_8px_32px_rgba(27,28,24,0.08)]" />
-                <div class="absolute inset-0 bg-on-surface/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                <img :src="avatarPreview || getR2Url(user?.avatar)" alt="Profile Preview" class="w-32 h-32 rounded-full object-cover shadow-[0_8px_32px_rgba(27,28,24,0.08)]" />
+                <input type="file" ref="avatarInput" accept="image/jpeg,image/png,image/webp" class="hidden" @change="handleAvatarChange" />
+                <div @click="triggerAvatarUpload" class="absolute inset-0 bg-on-surface/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
                   <span class="material-symbols-outlined text-surface-container-lowest">photo_camera</span>
                 </div>
               </div>
               <div class="flex-1 space-y-6 w-full">
                 <p class="text-sm text-secondary font-body">Upload a new avatar. Larger images will be resized automatically. Maximum upload size is 2 MB.</p>
-                <button class="bg-surface-container-highest text-on-surface font-label font-medium px-6 py-3 rounded-full hover:bg-surface-container-high transition-colors cursor-pointer">
-                  Upload New Photo
-                </button>
+                <div class="flex gap-3">
+                  <button @click="triggerAvatarUpload" :disabled="avatarLoading" class="bg-surface-container-highest text-on-surface font-label font-medium px-6 py-3 rounded-full hover:bg-surface-container-high transition-colors cursor-pointer disabled:opacity-50">
+                    {{ avatarLoading ? 'Uploading...' : 'Upload New Photo' }}
+                  </button>
+                  <button v-if="user?.avatar" @click="deleteAvatar" :disabled="avatarLoading" class="text-error font-label font-medium px-4 py-3 rounded-full hover:bg-error-container/50 transition-colors cursor-pointer disabled:opacity-50">
+                    Remove
+                  </button>
+                </div>
               </div>
             </div>
           </section>
@@ -39,11 +45,11 @@
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-2">
                   <label class="block text-sm font-label font-medium text-on-surface-variant" for="fullName">Full Name</label>
-                  <input v-model="user.name" class="w-full bg-surface-container border-transparent focus:border-outline-variant focus:bg-surface-container-lowest text-on-surface rounded-xl py-3 px-4 transition-colors font-label focus:ring-0" id="fullName" type="text" />
+                  <input v-model="user.name" class="w-full bg-surface border border-surface-container-highest focus:border-primary focus:bg-surface-container-lowest text-on-surface rounded-xl py-3 px-4 transition-colors font-label focus:ring-2 focus:ring-primary/20" id="fullName" type="text" />
                 </div>
                 <div class="space-y-2">
                   <label class="block text-sm font-label font-medium text-on-surface-variant" for="emailAddress">Email Address</label>
-                  <input v-model="user.email" class="w-full bg-surface-container border-transparent focus:border-outline-variant focus:bg-surface-container-lowest text-on-surface rounded-xl py-3 px-4 transition-colors font-label focus:ring-0" id="emailAddress" type="email" />
+                  <input v-model="user.email" class="w-full bg-surface border border-surface-container-highest focus:border-primary focus:bg-surface-container-lowest text-on-surface rounded-xl py-3 px-4 transition-colors font-label focus:ring-2 focus:ring-primary/20" id="emailAddress" type="email" />
                 </div>
               </div>
               <div class="pt-4 flex justify-end">
@@ -54,44 +60,7 @@
             </form>
           </section>
 
-          <!-- 3. Global Defaults -->
-          <section class="bg-surface-container-lowest rounded-lg p-8 shadow-[0_8px_48px_rgba(27,28,24,0.04)]">
-            <h3 class="text-2xl font-headline font-medium text-on-surface mb-8">Global Defaults</h3>
-            <p class="text-on-surface-variant font-body mb-6">Settings that apply across the entire system unless overridden per item.</p>
-            <form class="space-y-6" @submit.prevent="saveGlobalDefaults">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Base Tax Rate -->
-                <div class="space-y-2">
-                  <label class="block text-sm font-label font-medium text-on-surface-variant" for="taxRate">Base Tax Rate (%)</label>
-                  <input v-model.number="settings.tax_rate" class="w-full bg-surface-container border-transparent focus:border-outline-variant focus:bg-surface-container-lowest text-on-surface rounded-xl py-3 px-4 transition-colors font-label focus:ring-0" id="taxRate" type="number" min="0" step="0.01" />
-                  <p class="text-xs text-secondary font-body">Applied globally unless overridden per item.</p>
-                </div>
-
-                <!-- Default Currency -->
-                <div class="space-y-2">
-                  <label class="block text-sm font-label font-medium text-on-surface-variant" for="currency">Default Currency</label>
-                  <input v-model="settings.currency" class="w-full bg-surface-container border-transparent focus:border-outline-variant focus:bg-surface-container-lowest text-on-surface rounded-xl py-3 px-4 transition-colors font-label focus:ring-0" id="currency" type="text" />
-                  <p class="text-xs text-secondary font-body">Used for all transactions unless specified otherwise.</p>
-                </div>
-
-                <!-- Auto-sync Inventory -->
-                <div class="space-y-4">
-                  <div class="flex items-center">
-                    <input v-model="settings.auto_sync_inventory" class="h-4 w-4 rounded border-surface-container-highest text-primary focus:ring-primary" type="checkbox" />
-                    <span class="ml-3 text-sm font-label font-medium text-on-surface">Auto-sync Inventory</span>
-                  </div>
-                  <p class="text-xs text-secondary font-body ml-5">Automatically adjust inventory levels when sales are made.</p>
-                </div>
-              </div>
-              <div class="pt-4 flex justify-end">
-                <button class="bg-primary text-on-primary font-label font-medium px-8 py-3 rounded-full hover:bg-surface-tint shadow-[0_4px_16px_rgba(154,64,33,0.2)] transition-all hover:shadow-[0_8px_24px_rgba(154,64,33,0.3)] cursor-pointer" type="submit">
-                  Save Settings
-                </button>
-              </div>
-            </form>
-          </section>
-
-          <!-- 4. Security -->
+          <!-- 3. Security -->
           <section class="bg-surface-container-lowest rounded-lg p-8 shadow-[0_8px_48px_rgba(27,28,24,0.04)]">
             <div class="flex items-center gap-3 mb-8">
               <span class="material-symbols-outlined text-primary">lock</span>
@@ -100,15 +69,15 @@
             <form class="space-y-6 max-w-lg" @submit.prevent="updatePassword">
               <div class="space-y-2">
                 <label class="block text-sm font-label font-medium text-on-surface-variant" for="currentPassword">Current Password</label>
-                <input v-model="passwords.current" class="w-full bg-surface-container border-transparent focus:border-outline-variant focus:bg-surface-container-lowest text-on-surface rounded-xl py-3 px-4 transition-colors font-label focus:ring-0" id="currentPassword" type="password" />
+                <input v-model="passwords.current" class="w-full bg-surface border border-surface-container-highest focus:border-primary focus:bg-surface-container-lowest text-on-surface rounded-xl py-3 px-4 transition-colors font-label focus:ring-2 focus:ring-primary/20" id="currentPassword" type="password" />
               </div>
               <div class="space-y-2">
                 <label class="block text-sm font-label font-medium text-on-surface-variant" for="newPassword">New Password</label>
-                <input v-model="passwords.new" class="w-full bg-surface-container border-transparent focus:border-outline-variant focus:bg-surface-container-lowest text-on-surface rounded-xl py-3 px-4 transition-colors font-label focus:ring-0" id="newPassword" type="password" />
+                <input v-model="passwords.new" class="w-full bg-surface border border-surface-container-highest focus:border-primary focus:bg-surface-container-lowest text-on-surface rounded-xl py-3 px-4 transition-colors font-label focus:ring-2 focus:ring-primary/20" id="newPassword" type="password" />
               </div>
               <div class="space-y-2">
                 <label class="block text-sm font-label font-medium text-on-surface-variant" for="confirmPassword">Confirm New Password</label>
-                <input v-model="passwords.confirm" class="w-full bg-surface-container border-transparent focus:border-outline-variant focus:bg-surface-container-lowest text-on-surface rounded-xl py-3 px-4 transition-colors font-label focus:ring-0" id="confirmPassword" type="password" />
+                <input v-model="passwords.confirm" class="w-full bg-surface border border-surface-container-highest focus:border-primary focus:bg-surface-container-lowest text-on-surface rounded-xl py-3 px-4 transition-colors font-label focus:ring-2 focus:ring-primary/20" id="confirmPassword" type="password" />
               </div>
               <div class="pt-4">
                 <button class="bg-surface-container-highest text-on-surface font-label font-medium px-8 py-3 rounded-full hover:bg-surface-container-high transition-colors cursor-pointer" type="submit">
@@ -138,14 +107,54 @@
 import { ref, computed, onMounted } from 'vue';
 import Sidebar from '../components/layout/Sidebar.vue';
 import TopNav from '../components/layout/TopNav.vue';
-import { useAuthStore } from '../stores/auth';
+import { useAuthStore, getR2Url } from '../stores/auth';
 import { usersApi } from '../api/users';
 import { authApi } from '../api/auth';
-import { settingsApi } from '../api/settings';
 
 const authStore = useAuthStore();
 
 const user = computed(() => authStore.user);
+
+// Avatar upload
+const avatarInput = ref<HTMLInputElement | null>(null);
+const avatarPreview = ref<string | null>(null);
+const avatarLoading = ref(false);
+
+function triggerAvatarUpload() {
+  avatarInput.value?.click();
+}
+
+async function handleAvatarChange(e: Event) {
+  const target = e.target as HTMLInputElement;
+  const file = target.files?.[0];
+  if (!file) return;
+
+  avatarLoading.value = true;
+  try {
+    const res = await usersApi.uploadAvatar(file);
+    avatarPreview.value = URL.createObjectURL(file);
+    await authStore.fetchMe();
+    avatarPreview.value = null;
+  } catch (err: any) {
+    console.error('Upload failed:', err);
+  } finally {
+    avatarLoading.value = false;
+    target.value = '';
+  }
+}
+
+async function deleteAvatar() {
+  if (!confirm('Remove your profile photo?')) return;
+  avatarLoading.value = true;
+  try {
+    await usersApi.deleteAvatar();
+    await authStore.fetchMe();
+  } catch (err: any) {
+    console.error('Delete failed:', err);
+  } finally {
+    avatarLoading.value = false;
+  }
+}
 
 // Profile form
 const profileForm = ref({ name: '', email: '' });
@@ -157,16 +166,6 @@ const saveError = ref<string | null>(null);
 const passwords = ref({ current: '', new: '', confirm: '' });
 const passwordError = ref<string | null>(null);
 const passwordSuccess = ref(false);
-
-// Global defaults
-const settings = ref({
-  tax_rate: 0,
-  currency: '',
-  auto_sync_inventory: false
-});
-const saveSettingsLoading = ref(false);
-const saveSettingsSuccess = ref(false);
-const saveSettingsError = ref<string | null>(null);
 
 async function saveProfile() {
   saveLoading.value = true;
@@ -181,21 +180,6 @@ async function saveProfile() {
     saveError.value = err.response?.data?.error?.message || 'Gagal menyimpan profil';
   } finally {
     saveLoading.value = false;
-  }
-}
-
-async function saveGlobalDefaults() {
-  saveSettingsLoading.value = true;
-  saveSettingsError.value = null;
-  saveSettingsSuccess.value = false;
-  try {
-    await settingsApi.update(settings.value);
-    saveSettingsSuccess.value = true;
-    setTimeout(() => saveSettingsSuccess.value = false, 3000);
-  } catch (err: any) {
-    saveSettingsError.value = err.response?.data?.error?.message || 'Gagal menyimpan pengaturan';
-  } finally {
-    saveSettingsLoading.value = false;
   }
 }
 

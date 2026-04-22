@@ -25,6 +25,7 @@ export const useProductsStore = defineStore('products', () => {
         category_id: p.product_category_id,
         category: p.category_name,
         active: !!p.is_active,
+        image: p.photo_url,
       }))
       if (res.data?.data?.meta) meta.value = res.data.data.meta
     } catch (err: any) {

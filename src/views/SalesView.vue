@@ -36,7 +36,7 @@
                    class="bg-surface-container-lowest rounded-lg overflow-hidden group cursor-pointer flex flex-col hover:bg-surface-container-low transition-colors duration-300"
                    @click="addToCart(product)">
                 <div class="h-40 overflow-hidden relative">
-                  <img :src="product.image" :alt="product.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img :src="getR2Url(product.image)" :alt="product.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 </div>
                 <div class="p-5 flex-1 flex flex-col justify-between">
                   <div>
@@ -244,7 +244,7 @@
 import { ref, computed, onMounted } from 'vue';
 import Sidebar from '../components/layout/Sidebar.vue';
 import TopNav from '../components/layout/TopNav.vue';
-import { useAuthStore } from '../stores/auth';
+import { useAuthStore, getR2Url } from '../stores/auth';
 import { useProductsStore } from '../stores/products';
 import { useCategoriesStore } from '../stores/categories';
 import { usePosStore } from '../stores/pos';
