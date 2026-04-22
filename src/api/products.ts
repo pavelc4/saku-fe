@@ -18,4 +18,12 @@ export const productsApi = {
 
   updateStock: (id: string, data: { stock: number; reason: string }) =>
     apiClient.patch(`/products/${id}/stock`, data),
+
+  uploadPhoto: (id: string, file: File) => {
+    const formData = new FormData()
+    formData.append('photo', file)
+    return apiClient.post(`/products/${id}/photo`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+  },
 }

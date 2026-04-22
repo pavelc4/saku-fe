@@ -188,6 +188,20 @@
             <div class="space-y-6">
               <h3 class="text-sm font-headline font-semibold text-primary uppercase tracking-wider">Informasi Dasar</h3>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Photo Upload -->
+                <div class="flex items-center gap-4">
+                  <div class="relative group cursor-pointer w-20 h-20 rounded-lg overflow-hidden bg-surface-container-low shrink-0">
+                    <img v-if="editProductPreview || editingProduct.image" :src="editProductPreview || getR2Url(editingProduct.image)" alt="Preview" class="w-full h-full object-cover" />
+                    <div v-else class="w-full h-full flex items-center justify-center">
+                      <span class="material-symbols-outlined text-on-surface-variant text-2xl">add_photo_alternate</span>
+                    </div>
+                    <input type="file" ref="editProductImageInput" accept="image/*" class="hidden" @change="handleEditProductImage" />
+                    <div @click="editProductImageInput?.click()" class="absolute inset-0 bg-on-surface/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <span class="material-symbols-outlined text-surface text-lg">photo_camera</span>
+                    </div>
+                  </div>
+                  <p class="text-sm text-on-surface-variant">Ganti photo</p>
+                </div>
                 <div class="col-span-1 md:col-span-2">
                   <label class="block text-sm font-medium text-on-background mb-2">Nama Produk</label>
                   <input v-model="editingProduct.name" class="w-full bg-surface border-0 border-b-2 border-surface-variant focus:border-primary focus:bg-surface-container-lowest focus:ring-0 px-4 py-3 rounded-t-lg transition-colors text-on-background font-body placeholder:text-on-surface-variant/50" type="text"/>
@@ -282,6 +296,24 @@
         <div class="px-8 py-6 overflow-y-auto flex-1 bg-surface-container-lowest custom-scrollbar">
           <form class="space-y-8" @submit.prevent="addProduct">
             <div class="space-y-6">
+              <!-- Photo Upload -->
+              <div class="flex items-center gap-6">
+                <div class="relative group cursor-pointer w-24 h-24 rounded-lg overflow-hidden bg-surface-container-low shrink-0">
+                  <img v-if="newProductPreview" :src="newProductPreview" alt="Preview" class="w-full h-full object-cover" />
+                  <div v-else class="w-full h-full flex items-center justify-center">
+                    <span class="material-symbols-outlined text-on-surface-variant text-3xl">add_photo_alternate</span>
+                  </div>
+                  <input type="file" ref="newProductImageInput" accept="image/*" class="hidden" @change="handleNewProductImage" />
+                  <div @click="newProductImageInput?.click()" class="absolute inset-0 bg-on-surface/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <span class="material-symbols-outlined text-surface text-xl">photo_camera</span>
+                  </div>
+                </div>
+                <div>
+                  <p class="font-medium text-on-surface">Product Photo</p>
+                  <p class="text-sm text-on-surface-variant">JPG, PNG, max 5MB</p>
+                </div>
+              </div>
+              
               <div>
                 <label class="block text-sm font-semibold text-on-surface mb-2 font-label">Product Name</label>
                 <input v-model="newProduct.name" class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3.5 text-on-surface placeholder:text-on-surface-variant/50 focus:ring-0 focus:bg-surface-container-lowest focus:shadow-[0_0_0_2px_rgba(220,193,184,0.2)] transition-all font-body text-base" placeholder="e.g. Artisan Sourdough Loaf" type="text" required />
@@ -387,9 +419,10 @@
 import { ref, onMounted, computed } from 'vue';
 import Sidebar from '../components/layout/Sidebar.vue';
 import TopNav from '../components/layout/TopNav.vue';
-import { useAuthStore } from '../stores/auth';
+import { useAuthStore, getR2Url } from '../stores/auth';
 import { useProductsStore } from '../stores/products';
 import { useCategoriesStore } from '../stores/categories';
+import { productsApi } from '../api/products';
 
 const authStore = useAuthStore();
 const productsStore = useProductsStore();
@@ -429,10 +462,25 @@ const inventoryValue = computed(() => {
 const isAddModalOpen = ref(false);
 const addLoading = ref(false);
 const newProduct = ref({ name: '', sku: '', product_category_id: '', stock: 0, price: 0, is_active: true });
+const newProductImageInput = ref<HTMLInputElement | null>(null);
+const newProductImage = ref<File | null>(null);
+const newProductPreview = ref<string | null>(null);
+
+function handleNewProductImage(e: Event) {
+  const target = e.target as HTMLInputElement;
+  const file = target.files?.[0];
+  if (file) {
+    newProductImage.value = file;
+    newProductPreview.value = URL.createObjectURL(file);
+  }
+}
+
 const openAddModal = () => { isAddModalOpen.value = true; };
 const closeAddModal = () => {
   isAddModalOpen.value = false;
   newProduct.value = { name: '', sku: '', product_category_id: '', stock: 0, price: 0, is_active: true };
+  newProductImage.value = null;
+  newProductPreview.value = null;
 };
 const addProduct = async () => {
   const payload = {
@@ -445,6 +493,13 @@ const addProduct = async () => {
   };
   addLoading.value = true;
   const ok = await productsStore.createProduct(payload);
+  
+  // Upload photo if exists
+  if (ok && newProductImage.value && productsStore.items[0]) {
+    const productId = productsStore.items[0].id;
+    await productsApi.uploadPhoto(productId, newProductImage.value);
+  }
+  
   addLoading.value = false;
   if (ok) closeAddModal();
 };
@@ -453,15 +508,34 @@ const addProduct = async () => {
 const isEditModalOpen = ref(false);
 const editLoading = ref(false);
 const editingProduct = ref<any>({});
+const editProductImageInput = ref<HTMLInputElement | null>(null);
+const editProductImage = ref<File | null>(null);
+const editProductPreview = ref<string | null>(null);
+
+function handleEditProductImage(e: Event) {
+  const target = e.target as HTMLInputElement;
+  const file = target.files?.[0];
+  if (file) {
+    editProductImage.value = file;
+    editProductPreview.value = URL.createObjectURL(file);
+  }
+}
+
 const openEditModal = (item: any) => {
   editingProduct.value = {
     ...item,
     is_active: item.active,
     product_category_id: item.category_id,
   };
+  editProductImage.value = null;
+  editProductPreview.value = null;
   isEditModalOpen.value = true;
 };
-const closeEditModal = () => { isEditModalOpen.value = false; };
+const closeEditModal = () => { 
+  isEditModalOpen.value = false; 
+  editProductImage.value = null;
+  editProductPreview.value = null;
+};
 const saveProduct = async () => {
   const payload = {
     name: editingProduct.value.name,
@@ -472,6 +546,12 @@ const saveProduct = async () => {
   };
   editLoading.value = true;
   const ok = await productsStore.updateProduct(editingProduct.value.id, payload);
+  
+  // Upload new photo if exists
+  if (ok && editProductImage.value) {
+    await productsApi.uploadPhoto(editingProduct.value.id, editProductImage.value);
+  }
+  
   editLoading.value = false;
   if (ok) closeEditModal();
 };
