@@ -5,16 +5,8 @@
       <input class="w-full pl-10 pr-4 py-2 rounded-full bg-surface-container-highest border-none focus:ring-0 focus:bg-surface-container-lowest transition-colors font-body text-sm text-on-surface placeholder:text-on-surface-variant" placeholder="Search..." type="text"/>
     </div>
     <div class="flex items-center gap-4 relative" ref="navContainer">
-      <button @click="showNotifications = !showNotifications" class="h-10 w-10 rounded-full hover:bg-surface-container-highest flex items-center justify-center text-on-surface-variant transition-colors relative cursor-pointer">
-        <span class="material-symbols-outlined">notifications</span>
-        <span class="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary"></span>
-      </button>
       <button v-if="showCloseShift" @click="$emit('close-shift')" class="font-body font-semibold text-primary hover:bg-surface-container-highest transition-colors px-4 py-2 bg-surface-container rounded-full cursor-pointer hidden md:block">
         Tutup Shift
-      </button>
-      <button class="h-10 w-10 rounded-full bg-surface-container-highest flex items-center justify-center text-primary font-headline font-medium hover:opacity-80 transition-opacity overflow-hidden">
-        <img v-if="user && user.avatar" :src="getR2Url(user.avatar)" alt="User Profile" class="w-full h-full object-cover" />
-        <span v-else-if="user" class="material-symbols-outlined text-on-surface-variant">account_circle</span>
       </button>
 
       <!-- Notification Center Card -->
