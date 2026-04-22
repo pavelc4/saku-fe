@@ -16,8 +16,8 @@
           
           <div class="lg:col-span-2 space-y-8">
             <InsightCard 
-              title="Morning Insight" 
-              message="Inventory for 'Artisan Clay Mugs' is moving 20% faster than usual due to the upcoming weekend festival. Consider restocking or highlighting complementary items near the checkout."
+              :title="dailyInsightTitle" 
+              :message="dailyInsightMessage || 'Belum ada insight untuk hari ini.'"
             />
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -40,7 +40,7 @@
               />
             </div>
 
-            <RevenueChart total="$8,420" :data="chartData" />
+            <RevenueChart :total="formatCurrency(metrics?.income || 0)" :data="chartData" />
             <RecentTransactionsWidget />
           </div>
 
@@ -107,15 +107,28 @@ const lowStockItems = computed(() =>
   }))
 );
 
-const chartData = ref([
-  { label: 'Sen', height: '30%', isToday: false },
-  { label: 'Sel', height: '50%', isToday: false },
-  { label: 'Rab', height: '40%', isToday: false },
-  { label: 'Kam', height: '70%', isToday: false },
-  { label: 'Jum', height: '90%', isToday: true },
-  { label: 'Sab', height: '20%', isToday: false },
-  { label: 'Min', height: '10%', isToday: false },
-]);
+const chartData = computed(() => dashboardStore.weeklyRevenue.length > 0 
+  ? dashboardStore.weeklyRevenue 
+  : [
+      { label: 'Sen', height: '10%', isToday: false },
+      { label: 'Sel', height: '10%', isToday: false },
+      { label: 'Rab', height: '10%', isToday: false },
+      { label: 'Kam', height: '10%', isToday: false },
+      { label: 'Jum', height: '10%', isToday: false },
+      { label: 'Sab', height: '10%', isToday: false },
+      { label: 'Min', height: '10%', isToday: false },
+    ]
+)
+
+const dailyInsightTitle = computed(() => {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Insight Pagi';
+  if (hour < 15) return 'Insight Siang';
+  if (hour < 18) return 'Insight Sore';
+  return 'Insight Malam';
+})
+
+const dailyInsightMessage = computed(() => dashboardStore.dailyInsight?.insight || '')
 
 onMounted(() => {
   dashboardStore.fetchDashboard();
