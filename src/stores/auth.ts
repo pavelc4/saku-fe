@@ -7,8 +7,7 @@ const R2_PUBLIC_URL = import.meta.env.VITE_R2_PUBLIC_URL || ''
 export function getR2Url(path: string) {
   if (!path) return ''
   if (path.startsWith('http')) return path
-  if (R2_PUBLIC_URL) return `${R2_PUBLIC_URL}/files/${path}`
-  return `/files/${path}`
+  return '' // Disable R2 for now - not working in production
 }
 
 export const useAuthStore = defineStore('auth', () => {
