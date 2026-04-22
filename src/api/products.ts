@@ -15,4 +15,7 @@ export const productsApi = {
 
   delete: (id: string) =>
     apiClient.delete(`/products/${id}`),
+
+  updateStock: (id: string, data: { stock: number; reason: string }) =>
+    apiClient.patch(`/products/${id}/stock`, data),
 }

@@ -45,9 +45,9 @@
           </div>
 
           <div class="space-y-8">
-            <LowStockWidget :items="lowStockItems" />
+            <LowStockWidget :items="lowStockItems" @restock="handleRestock" />
             <TopSellingWidget />
-            <QuickActionWidget />
+            <QuickActionWidget :loading="reportLoading" @generate="generateReport" />
           </div>
           
         </div>
@@ -72,9 +72,33 @@ import RecentTransactionsWidget from '../components/dashboard/RecentTransactions
 import TopSellingWidget from '../components/dashboard/TopSellingWidget.vue';
 import { useAuthStore } from '../stores/auth';
 import { useDashboardStore } from '../stores/dashboard';
+import { useProductsStore } from '../stores/products';
+import { insightsApi } from '../api/insights';
 
 const authStore = useAuthStore();
 const dashboardStore = useDashboardStore();
+const productsStore = useProductsStore();
+
+const handleRestock = async (id: string) => {
+  const product = productsStore.items.find(p => p.id === id)
+  if (product) {
+    const newStock = product.stock + 10
+    await productsStore.restockProduct(id, newStock)
+    dashboardStore.fetchDashboard()
+  }
+}
+
+const reportLoading = ref(false)
+const generateReport = async () => {
+  reportLoading.value = true
+  try {
+    const res = await insightsApi.askAdvisor('Generate daily summary')
+    alert(res.data?.data || 'Report generated!')
+  } catch (e) {
+    alert('Failed to generate report')
+  }
+  reportLoading.value = false
+}
 
 const greeting = computed(() => {
   const hour = new Date().getHours();
@@ -99,6 +123,7 @@ const totalTransactions = computed(() => dashboardStore.metrics?.transaction_cou
 
 const lowStockItems = computed(() =>
   dashboardStore.lowStock.map(p => ({
+    id: p.id,
     name: p.name,
     remaining: p.stock,
     image: p.image_url || '',

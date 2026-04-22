@@ -74,5 +74,16 @@ export const useProductsStore = defineStore('products', () => {
     }
   }
 
-  return { items, loading, error, meta, search, activeCategoryId, lowStockItems, outOfStock, totalValue, fetchProducts, createProduct, updateProduct, deleteProduct }
+  async function restockProduct(id: string, quantity: number) {
+    try {
+      await productsApi.updateStock(id, { stock: quantity, reason: 'Restock from dashboard' })
+      const idx = items.value.findIndex(p => p.id === id)
+      if (idx !== -1) items.value[idx].stock = quantity
+      return true
+    } catch (err: any) {
+      return false
+    }
+  }
+
+  return { items, loading, error, meta, search, activeCategoryId, lowStockItems, outOfStock, totalValue, fetchProducts, createProduct, updateProduct, deleteProduct, restockProduct }
 })

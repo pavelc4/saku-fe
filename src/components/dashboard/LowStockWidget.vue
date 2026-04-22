@@ -14,17 +14,18 @@
           <h4 class="font-body font-medium text-on-surface truncate">{{ item.name }}</h4>
           <p class="font-body text-sm" :class="item.statusColor">{{ item.remaining }} Remaining</p>
         </div>
-        <button class="h-8 w-8 rounded-full flex items-center justify-center hover:bg-surface-container-highest text-secondary cursor-pointer">
+        <button @click.stop="$emit('restock', item.id)" class="h-8 w-8 rounded-full flex items-center justify-center hover:bg-surface-container-highest text-secondary cursor-pointer">
           <span class="material-symbols-outlined text-[20px]">add</span>
         </button>
       </li>
     </ul>
-    <button class="w-full mt-6 py-2 text-primary font-body text-sm font-medium hover:underline cursor-pointer">View All Inventory</button>
+    <router-link to="/inventory" class="block w-full mt-6 py-2 text-primary font-body text-sm font-medium hover:underline text-center cursor-pointer">View All Inventory</router-link>
   </aside>
 </template>
 
 <script setup lang="ts">
 export interface StockItem {
+  id?: string;
   name: string;
   remaining: number;
   image: string;
@@ -34,5 +35,9 @@ export interface StockItem {
 
 defineProps<{
   items: StockItem[];
+}>();
+
+defineEmits<{
+  restock: [id: string];
 }>();
 </script>

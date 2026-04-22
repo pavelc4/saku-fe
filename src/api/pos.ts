@@ -21,4 +21,7 @@ export const posApi = {
 
   getTransactions: (params?: { page?: number; limit?: number; session_id?: string }) =>
     apiClient.get('/pos/transactions', { params }),
+
+  getSummaryToday: () =>
+    apiClient.get('/pos/summary/today'),
 }

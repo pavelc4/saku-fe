@@ -16,11 +16,11 @@
           </div>
           <div>
             <p class="font-medium text-on-surface text-sm">Order #{{ trx.orderNumber }}</p>
-            <p class="text-xs text-on-surface-variant mt-0.5">{{ trx.time }} • {{ trx.items }} items</p>
+            <p class="text-xs text-on-surface-variant mt-0.5">{{ trx.time }}</p>
           </div>
         </div>
         <div class="text-right">
-          <p class="font-bold text-on-surface text-sm">{{ formatCurrency(trx.amount) }}</p>
+          <p class="font-bold text-on-surface text-sm">{{ trx.amount }}</p>
           <p :class="[
             'text-xs font-medium mt-0.5',
             trx.status === 'Selesai' ? 'text-tertiary-container' : 'text-error'
@@ -81,12 +81,19 @@ const formatCurrency = (val: number) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val || 0)
 
 const transactions = computed(() =>
-  dashboardStore.recentTransactions.map(t => ({
-    id: t.id?.slice(0, 8) || '-',
+  dashboardStore.recentTransactions.slice(0, 5).map(t => ({
+    id: t.id,
+    orderNumber: t.id?.slice(-4) || '0000',
     customer: t.customer_name || 'Pelanggan',
     amount: formatCurrency(t.total || t.amount || 0),
-    status: t.status || 'confirmed',
+    status: t.status === 'confirmed' ? 'Selesai' : 'Pending',
     time: t.created_at ? new Date(t.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '-',
+    items: t.items?.length || 0,
+    icon: 'receipt_long',
   }))
 )
+
+const allTransactions = computed(() => transactions.value)
+
+const isPopupOpen = defineModel<boolean>('open', { default: false })
 </script>
