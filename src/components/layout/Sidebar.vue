@@ -32,6 +32,10 @@
           </router-link>
         </li>
       </ul>
+      <button @click="authStore.logout()" class="w-full flex items-center gap-3 px-4 py-2 rounded-full transition-colors text-sm text-error font-medium hover:bg-error/10">
+        <span class="material-symbols-outlined text-[20px]">logout</span>
+        <span>Keluar</span>
+      </button>
     </div>
   </nav>
 </template>
@@ -39,8 +43,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
+import { useAuthStore } from '../../stores/auth';
 
 const route = useRoute();
+const authStore = useAuthStore();
 
 const navItems = ref([
   { name: 'Dashboard', icon: 'dashboard', path: '/dashboard' },

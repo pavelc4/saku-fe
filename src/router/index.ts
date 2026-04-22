@@ -9,6 +9,7 @@ import CategoriesView from '../views/CategoriesView.vue'
 import NotificationsView from '../views/NotificationsView.vue'
 import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
+import OAuthSuccess from '../views/OAuthSuccess.vue'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -68,6 +69,12 @@ const routes: RouteRecordRaw[] = [
     path: '/register',
     name: 'register',
     component: Register,
+    meta: { guestOnly: true }
+  },
+  {
+    path: '/oauth/success',
+    name: 'oauth-success',
+    component: OAuthSuccess,
     meta: { guestOnly: true }
   }
 ]
