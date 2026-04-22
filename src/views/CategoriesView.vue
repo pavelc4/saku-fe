@@ -333,6 +333,7 @@ const saveSettings = async () => {
   try {
     await settingsApi.update({
       tax_rate: settings.value.tax_rate,
+      currency: settings.value.currency,
       auto_sync_inventory: settings.value.auto_sync_inventory,
     });
   } catch (e) { console.error(e); }
