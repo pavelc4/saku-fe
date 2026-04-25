@@ -7,10 +7,10 @@ export const categoriesApi = {
   getById: (id: string) =>
     apiClient.get(`/products/categories/${id}`),
 
-  create: (data: { name: string; color?: string }) =>
+  create: (data: { name: string; color?: string; icon?: string }) =>
     apiClient.post('/products/categories', data),
 
-  update: (id: string, data: { name?: string; color?: string }) =>
+  update: (id: string, data: { name?: string; color?: string; icon?: string; is_active?: boolean }) =>
     apiClient.patch(`/products/categories/${id}`, data),
 
   delete: (id: string) =>

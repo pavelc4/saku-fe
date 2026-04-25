@@ -31,8 +31,11 @@
                      
                   <div class="flex items-center justify-between w-full">
                     <div class="flex items-center gap-5">
-                      <div :class="['w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-inner', category.iconBg, category.iconText]">
-                        <span class="material-symbols-outlined">{{ category.icon }}</span>
+                      <div 
+                        :style="{ backgroundColor: (category.color || '#c96442') + '15', color: category.color || '#c96442' }"
+                        class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-inner"
+                      >
+                        <span class="material-symbols-outlined">{{ category.icon || 'category' }}</span>
                       </div>
                       <div>
                         <h4 class="font-headline text-xl text-on-surface font-medium">{{ category.name }}</h4>
@@ -352,10 +355,19 @@ const showEditModal = ref(false);
 const editLoading = ref(false);
 const selectedCategoryToEdit = ref<any>(null);
 const openEditModal = (cat: any) => { 
-  selectedCategoryToEdit.value = { ...cat }; 
+  selectedCategoryToEdit.value = { 
+    id: cat.id,
+    name: cat.name || '',
+    icon: cat.icon || 'category',
+    color: cat.color || '#c96442',
+    is_active: cat.is_active !== false
+  }; 
   showEditModal.value = true; 
 };
-const closeEditModal = () => { showEditModal.value = false; selectedCategoryToEdit.value = null; };
+const closeEditModal = () => { 
+  showEditModal.value = false; 
+  selectedCategoryToEdit.value = null; 
+};
 const saveEditCategory = async () => {
   if (!selectedCategoryToEdit.value) return;
   editLoading.value = true;
@@ -365,7 +377,6 @@ const saveEditCategory = async () => {
     color: selectedCategoryToEdit.value.color
   });
   if (ok) {
-    await categoriesStore.fetchCategories();
     closeEditModal();
   }
   editLoading.value = false;

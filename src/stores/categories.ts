@@ -12,7 +12,12 @@ export const useCategoriesStore = defineStore('categories', () => {
     error.value = null
     try {
       const res = await categoriesApi.getAll()
-      items.value = res.data?.data || []
+      const rawItems = res.data?.data || []
+      items.value = rawItems.map((c: any) => ({
+        ...c,
+        icon: c.icon || 'category',
+        color: c.color || '#c96442'
+      }))
     } catch (err: any) {
       error.value = err.response?.data?.error?.message || 'Gagal memuat kategori'
     } finally {
@@ -20,12 +25,20 @@ export const useCategoriesStore = defineStore('categories', () => {
     }
   }
 
-  async function createCategory(data: { name: string; color?: string }) {
+  async function createCategory(data: { name: string; color?: string; icon?: string }) {
     loading.value = true
     error.value = null
     try {
       const res = await categoriesApi.create(data)
-      items.value.push(res.data?.data)
+      const serverData = res.data?.data || {}
+      const newItem = { 
+        ...data, 
+        ...serverData,
+        // Preserve local values if server returns null/undefined
+        icon: serverData.icon || data.icon,
+        color: serverData.color || data.color
+      }
+      items.value.push(newItem)
       return true
     } catch (err: any) {
       error.value = err.response?.data?.error?.message || 'Gagal membuat kategori'
@@ -51,8 +64,18 @@ export const useCategoriesStore = defineStore('categories', () => {
     error.value = null
     try {
       const res = await categoriesApi.update(id, data)
+      const serverData = res.data?.data || {}
       const idx = items.value.findIndex(c => c.id === id)
-      if (idx !== -1) items.value[idx] = res.data?.data
+      if (idx !== -1) {
+        items.value[idx] = { 
+          ...items.value[idx], 
+          ...data, 
+          ...serverData,
+          // Preserve local values if server returns null/undefined
+          icon: serverData.icon || (data as any).icon || items.value[idx].icon,
+          color: serverData.color || (data as any).color || items.value[idx].color
+        }
+      }
       return true
     } catch (err: any) {
       error.value = err.response?.data?.error?.message || 'Gagal mengupdate kategori'
