@@ -11,7 +11,6 @@ import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
 import OAuthSuccess from '../views/OAuthSuccess.vue'
 import TransactionsView from '../views/TransactionsView.vue'
-import ReportView from '../views/ReportView.vue'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -68,12 +67,6 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/reports',
-    name: 'reports',
-    component: ReportView,
-    meta: { requiresAuth: true }
-  },
-  {
     path: '/settings',
     name: 'settings',
     component: SettingsView,
@@ -95,6 +88,12 @@ const routes: RouteRecordRaw[] = [
     path: '/oauth/success',
     name: 'oauth-success',
     component: OAuthSuccess,
+    meta: { guestOnly: true }
+  },
+  {
+    path: '/auth/verify',
+    name: 'verify-email',
+    component: () => import('../views/VerifyEmailView.vue'),
     meta: { guestOnly: true }
   }
 ]
