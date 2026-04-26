@@ -7,7 +7,7 @@
     <div class="flex items-center gap-4 relative" ref="navContainer">
       <button @click="showNotifications = !showNotifications" class="h-10 w-10 rounded-full hover:bg-surface-container-highest flex items-center justify-center text-on-surface-variant transition-colors relative cursor-pointer">
         <span class="material-symbols-outlined">notifications</span>
-        <span class="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary"></span>
+        <span v-if="unreadCount > 0" class="absolute top-2 right-2 h-5 w-5 rounded-full bg-primary text-white text-xs flex items-center justify-center font-bold">{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
       </button>
       <button v-if="showCloseShift" @click="$emit('close-shift')" class="font-body font-semibold text-primary hover:bg-surface-container-highest transition-colors px-4 py-2 bg-surface-container rounded-full cursor-pointer hidden md:block">
         Tutup Shift
@@ -18,65 +18,30 @@
         <!-- Header -->
         <div class="px-8 py-6 flex justify-between items-baseline bg-surface-container-low rounded-t-xl shrink-0 border-b border-outline-variant/10">
           <h2 class="text-2xl font-headline font-medium text-on-surface">Notifications</h2>
-          <button class="text-sm font-label font-medium text-primary hover:text-primary-container transition-colors focus:outline-none cursor-pointer">
-            Clear All
+          <button v-if="unreadCount > 0" @click="handleMarkAllRead" class="text-sm font-label font-medium text-primary hover:text-primary-container transition-colors focus:outline-none cursor-pointer">
+            Mark All Read
           </button>
         </div>
         <!-- Notification List -->
         <div class="flex-1 overflow-y-auto max-h-[400px] bg-surface">
-          <!-- Item 1: Alert/Warning -->
-          <div class="group flex gap-4 p-6 hover:bg-surface-container-highest transition-colors duration-300 relative border-l-4 border-error">
-            <div class="w-10 h-10 rounded-full bg-error-container flex items-center justify-center shrink-0">
-              <span class="material-symbols-outlined text-on-error-container" style="font-variation-settings: 'FILL' 1;">warning</span>
-            </div>
-            <div class="flex-1 pt-1">
-              <h3 class="text-base font-body font-semibold text-on-surface mb-1">Low stock: Artisan Clay Mugs</h3>
-              <p class="text-sm font-body text-on-surface-variant line-clamp-2">Only 4 units remaining in inventory. Reorder recommended.</p>
-              <span class="text-xs font-label text-secondary mt-2 block">10 mins ago</span>
-            </div>
-            <button class="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-on-surface-variant hover:text-on-surface focus:outline-none absolute top-4 right-4 cursor-pointer">
-              <span class="material-symbols-outlined text-xl">close</span>
-            </button>
+          <!-- Empty State -->
+          <div v-if="notifications.length === 0" class="flex flex-col items-center justify-center py-12 text-center">
+            <span class="material-symbols-outlined text-4xl text-on-surface-variant mb-3">notifications_none</span>
+            <p class="text-on-surface-variant text-sm">No notifications yet</p>
           </div>
-          <!-- Item 2: Success/Transaction -->
-          <div class="group flex gap-4 p-6 hover:bg-surface-container-highest transition-colors duration-300 relative border-l-4 border-transparent">
-            <div class="w-10 h-10 rounded-full bg-tertiary-container/30 flex items-center justify-center shrink-0">
-              <span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">payments</span>
+          <!-- Notifications -->
+          <div v-for="notif in notifications" :key="notif.id" 
+               :class="['group flex gap-4 p-6 hover:bg-surface-container-highest transition-colors duration-300 relative cursor-pointer', getBorderColor(notif.type), !notif.is_read ? 'bg-primary-container/10' : '']"
+               @click="handleMarkAsRead(notif.id)">
+            <div :class="['w-10 h-10 rounded-full flex items-center justify-center shrink-0', notif.type === 'warning' || notif.type === 'alert' ? 'bg-error-container' : notif.type === 'success' ? 'bg-tertiary-container/30' : 'bg-surface-variant']">
+              <span :class="['material-symbols-outlined', notif.type === 'warning' || notif.type === 'alert' ? 'text-on-error-container' : notif.type === 'success' ? 'text-tertiary' : 'text-on-surface-variant']" style="font-variation-settings: 'FILL' 1;">{{ getIcon(notif.type) }}</span>
             </div>
             <div class="flex-1 pt-1">
-              <h3 class="text-base font-body font-semibold text-on-surface mb-1">New sale: Rp 450.000</h3>
-              <p class="text-sm font-body text-on-surface-variant line-clamp-2">Order #4029 completed successfully via Credit Card.</p>
-              <span class="text-xs font-label text-secondary mt-2 block">45 mins ago</span>
+              <h3 class="text-base font-body font-semibold text-on-surface mb-1">{{ notif.title }}</h3>
+              <p class="text-sm font-body text-on-surface-variant line-clamp-2">{{ notif.message }}</p>
+              <span class="text-xs font-label text-secondary mt-2 block">{{ formatTime(notif.created_at) }}</span>
             </div>
-            <button class="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-on-surface-variant hover:text-on-surface focus:outline-none absolute top-4 right-4 cursor-pointer">
-              <span class="material-symbols-outlined text-xl">close</span>
-            </button>
-          </div>
-          <!-- Item 3: AI Insight -->
-          <div class="group flex gap-4 p-6 hover:bg-surface-container-highest transition-colors duration-300 relative border-l-4 border-transparent">
-            <div class="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center shrink-0">
-              <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
-            </div>
-            <div class="flex-1 pt-1">
-              <h3 class="text-base font-body font-semibold text-on-surface mb-1">AI Insight ready</h3>
-              <p class="text-sm font-body text-on-surface-variant line-clamp-2">Weekly sales trend analysis is complete. View to see predicted peak hours for next week.</p>
-              <span class="text-xs font-label text-secondary mt-2 block">2 hours ago</span>
-            </div>
-            <button class="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-on-surface-variant hover:text-on-surface focus:outline-none absolute top-4 right-4 cursor-pointer">
-              <span class="material-symbols-outlined text-xl">close</span>
-            </button>
-          </div>
-          <!-- Item 4: General Update -->
-          <div class="group flex gap-4 p-6 hover:bg-surface-container-highest transition-colors duration-300 relative border-l-4 border-transparent">
-            <div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center shrink-0">
-              <span class="material-symbols-outlined text-on-surface-variant" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
-            </div>
-            <div class="flex-1 pt-1">
-              <h3 class="text-base font-body font-semibold text-on-surface mb-1">Shipment Arrived</h3>
-              <p class="text-sm font-body text-on-surface-variant line-clamp-2">Supplier delivery from 'Editorial Goods Co.' has been checked into the warehouse.</p>
-              <span class="text-xs font-label text-secondary mt-2 block">Yesterday</span>
-            </div>
-            <button class="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-on-surface-variant hover:text-on-surface focus:outline-none absolute top-4 right-4 cursor-pointer">
+            <button @click.stop="handleDelete(notif.id)" class="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-on-surface-variant hover:text-on-surface focus:outline-none absolute top-4 right-4 cursor-pointer">
               <span class="material-symbols-outlined text-xl">close</span>
             </button>
           </div>
@@ -93,7 +58,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { useNotificationsStore } from '../../stores/notifications';
 import { getR2Url } from '../../stores/auth';
 
 defineProps<{
@@ -103,8 +69,44 @@ defineProps<{
 
 defineEmits(['close-shift']);
 
+const notifStore = useNotificationsStore();
 const showNotifications = ref(false);
 const navContainer = ref<HTMLElement | null>(null);
+
+const unreadCount = computed(() => notifStore.unreadCount);
+const notifications = computed(() => notifStore.notifications);
+
+function formatTime(timestamp: number) {
+  const now = Date.now();
+  const diff = now - timestamp * 1000;
+  const mins = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+  
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins} min${mins > 1 ? 's' : ''} ago`;
+  if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+  if (days === 1) return 'Yesterday';
+  return `${days} days ago`;
+}
+
+function getIcon(type: string) {
+  switch (type) {
+    case 'warning': case 'alert': return 'warning';
+    case 'success': return 'payments';
+    case 'error': return 'error';
+    default: return 'notifications';
+  }
+}
+
+function getBorderColor(type: string) {
+  switch (type) {
+    case 'warning': case 'alert': return 'border-l-4 border-error';
+    case 'success': return 'border-l-4 border-tertiary';
+    case 'error': return 'border-l-4 border-error';
+    default: return 'border-l-4 border-transparent';
+  }
+}
 
 const closeNotifications = (e: MouseEvent) => {
   const target = e.target as HTMLElement;
@@ -113,8 +115,21 @@ const closeNotifications = (e: MouseEvent) => {
   }
 };
 
-onMounted(() => {
+const handleMarkAllRead = async () => {
+  await notifStore.markAllAsRead();
+};
+
+const handleDelete = async (id: string) => {
+  await notifStore.deleteNotification(id);
+};
+
+const handleMarkAsRead = async (id: string) => {
+  await notifStore.markAsRead(id);
+};
+
+onMounted(async () => {
   document.addEventListener('click', closeNotifications);
+  await notifStore.fetchNotifications();
 });
 
 onUnmounted(() => {
