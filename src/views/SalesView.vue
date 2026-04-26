@@ -107,6 +107,9 @@
               <span>{{ isCheckoutLoading ? 'Memproses...' : 'Bayar Sekarang' }}</span>
               <span v-if="!isCheckoutLoading" class="material-symbols-outlined text-sm">arrow_forward</span>
             </button>
+            <div v-if="checkoutError" class="mt-3 p-3 bg-error/10 text-error text-sm rounded-lg text-center">
+              {{ checkoutError }}
+            </div>
           </div>
           </div>
         </template>
@@ -322,15 +325,20 @@ const total = computed(() => cartStore.totalPrice);
 
 const isCheckoutLoading = ref(false);
 const checkoutSuccess = ref(false);
+const checkoutError = ref<string | null>(null);
 const checkout = async () => {
   if (!cart.value.length) return;
   isCheckoutLoading.value = true;
+  checkoutError.value = null;
   const items = cart.value.map(i => ({ product_id: i.id, quantity: i.quantity }));
   const result = await posStore.checkout(items, 'cash');
   if (result) {
     cartStore.clearCart();
     checkoutSuccess.value = true;
     setTimeout(() => checkoutSuccess.value = false, 3000);
+  } else if (posStore.error) {
+    checkoutError.value = posStore.error;
+    setTimeout(() => checkoutError.value = null, 4000);
   }
   isCheckoutLoading.value = false;
 };
