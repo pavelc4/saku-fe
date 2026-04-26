@@ -132,6 +132,13 @@
 
             <!-- Actions -->
             <div class="flex flex-col gap-3">
+              <button 
+                @click="isReceiptOpen = true"
+                class="w-full py-4 rounded-full bg-surface-container-highest text-primary font-bold hover:bg-primary/10 transition-all flex items-center justify-center gap-2 border border-primary/20"
+              >
+                <span class="material-symbols-outlined">qr_code_2</span>
+                View Digital Receipt
+              </button>
               <button class="w-full py-4 rounded-full bg-primary text-on-primary font-bold shadow-md shadow-primary/10 hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">print</span>
                 Reprint Receipt
@@ -143,6 +150,14 @@
             </div>
           </div>
         </div>
+
+        <!-- Receipt Modal -->
+        <ReceiptModal 
+          v-if="selectedTxn"
+          :is-open="isReceiptOpen"
+          :transaction="selectedTxn"
+          @close="isReceiptOpen = false"
+        />
 
         <!-- Empty State for Detail -->
         <div v-else class="w-96 flex flex-col items-center justify-center bg-surface-container-lowest rounded-xl border border-dashed border-outline-variant/50 text-secondary italic">
@@ -158,6 +173,7 @@
 import { ref, computed, onMounted } from 'vue';
 import Sidebar from '../components/layout/Sidebar.vue';
 import TopNav from '../components/layout/TopNav.vue';
+import ReceiptModal from '../components/transactions/ReceiptModal.vue';
 import { useAuthStore } from '../stores/auth';
 import { usePosStore } from '../stores/pos';
 
@@ -190,6 +206,7 @@ const transactions = computed(() => posStore.transactions.map((t: any) => {
 }));
 
 const selectedTxn = ref<any>(null);
+const isReceiptOpen = ref(false);
 
 const formatCurrency = (val: number) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val);
