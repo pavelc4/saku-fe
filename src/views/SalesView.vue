@@ -69,7 +69,11 @@
               <div class="flex-1 pr-4">
                 <h4 class="font-medium text-on-surface text-sm">{{ item.name }}</h4>
                 <p class="text-xs text-secondary mt-1" v-if="item.notes">{{ item.notes }}</p>
-                <div class="mt-2 text-primary font-bold text-sm">{{ formatCurrency(item.price * item.quantity) }}</div>
+                <div class="mt-2 flex items-center gap-2">
+                  <span v-if="item.discount_percent > 0" class="text-xs text-error line-through">{{ formatCurrency(item.price * item.quantity) }}</span>
+                  <span :class="item.discount_percent > 0 ? 'text-primary font-bold text-sm' : 'text-primary font-bold text-sm'">{{ formatCurrency((item.price * (100 - (item.discount_percent || 0)) / 100) * item.quantity) }}</span>
+                  <span v-if="item.discount_percent > 0" class="text-xs text-error font-medium">-{{ item.discount_percent }}%</span>
+                </div>
               </div>
               <div class="flex items-center gap-3 bg-surface-container-lowest rounded-full px-2 py-1">
                 <button class="w-6 h-6 rounded-full flex items-center justify-center text-secondary hover:bg-surface-container-highest transition-colors cursor-pointer" @click="decreaseQty(index)">
@@ -93,6 +97,10 @@
               <div class="flex justify-between text-sm text-secondary">
                 <span>Subtotal</span>
                 <span>{{ formatCurrency(subtotal) }}</span>
+              </div>
+              <div v-if="totalDiscount > 0" class="flex justify-between text-sm text-error">
+                <span>Diskon</span>
+                <span>-{{ formatCurrency(totalDiscount) }}</span>
               </div>
                <div class="flex justify-between text-sm text-secondary">
                  <span>Tax ({{ taxRate }}%)</span>
@@ -346,6 +354,7 @@ const decreaseQty = (index: number) => {
 const subtotal = computed(() => cartStore.subtotal);
 const tax = computed(() => cartStore.tax);
 const total = computed(() => cartStore.totalPrice);
+const totalDiscount = computed(() => cartStore.totalDiscount);
 
 const isCheckoutLoading = ref(false);
 const checkoutSuccess = ref(false);

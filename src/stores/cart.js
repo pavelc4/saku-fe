@@ -8,7 +8,15 @@ export const useCartStore = defineStore('cart', {
   
   getters: {
     totalItems: (state) => state.items.reduce((total, item) => total + item.quantity, 0),
-    subtotal: (state) => state.items.reduce((total, item) => total + (item.price * item.quantity), 0),
+    subtotal: (state) => state.items.reduce((total, item) => {
+      const discount = (item.discount_percent || 0) / 100;
+      return total + (item.price * (1 - discount) * item.quantity);
+    }, 0),
+    subtotalBeforeDiscount: (state) => state.items.reduce((total, item) => total + (item.price * item.quantity), 0),
+    totalDiscount: (state) => state.items.reduce((total, item) => {
+      const discount = (item.discount_percent || 0) / 100;
+      return total + (item.price * discount * item.quantity);
+    }, 0),
     tax() {
       return this.subtotal * (this.taxRate / 100)
     },
