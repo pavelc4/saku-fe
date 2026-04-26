@@ -175,15 +175,18 @@ onMounted(async () => {
   await posStore.fetchTransactions();
 });
 
-const transactions = computed(() => posStore.transactions.map((t: any) => ({
-  id: t.id,
-  time: new Date(t.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
-  date: new Date(t.created_at).toLocaleDateString('id-ID'),
-  itemsCount: t.items?.length || 0,
-  amount: t.amount || 0,
-  method: t.payment_method || 'cash',
-  items: t.items || []
-})));
+const transactions = computed(() => posStore.transactions.map((t: any) => {
+  const createdDate = t.created_at ? new Date(t.created_at) : new Date();
+  return {
+    id: t.id,
+    time: createdDate.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+    date: createdDate.toLocaleDateString('id-ID'),
+    itemsCount: t.items?.length || 0,
+    amount: t.amount || 0,
+    method: t.payment_method || 'cash',
+    items: t.items || []
+  };
+}));
 
 const selectedTxn = ref<any>(null);
 
