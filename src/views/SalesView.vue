@@ -46,7 +46,7 @@
                   <div class="mt-4 flex items-center justify-between">
                     <div class="flex items-center gap-2">
                       <span class="font-bold text-primary">{{ formatCurrency(product.price) }}</span>
-                      <span v-if="product.discount_percent > 0" class="text-xs bg-error text-white px-2 py-0.5 rounded-full">-{{ product.discount_percent }}%</span>
+                      <span v-if="product.discount > 0" class="text-xs bg-error text-white px-2 py-0.5 rounded-full">-{{ product.discount }}%</span>
                     </div>
                     <button class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors cursor-pointer" @click.stop="addToCart(product)">
                       <span class="material-symbols-outlined text-sm">add</span>
@@ -99,7 +99,7 @@
             <div class="space-y-3 mb-6">
               <div class="flex justify-between text-sm text-secondary">
                 <span>Subtotal</span>
-                <span>{{ formatCurrency(subtotal) }}</span>
+                <span>{{ formatCurrency(subtotalBeforeDiscount) }}</span>
               </div>
               <div v-if="totalDiscount > 0" class="flex justify-between text-sm text-error">
                 <span>Diskon</span>
@@ -115,8 +115,9 @@
               </div>
             </div>
             
+            
             <!-- Payment Method Selector -->
-            <div class="mb-4">
+            <div class="mb-6">
               <label class="font-label text-xs text-on-surface-variant uppercase tracking-wider mb-2 block">Metode Pembayaran</label>
               <div class="flex gap-2">
                 <button v-for="method in paymentMethods" :key="method.value"
@@ -268,7 +269,7 @@
 
       </div>
     </div>
-  </div>
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -355,8 +356,12 @@ const decreaseQty = (index: number) => {
 };
 
 const subtotal = computed(() => cartStore.subtotal);
-const tax = computed(() => cartStore.tax);
-const total = computed(() => cartStore.totalPrice);
+const subtotalBeforeDiscount = computed(() => cartStore.subtotalBeforeDiscount);
+const tax = computed(() => {
+  const afterDiscount = subtotal.value;
+  return Math.floor((afterDiscount * taxRate.value) / 100);
+});
+const total = computed(() => subtotal.value + tax.value);
 const totalDiscount = computed(() => cartStore.totalDiscount);
 
 const isCheckoutLoading = ref(false);
@@ -366,9 +371,12 @@ const checkout = async () => {
   if (!cart.value.length) return;
   isCheckoutLoading.value = true;
   checkoutError.value = null;
-  const items = cart.value.map(i => ({ product_id: i.id, quantity: i.quantity }));
+  const items = cart.value.map(i => ({ product_id: i.id, quantity: i.quantity, discount: i.discount || 0 }));
   const taxRate = cartStore.taxRate || 11;
-  const result = await posStore.checkout(items, selectedPaymentMethod.value, { tax_rate: taxRate });
+  const result = await posStore.checkout(items, selectedPaymentMethod.value as any, { 
+    tax_rate: taxRate,
+    discount: totalDiscount.value,
+  });
   if (result) {
     cartStore.clearCart();
     checkoutSuccess.value = true;

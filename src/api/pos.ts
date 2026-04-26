@@ -11,7 +11,7 @@ export const posApi = {
     apiClient.get('/pos/session'),
 
   createTransaction: (data: {
-    items: { product_id: string; quantity: number }[];
+    items: { product_id: string; quantity: number; discount?: number }[];
     payment_method: 'cash' | 'transfer' | 'qris';
     note?: string;
     category_id?: string;

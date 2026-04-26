@@ -51,7 +51,11 @@
         <div class="border-t border-dashed border-outline-variant pt-8 mb-10 flex flex-col gap-3 font-body">
           <div class="flex justify-between text-sm font-medium">
             <span class="text-on-surface-variant">Subtotal</span>
-            <span class="text-on-surface">{{ formatCurrency(transaction.amount - transaction.tax) }}</span>
+            <span class="text-on-surface">{{ formatCurrency(transaction.subtotal || (transaction.amount - transaction.tax + (transaction.discount || 0))) }}</span>
+          </div>
+          <div v-if="transaction.discount" class="flex justify-between text-sm font-medium">
+            <span class="text-on-surface-variant text-error">Diskon</span>
+            <span class="text-error">-{{ formatCurrency(transaction.discount) }}</span>
           </div>
           <div class="flex justify-between text-sm font-medium">
             <span class="text-on-surface-variant">Tax ({{ transaction.tax_rate }}%)</span>
@@ -59,7 +63,7 @@
           </div>
           <div class="flex justify-between items-end mt-6 pt-6 border-t-2 border-on-surface/10">
             <span class="font-headline text-xl text-on-surface-variant italic">Grand Total</span>
-            <span class="font-headline text-4xl font-bold text-primary tracking-tighter">{{ formatCurrency(transaction.amount * 1.11) }}</span>
+            <span class="font-headline text-4xl font-bold text-primary tracking-tighter">{{ formatCurrency(transaction.amount) }}</span>
           </div>
         </div>
 
@@ -110,10 +114,12 @@ const props = defineProps<{
     time: string;
     cashier: string;
     amount: number;
+    subtotal: number;
+    discount: number;
     method: string;
     tax: number;
     tax_rate: number;
-    items: Array<{ name: string; quantity: number; price: number }>;
+    items: Array<{ name: string; quantity: number; price: number; discount?: number }>;
   };
 }>();
 
