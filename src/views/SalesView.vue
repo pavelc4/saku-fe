@@ -103,9 +103,9 @@
                 <span class="font-headline text-3xl font-bold text-primary tracking-tight">{{ formatCurrency(total) }}</span>
               </div>
             </div>
-            <button class="w-full bg-gradient-to-r from-primary to-primary-container text-white font-bold py-4 rounded-full shadow-[0_4px_16px_rgba(154,64,33,0.3)] hover:opacity-95 transition-opacity flex items-center justify-center gap-2 cursor-pointer" :disabled="cart.length === 0">
-              <span>Bayar Sekarang</span>
-              <span class="material-symbols-outlined text-sm">arrow_forward</span>
+            <button @click="checkout" :disabled="cart.length === 0 || isCheckoutLoading" class="w-full bg-gradient-to-r from-primary to-primary-container text-white font-bold py-4 rounded-full shadow-[0_4px_16px_rgba(154,64,33,0.3)] hover:opacity-95 transition-opacity flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50">
+              <span>{{ isCheckoutLoading ? 'Memproses...' : 'Bayar Sekarang' }}</span>
+              <span v-if="!isCheckoutLoading" class="material-symbols-outlined text-sm">arrow_forward</span>
             </button>
           </div>
           </div>
