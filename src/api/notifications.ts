@@ -1,4 +1,4 @@
-import { apiClient } from './client';
+import apiClient from './client';
 
 export const notificationsApi = {
   list: () => apiClient.get('/notifications'),
