@@ -84,10 +84,10 @@ const transactions = computed(() =>
   dashboardStore.recentTransactions.slice(0, 5).map(t => ({
     id: t.id,
     orderNumber: t.id?.slice(-4) || '0000',
-    customer: t.customer_name || 'Pelanggan',
-    amount: formatCurrency(t.total || t.amount || 0),
-    status: t.status === 'confirmed' ? 'Selesai' : 'Pending',
-    time: t.created_at ? new Date(t.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '-',
+    customer: t.customer_name || t.name || 'Pelanggan',
+    amount: formatCurrency(t.amount || t.total || 0),
+    status: t.status === 'confirmed' || t.status === 'pending' ? 'Selesai' : 'Pending',
+    time: t.created_at ? new Date(t.created_at * 1000).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '-',
     items: t.items?.length || 0,
     icon: 'receipt_long',
   }))

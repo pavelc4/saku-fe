@@ -176,7 +176,7 @@ onMounted(async () => {
 });
 
 const transactions = computed(() => posStore.transactions.map((t: any) => {
-  const createdDate = t.created_at ? new Date(t.created_at) : new Date();
+  const createdDate = t.created_at ? new Date(t.created_at * 1000) : new Date();
   return {
     id: t.id,
     time: createdDate.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
