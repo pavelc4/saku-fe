@@ -246,7 +246,14 @@
                   <label class="block text-sm font-medium text-on-background mb-2">Harga Jual</label>
                   <div class="relative">
                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-medium">Rp</span>
-                    <input class="w-full bg-surface border-0 border-b-2 border-surface-variant focus:border-primary focus:bg-surface-container-lowest focus:ring-0 pl-12 pr-4 py-3 rounded-t-lg transition-colors text-on-background font-body text-right" type="text" placeholder="85.000"/>
+                    <input v-model="editingProduct.price" class="w-full bg-surface border-0 border-b-2 border-surface-variant focus:border-primary focus:bg-surface-container-lowest focus:ring-0 pl-12 pr-4 py-3 rounded-t-lg transition-colors text-on-background font-body text-right" type="number" placeholder="0"/>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-on-background mb-2">Diskon (Rp)</label>
+                  <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-medium">Rp</span>
+                    <input v-model="editingProduct.discount" class="w-full bg-surface border-0 border-b-2 border-surface-variant focus:border-primary focus:bg-surface-container-lowest focus:ring-0 pl-12 pr-4 py-3 rounded-t-lg transition-colors text-on-background font-body text-right" type="number" placeholder="0"/>
                   </div>
                 </div>
               </div>
@@ -344,6 +351,13 @@
                   <div class="relative">
                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-body">Rp</span>
                     <input v-model="newProduct.price" class="w-full bg-surface-container-low border-none rounded-lg pl-12 pr-4 py-3.5 text-on-surface placeholder:text-on-surface-variant/50 focus:ring-0 focus:bg-surface-container-lowest focus:shadow-[0_0_0_2px_rgba(220,193,184,0.2)] transition-all font-body text-base" placeholder="0" type="number" />
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-on-surface mb-2 font-label">Diskon (Rp)</label>
+                  <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-body">Rp</span>
+                    <input v-model="newProduct.discount" class="w-full bg-surface-container-low border-none rounded-lg pl-12 pr-4 py-3.5 text-on-surface placeholder:text-on-surface-variant/50 focus:ring-0 focus:bg-surface-container-lowest focus:shadow-[0_0_0_2px_rgba(220,193,184,0.2)] transition-all font-body text-base" placeholder="0" type="number" />
                   </div>
                 </div>
                 <div>
@@ -461,7 +475,7 @@ const inventoryValue = computed(() => {
 // Add Modal
 const isAddModalOpen = ref(false);
 const addLoading = ref(false);
-const newProduct = ref({ name: '', sku: '', product_category_id: '', stock: 0, price: 0, is_active: true });
+const newProduct = ref({ name: '', sku: '', product_category_id: '', stock: 0, price: 0, discount: 0, is_active: true });
 const newProductImageInput = ref<HTMLInputElement | null>(null);
 const newProductImage = ref<File | null>(null);
 const newProductPreview = ref<string | null>(null);
@@ -478,7 +492,7 @@ function handleNewProductImage(e: Event) {
 const openAddModal = () => { isAddModalOpen.value = true; };
 const closeAddModal = () => {
   isAddModalOpen.value = false;
-  newProduct.value = { name: '', sku: '', product_category_id: '', stock: 0, price: 0, is_active: true };
+  newProduct.value = { name: '', sku: '', product_category_id: '', stock: 0, price: 0, discount: 0, is_active: true };
   newProductImage.value = null;
   newProductPreview.value = null;
 };
@@ -489,6 +503,7 @@ const addProduct = async () => {
     product_category_id: newProduct.value.product_category_id || null,
     stock: Number(newProduct.value.stock) || 0,
     price: Number(newProduct.value.price) || 0,
+    discount: Number(newProduct.value.discount) || 0,
     is_active: newProduct.value.is_active,
   };
   addLoading.value = true;
@@ -542,6 +557,7 @@ const saveProduct = async () => {
     product_category_id: editingProduct.value.product_category_id || null,
     stock: Number(editingProduct.value.stock) || 0,
     price: Number(editingProduct.value.price) || 0,
+    discount: Number(editingProduct.value.discount) || 0,
     is_active: editingProduct.value.is_active,
   };
   editLoading.value = true;
