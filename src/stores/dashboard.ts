@@ -20,7 +20,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     try {
       const [summaryRes, transRes, productsRes, dailyRes, posSummaryRes] = await Promise.all([
         apiClient.get('/transactions/summary'),
-        apiClient.get('/transactions', { params: { limit: 5 } }),
+        posApi.getTransactions({ limit: 5 }),
         apiClient.get('/products', { params: { limit: 50 } }),
         insightsApi.getDaily().catch(() => ({ data: { data: {} } })),
         posApi.getSummaryToday().catch(() => ({ data: { data: {} } })),
