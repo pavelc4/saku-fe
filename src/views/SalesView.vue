@@ -103,6 +103,23 @@
                 <span class="font-headline text-3xl font-bold text-primary tracking-tight">{{ formatCurrency(total) }}</span>
               </div>
             </div>
+            
+            <!-- Payment Method Selector -->
+            <div class="mb-4">
+              <label class="font-label text-xs text-on-surface-variant uppercase tracking-wider mb-2 block">Metode Pembayaran</label>
+              <div class="flex gap-2">
+                <button v-for="method in paymentMethods" :key="method.value"
+                  @click="selectedPaymentMethod = method.value"
+                  :class="['flex-1 py-3 rounded-lg font-medium text-sm transition-all flex flex-col items-center gap-1',
+                    selectedPaymentMethod === method.value 
+                      ? 'bg-primary text-white shadow-md' 
+                      : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high']">
+                  <span class="material-symbols-outlined text-xl">{{ method.icon }}</span>
+                  <span>{{ method.label }}</span>
+                </button>
+              </div>
+            </div>
+            
             <button @click="checkout" :disabled="cart.length === 0 || isCheckoutLoading" class="w-full bg-gradient-to-r from-primary to-primary-container text-white font-bold py-4 rounded-full shadow-[0_4px_16px_rgba(154,64,33,0.3)] hover:opacity-95 transition-opacity flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50">
               <span>{{ isCheckoutLoading ? 'Memproses...' : 'Bayar Sekarang' }}</span>
               <span v-if="!isCheckoutLoading" class="material-symbols-outlined text-sm">arrow_forward</span>
@@ -268,6 +285,12 @@ const isCloseModalOpen = ref(false);
 const initialCash = ref(0);
 const actualCash = ref(0);
 const cashierName = ref('');
+const selectedPaymentMethod = ref('cash');
+const paymentMethods = [
+  { value: 'cash', label: 'Tunai', icon: 'payments' },
+  { value: 'qris', label: 'QRIS', icon: 'qr_code' },
+  { value: 'transfer', label: 'Transfer', icon: 'account_balance' },
+];
 const totalSales = ref(0);
 
 const expectedCash = computed(() => posStore.activeSession?.opening_cash || 0);
@@ -332,7 +355,7 @@ const checkout = async () => {
   isCheckoutLoading.value = true;
   checkoutError.value = null;
   const items = cart.value.map(i => ({ product_id: i.id, quantity: i.quantity }));
-  const result = await posStore.checkout(items, 'cash');
+  const result = await posStore.checkout(items, selectedPaymentMethod.value);
   if (result) {
     cartStore.clearCart();
     checkoutSuccess.value = true;
