@@ -184,6 +184,7 @@ const transactions = computed(() => posStore.transactions.map((t: any) => {
     itemsCount: t.items?.length || 0,
     amount: t.amount || 0,
     method: t.payment_method || 'cash',
+    cashier: t.cashier_name || '-',
     items: t.items || []
   };
 }));
