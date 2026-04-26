@@ -32,6 +32,8 @@
           <div class="text-right font-bold text-on-surface">{{ transaction.date }}, {{ transaction.time }}</div>
           <div class="text-on-surface-variant font-medium">Cashier</div>
           <div class="text-right font-bold text-on-surface">{{ transaction.cashier }}</div>
+          <div class="text-on-surface-variant font-medium">Payment</div>
+          <div class="text-right font-bold text-on-surface uppercase">{{ transaction.method }}</div>
         </div>
 
         <!-- Items List -->
@@ -108,6 +110,7 @@ const props = defineProps<{
     time: string;
     cashier: string;
     amount: number;
+    method: string;
     items: Array<{ name: string; quantity: number; price: number }>;
   };
 }>();
