@@ -118,15 +118,15 @@
             <div class="flex flex-col gap-2 mb-6">
               <div class="flex justify-between items-center">
                 <span class="text-sm text-secondary">Subtotal</span>
-                <span class="text-sm font-medium text-on-surface">{{ formatCurrency(selectedTxn.amount) }}</span>
+                <span class="text-sm font-medium text-on-surface">{{ formatCurrency((selectedTxn.amount || 0) - (selectedTxn.tax || 0) + (selectedTxn.discount || 0)) }}</span>
               </div>
               <div class="flex justify-between items-center">
-                <span class="text-sm text-secondary">Tax (0%)</span>
-                <span class="text-sm font-medium text-on-surface">{{ formatCurrency(0) }}</span>
+                <span class="text-sm text-secondary">Tax ({{ selectedTxn.tax_rate || 0 }}%)</span>
+                <span class="text-sm font-medium text-on-surface">{{ formatCurrency(selectedTxn.tax || 0) }}</span>
               </div>
               <div class="flex justify-between items-center">
                 <span class="text-sm text-secondary">Discount</span>
-                <span class="text-sm font-medium text-on-surface">-{{ formatCurrency(0) }}</span>
+                <span class="text-sm font-medium text-on-surface">-{{ formatCurrency(selectedTxn.discount || 0) }}</span>
               </div>
             </div>
 
@@ -199,6 +199,9 @@ const transactions = computed(() => posStore.transactions.map((t: any) => {
     date: createdDate.toLocaleDateString('id-ID'),
     itemsCount: t.items?.length || 0,
     amount: t.amount || 0,
+    tax: t.tax || 0,
+    discount: t.discount || 0,
+    tax_rate: t.tax_rate || 0,
     method: t.payment_method || 'cash',
     cashier: t.cashier_name || '-',
     items: t.items || []
