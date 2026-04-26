@@ -1,17 +1,5 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Home from '../views/Home.vue'
-import AppLayout from '../components/layout/AppLayout.vue'
-import DashboardView from '../views/DashboardView.vue'
-import SettingsView from '../views/SettingsView.vue'
-import SalesView from '../views/SalesView.vue'
-import InventoryView from '../views/InventoryView.vue'
-import AiInsightsView from '../views/AiInsightsView.vue'
-import CategoriesView from '../views/CategoriesView.vue'
-import NotificationsView from '../views/NotificationsView.vue'
-import Login from '../views/Login.vue'
-import Register from '../views/Register.vue'
-import OAuthSuccess from '../views/OAuthSuccess.vue'
-import TransactionsView from '../views/TransactionsView.vue'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -21,43 +9,43 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/',
-    component: AppLayout,
+    component: () => import('../components/layout/AppLayout.vue'),
     meta: { requiresAuth: true },
     children: [
       {
         path: 'dashboard',
         name: 'dashboard',
-        component: DashboardView
+        component: () => import('../views/DashboardView.vue')
       },
       {
         path: 'sales',
         name: 'sales',
-        component: SalesView
+        component: () => import('../views/SalesView.vue')
       },
       {
         path: 'transactions',
         name: 'transactions',
-        component: TransactionsView
+        component: () => import('../views/TransactionsView.vue')
       },
       {
         path: 'inventory',
         name: 'inventory',
-        component: InventoryView
+        component: () => import('../views/InventoryView.vue')
       },
       {
         path: 'categories',
         name: 'categories',
-        component: CategoriesView
+        component: () => import('../views/CategoriesView.vue')
       },
       {
         path: 'notifications',
         name: 'notifications',
-        component: NotificationsView
+        component: () => import('../views/NotificationsView.vue')
       },
       {
         path: 'ai-insights',
         name: 'ai-insights',
-        component: AiInsightsView
+        component: () => import('../views/AiInsightsView.vue')
       },
       {
         path: 'reports',
@@ -67,26 +55,26 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'settings',
         name: 'settings',
-        component: SettingsView
+        component: () => import('../views/SettingsView.vue')
       }
     ]
   },
   {
     path: '/login',
     name: 'login',
-    component: Login,
+    component: () => import('../views/Login.vue'),
     meta: { guestOnly: true }
   },
   {
     path: '/register',
     name: 'register',
-    component: Register,
+    component: () => import('../views/Register.vue'),
     meta: { guestOnly: true }
   },
   {
     path: '/oauth/success',
     name: 'oauth-success',
-    component: OAuthSuccess,
+    component: () => import('../views/OAuthSuccess.vue'),
     meta: { guestOnly: true }
   },
   {

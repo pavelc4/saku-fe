@@ -31,7 +31,10 @@
         <!-- Simple icon placeholder -->
         <div class="absolute inset-0 flex items-center justify-center">
           <div class="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-3xl bg-surface-container-lowest/50 backdrop-blur-sm flex items-center justify-center border border-outline-variant/20">
-            <span class="material-symbols-outlined text-5xl sm:text-6xl md:text-7xl text-primary/30" style="font-variation-settings: 'FILL' 1;">point_of_sale</span>
+            <!-- Inline SVG for point_of_sale to prevent LCP delay from font loading -->
+            <svg class="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 text-primary/30" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 8H5V6h14v2zm-1 9v2H6v-2h12zm-3-4v2H9v-2h6zm4-7H5c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM5 20h14v-2H5v2zm14-4H5V8h14v8z"/>
+            </svg>
           </div>
         </div>
         

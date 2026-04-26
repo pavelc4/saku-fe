@@ -1,7 +1,9 @@
 <script setup>
+import { defineAsyncComponent } from 'vue'
 import Hero from '../components/sections/Hero.vue'
-import Features from '../components/sections/Features.vue'
-import Team from '../components/sections/Team.vue'
+
+const Features = defineAsyncComponent(() => import('../components/sections/Features.vue'))
+const Team = defineAsyncComponent(() => import('../components/sections/Team.vue'))
 </script>
 
 <template>
