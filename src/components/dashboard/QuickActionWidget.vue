@@ -30,7 +30,7 @@ const generateReportHtml = (transactions: any[], summary: any, insight: any, gen
       const time = t.created_at ? new Date(t.created_at * 1000).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '-';
       // Get item names from items array or name field
       let items = 'POS';
-      if (t.items && Array.isArray(t.items) {
+      if (t.items && Array.isArray(t.items)) {
         items = t.items.slice(0, 2).map((i: any) => i.name).join(', ');
         if (t.items.length > 2) items += ' +' + (t.items.length - 2);
       } else if (t.name) {
