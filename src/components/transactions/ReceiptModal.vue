@@ -51,11 +51,11 @@
         <div class="border-t border-dashed border-outline-variant pt-8 mb-10 flex flex-col gap-3 font-body">
           <div class="flex justify-between text-sm font-medium">
             <span class="text-on-surface-variant">Subtotal</span>
-            <span class="text-on-surface">{{ formatCurrency(transaction.amount) }}</span>
+            <span class="text-on-surface">{{ formatCurrency(transaction.amount - transaction.tax) }}</span>
           </div>
           <div class="flex justify-between text-sm font-medium">
-            <span class="text-on-surface-variant">Tax (11%)</span>
-            <span class="text-on-surface">{{ formatCurrency(transaction.amount * 0.11) }}</span>
+            <span class="text-on-surface-variant">Tax ({{ transaction.tax_rate }}%)</span>
+            <span class="text-on-surface">{{ formatCurrency(transaction.tax) }}</span>
           </div>
           <div class="flex justify-between items-end mt-6 pt-6 border-t-2 border-on-surface/10">
             <span class="font-headline text-xl text-on-surface-variant italic">Grand Total</span>
@@ -111,6 +111,8 @@ const props = defineProps<{
     cashier: string;
     amount: number;
     method: string;
+    tax: number;
+    tax_rate: number;
     items: Array<{ name: string; quantity: number; price: number }>;
   };
 }>();
