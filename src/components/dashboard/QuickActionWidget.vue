@@ -13,16 +13,15 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { usePosStore } from '../../stores/pos';
+import { useDashboardStore } from '../../stores/dashboard';
 
 const loading = ref(false);
+const posStore = usePosStore();
+const dashboardStore = useDashboardStore();
 
 const formatCurrency = (val: number) => 
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val || 0);
-
-const getAuthHeader = () => {
-  const token = localStorage.getItem('token');
-  return token ? { Authorization: 'Bearer ' + token } : {};
-};
 
 const generateReportHtml = (transactions: any[], summary: any, insight: any, generatedDate: string) => {
   let rowsHtml = '';
@@ -98,17 +97,14 @@ aiSection +
 const exportPdf = async () => {
   loading.value = true;
   try {
-    const headers = { 'Content-Type': 'application/json', ...getAuthHeader() };
+    // Fetch from store (already has correct auth)
+    if (!dashboardStore.recentTransactions.length) {
+      await dashboardStore.fetchDashboard();
+    }
     
-    const [transRes, summaryRes, insightRes] = await Promise.all([
-      fetch('/api/pos/transactions?limit=10', { headers }).then(r => r.json()).catch(() => ({ data: { data: [] } })),
-      fetch('/api/pos/summary/today', { headers }).then(r => r.json()).catch(() => ({ data: { data: {} } })),
-      fetch('/api/insights/daily', { headers }).then(r => r.json()).catch(() => ({ data: { data: {} } })),
-    ]);
-
-    const transactions = transRes.data?.data || [];
-    const summary = summaryRes.data?.data || {};
-    const insight = insightRes.data?.data || {};
+    const transactions = dashboardStore.recentTransactions.slice(0, 10);
+    const summary = dashboardStore.metrics || {};
+    const insight = dashboardStore.dailyInsight || {};
     
     const generatedDate = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     const html = generateReportHtml(transactions, summary, insight, generatedDate);
