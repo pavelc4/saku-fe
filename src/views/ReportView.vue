@@ -216,24 +216,27 @@ const exportToPdf = async () => {
   isExporting.value = true;
   
   const element = document.getElementById('report-document');
-  const opt = {
-    margin: 10,
-    filename: `Saku_Report_${new Date().toISOString().split('T')[0]}.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { 
-      scale: 2, 
-      useCORS: true,
-      letterRendering: true,
-      windowWidth: 1200
-    },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
+  if (!element) {
+    alert('Gagal mengekspor PDF. Elemen tidak ditemukan.');
+    isExporting.value = false;
+    return;
+  }
 
   try {
+    // Try html2pdf.js first
+    const opt = {
+      margin: 10,
+      filename: `Saku_Report_${new Date().toISOString().split('T')[0]}.pdf`,
+      image: { type: 'png', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, windowWidth: 1200 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
     await html2pdf().set(opt).from(element).save();
-  } catch (error) {
-    console.error('PDF Export failed:', error);
-    alert('Gagal mengekspor PDF. Silakan coba lagi.');
+  } catch (error: any) {
+    // Fallback: use browser print
+    console.warn('html2pdf failed, trying window.print:', error);
+    window.print();
   } finally {
     isExporting.value = false;
   }
