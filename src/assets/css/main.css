@@ -29,8 +29,8 @@
 
   --radius-soft: 32px;
 
-  --font-headline: "Newsreader", serif;
-  --font-body: "Manrope", sans-serif;
+  --font-headline: "Newsreader", "Georgia", serif;
+  --font-body: "Manrope", system-ui, -apple-system, sans-serif;
 }
 
 @layer base {

@@ -16,7 +16,7 @@
           <div class="md:col-span-5 flex flex-col items-start z-10 md:-ml-16">
             <h3 class="text-5xl md:text-6xl font-headline font-medium text-[#f5f4ed] mb-4">Dimas Dwi Ariyanto</h3>
             <div class="flex items-center gap-4 mb-8">
-              <span class="text-primary font-headline italic text-2xl">Lead Developer</span>
+              <span class="text-[#fbdcd1] font-headline text-2xl">Lead Developer</span>
               <span class="w-1.5 h-1.5 rounded-full bg-surface-variant"></span>
               <span class="text-surface-variant font-headline text-xl">pavelc4</span>
             </div>

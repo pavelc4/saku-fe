@@ -23,8 +23,21 @@
     
     <div class="w-full lg:w-1/2 relative">
       <div class="absolute inset-0 bg-primary opacity-5 blur-[100px] rounded-full"></div>
-      <div class="relative w-full aspect-[4/3] rounded-soft bg-surface-container-lowest overflow-hidden shadow-[0_32px_64px_-12px_rgba(27,28,24,0.1)]">
-        <img alt="minimalist retail counter" class="w-full h-full object-cover mix-blend-multiply opacity-90" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-wY5A8jP7hy0QtZn2ZVHS1A6xaKwXgx0ku1E3c-PxMELzmTS5Ulhk5u-HvdNkVCKipKrq6Y6bcuw00eqSDQV4uNKzg96Hi9oqyPoofQw5OZ-oOkKz7MB5kq76xdpgdlxs7iwfweWQ0yTC3LPXW6QS31dULctRlpGFIzz4PCxkZSi7Bz8K-9tdXfOx_APEGJqSDkJVMkAZ7EBZIWNImibZuF5Pt-dEG3G4RDLkLuwQI7yBo7TFCbyQKTlzmDNahxogi2Toa6DX6jA"/>
+      <div class="relative w-full aspect-[4/3] rounded-soft bg-gradient-to-br from-primary/10 via-surface-container-low to-surface-container-lowest overflow-hidden shadow-[0_32px_64px_-12px_rgba(27,28,24,0.1)]">
+        <!-- Placeholder gradient pattern -->
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(154,64,33,0.15),transparent_50%)]"></div>
+        <div class="absolute inset-0 bg-[linear-gradient(135deg,transparent_40%,rgba(255,255,255,0.1)_50%,transparent_60%)]"></div>
+        
+        <!-- Simple icon placeholder -->
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-3xl bg-surface-container-lowest/50 backdrop-blur-sm flex items-center justify-center border border-outline-variant/20">
+            <span class="material-symbols-outlined text-5xl sm:text-6xl md:text-7xl text-primary/30" style="font-variation-settings: 'FILL' 1;">point_of_sale</span>
+          </div>
+        </div>
+        
+        <!-- Decorative circles -->
+        <div class="absolute top-8 right-8 w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-tertiary/10"></div>
+        <div class="absolute bottom-12 left-12 w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-secondary/10"></div>
         
         <div class="absolute bottom-4 sm:bottom-8 left-4 sm:left-8 right-4 sm:right-8 bg-surface-container-lowest/80 backdrop-blur-xl rounded-2xl sm:rounded-[2rem] p-4 sm:p-6 shadow-lg border border-white/20 flex justify-between items-center">
           <div class="min-w-0">
