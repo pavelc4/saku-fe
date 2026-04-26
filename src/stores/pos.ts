@@ -5,6 +5,7 @@ import { posApi } from '../api/pos'
 export const usePosStore = defineStore('pos', () => {
   const activeSession = ref<any>(null)
   const transactions = ref<any[]>([])
+  const summary = ref<any>(null)
   const loading = ref(false)
   const error = ref<string | null>(null)
 
@@ -82,5 +83,14 @@ export const usePosStore = defineStore('pos', () => {
     }
   }
 
-  return { activeSession, transactions, loading, error, fetchActiveSession, openSession, closeSession, checkout, fetchTransactions }
+  async function fetchSummary() {
+    try {
+      const res = await posApi.getSummaryToday()
+      summary.value = res.data?.data || null
+    } catch (err: any) {
+      summary.value = null
+    }
+  }
+
+  return { activeSession, transactions, summary, loading, error, fetchActiveSession, openSession, closeSession, checkout, fetchTransactions, fetchSummary }
 })

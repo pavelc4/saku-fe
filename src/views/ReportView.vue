@@ -50,35 +50,35 @@
             <!-- Executive Summary -->
             <section class="mb-20">
               <h2 class="text-2xl font-headline font-medium text-on-surface mb-8 flex items-center gap-3">
-                Executive Summary
+                Ringkasan Eksekutif
                 <span class="h-[1px] flex-1 bg-outline-variant/30"></span>
               </h2>
               <div class="grid grid-cols-3 gap-8">
                 <!-- Total Revenue -->
                 <div class="bg-surface-container-low p-8 rounded-2xl flex flex-col gap-3 border border-outline-variant/10">
-                  <span class="font-label text-xs text-on-surface-variant uppercase tracking-[0.15em] font-bold">Total Revenue</span>
-                  <span class="font-headline text-5xl font-medium text-primary tracking-tighter">$42,850</span>
+                  <span class="font-label text-xs text-on-surface-variant uppercase tracking-[0.15em] font-bold">Total Pendapatan</span>
+                  <span class="font-headline text-5xl font-medium text-primary tracking-tighter">{{ formatCurrency(summary?.total_omzet || 0) }}</span>
                   <span class="font-label text-sm text-tertiary flex items-center gap-1.5 mt-2 bg-tertiary/10 self-start px-3 py-1 rounded-full font-bold">
                     <span class="material-symbols-outlined text-[18px]">trending_up</span>
-                    +12.4%
+                    {{ summary?.total_transaksi || 0 }} transaksi
                   </span>
                 </div>
-                <!-- Total Expenses -->
+                <!-- Total Transactions -->
                 <div class="bg-surface-container-low p-8 rounded-2xl flex flex-col gap-3 border border-outline-variant/10">
-                  <span class="font-label text-xs text-on-surface-variant uppercase tracking-[0.15em] font-bold">Total Expenses</span>
-                  <span class="font-headline text-5xl font-medium text-on-surface tracking-tighter">$28,340</span>
+                  <span class="font-label text-xs text-on-surface-variant uppercase tracking-[0.15em] font-bold">Total Transaksi</span>
+                  <span class="font-headline text-5xl font-medium text-on-surface tracking-tighter">{{ summary?.total_transaksi || 0 }}</span>
                   <span class="font-label text-sm text-secondary flex items-center gap-1.5 mt-2 bg-secondary/10 self-start px-3 py-1 rounded-full font-bold">
-                    <span class="material-symbols-outlined text-[18px]">trending_flat</span>
-                    +2.1%
+                    <span class="material-symbols-outlined text-[18px]">receipt_long</span>
+                    Hari ini
                   </span>
                 </div>
-                <!-- Net Profit -->
+                <!-- Pending Orders -->
                 <div class="bg-surface-container-high p-8 rounded-2xl flex flex-col gap-3 border border-outline-variant/10">
-                  <span class="font-label text-xs text-on-surface-variant uppercase tracking-[0.15em] font-bold">Net Profit</span>
-                  <span class="font-headline text-5xl font-medium text-on-surface tracking-tighter">$14,510</span>
+                  <span class="font-label text-xs text-on-surface-variant uppercase tracking-[0.15em] font-bold">Pending</span>
+                  <span class="font-headline text-5xl font-medium text-on-surface tracking-tighter">{{ summary?.pending_count || 0 }}</span>
                   <span class="font-label text-sm text-tertiary flex items-center gap-1.5 mt-2 bg-tertiary/10 self-start px-3 py-1 rounded-full font-bold">
-                    <span class="material-symbols-outlined text-[18px]">trending_up</span>
-                    +18.7%
+                    <span class="material-symbols-outlined text-[18px]">hourglass_empty</span>
+                    Menunggu
                   </span>
                 </div>
               </div>
@@ -155,14 +155,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import Sidebar from '../components/layout/Sidebar.vue';
 import TopNav from '../components/layout/TopNav.vue';
 import { useAuthStore } from '../stores/auth';
+import { usePosStore } from '../stores/pos';
+import { insightsApi } from '../api/insights';
 import html2pdf from 'html2pdf.js';
 
 const authStore = useAuthStore();
+const posStore = usePosStore();
 const isExporting = ref(false);
+const loading = ref(true);
 
 const user = computed(() => ({
   name: authStore.user?.name || 'Owner',
@@ -170,7 +174,7 @@ const user = computed(() => ({
 }));
 
 const generatedDate = computed(() => {
-  return new Date().toLocaleDateString('en-US', { 
+  return new Date().toLocaleDateString('id-ID', { 
     month: 'short', 
     day: 'numeric', 
     year: 'numeric',
@@ -179,15 +183,17 @@ const generatedDate = computed(() => {
   });
 });
 
-const transactions = ref([
-  { id: 1, date: 'Oct 28', desc: 'Wholesale Botanical Restock', cat: 'Inventory', amount: -1240.00 },
-  { id: 2, date: 'Oct 25', desc: 'Corporate Gifting Order (50x Tinctures)', cat: 'B2B Sales', amount: 3500.00 },
-  { id: 3, date: 'Oct 18', desc: 'Monthly Storefront Lease', cat: 'Operations', amount: -4200.00 },
-  { id: 4, date: 'Oct 12', desc: 'Weekend Artisan Market Payout', cat: 'Retail Sales', amount: 5820.50 },
-]);
+const summary = computed(() => posStore.summary || {});
+const transactions = computed(() => (posStore.transactions || []).slice(0, 10).map((t: any) => ({
+  id: t.id,
+  date: t.created_at ? new Date(t.created_at * 1000).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : '-',
+  desc: t.items?.map((i: any) => i.name).join(', ') || 'POS Transaction',
+  cat: t.payment_method || 'cash',
+  amount: t.amount || 0,
+})));
 
 const formatCurrency = (val: number) => 
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
+  new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val || 0);
 
 const exportToPdf = async () => {
   isExporting.value = true;
@@ -215,6 +221,15 @@ const exportToPdf = async () => {
     isExporting.value = false;
   }
 };
+
+onMounted(async () => {
+  loading.value = true;
+  await Promise.all([
+    posStore.fetchTransactions({ limit: 20 }),
+    posStore.fetchSummary(),
+  ]);
+  loading.value = false;
+});
 </script>
 
 <style scoped>
