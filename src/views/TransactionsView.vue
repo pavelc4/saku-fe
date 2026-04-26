@@ -155,12 +155,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import Sidebar from '../components/layout/Sidebar.vue';
 import TopNav from '../components/layout/TopNav.vue';
 import { useAuthStore } from '../stores/auth';
+import { usePosStore } from '../stores/pos';
 
 const authStore = useAuthStore();
+const posStore = usePosStore();
 const user = computed(() => ({
   name: authStore.user?.name || 'Manager',
   avatar: authStore.user?.avatar || '',
@@ -169,49 +171,21 @@ const user = computed(() => ({
 const activeFilter = ref('All');
 const filters = ['All', 'Completed', 'Refunded'];
 
-const transactions = ref([
-  {
-    id: 'TXN-8829',
-    time: '10:42 AM',
-    date: 'Oct 24, 2023',
-    itemsCount: 2,
-    amount: 42500,
-    method: 'Cash',
-    cashier: 'Sarah J.',
-    items: [
-      { name: 'Artisan Clay Mug', qty: 1, price: 24000 },
-      { name: 'Hand-stitched Notebook', qty: 1, price: 18500 }
-    ]
-  },
-  {
-    id: 'TXN-8828',
-    time: '09:15 AM',
-    date: 'Oct 24, 2023',
-    itemsCount: 1,
-    amount: 18000,
-    method: 'QRIS',
-    cashier: 'Sarah J.',
-    items: [
-      { name: 'Organic Coffee Beans', qty: 1, price: 18000 }
-    ]
-  },
-  {
-    id: 'TXN-8827',
-    time: '08:30 AM',
-    date: 'Oct 24, 2023',
-    itemsCount: 4,
-    amount: 112750,
-    method: 'Card',
-    cashier: 'Sarah J.',
-    items: [
-      { name: 'Ceramic Plate Set', qty: 1, price: 85000 },
-      { name: 'Wooden Spatula', qty: 2, price: 10000 },
-      { name: 'Linen Napkin', qty: 1, price: 7750 }
-    ]
-  }
-]);
+onMounted(async () => {
+  await posStore.fetchTransactions();
+});
 
-const selectedTxn = ref(transactions.value[0]);
+const transactions = computed(() => posStore.transactions.map((t: any) => ({
+  id: t.id,
+  time: new Date(t.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+  date: new Date(t.created_at).toLocaleDateString('id-ID'),
+  itemsCount: t.items?.length || 0,
+  amount: t.amount || 0,
+  method: t.payment_method || 'cash',
+  items: t.items || []
+})));
+
+const selectedTxn = ref<any>(null);
 
 const formatCurrency = (val: number) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val);

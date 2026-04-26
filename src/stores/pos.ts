@@ -4,6 +4,7 @@ import { posApi } from '../api/pos'
 
 export const usePosStore = defineStore('pos', () => {
   const activeSession = ref<any>(null)
+  const transactions = ref<any[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
 
@@ -68,5 +69,18 @@ export const usePosStore = defineStore('pos', () => {
     }
   }
 
-  return { activeSession, loading, error, fetchActiveSession, openSession, closeSession, checkout }
+  async function fetchTransactions(params?: { page?: number; limit?: number; session_id?: string }) {
+    loading.value = true
+    error.value = null
+    try {
+      const res = await posApi.getTransactions(params)
+      transactions.value = res.data?.data || []
+    } catch (err: any) {
+      error.value = err.response?.data?.error?.message || 'Gagal memuat transaksi'
+    } finally {
+      loading.value = false
+    }
+  }
+
+  return { activeSession, transactions, loading, error, fetchActiveSession, openSession, closeSession, checkout, fetchTransactions }
 })
