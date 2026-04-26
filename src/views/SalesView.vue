@@ -44,7 +44,10 @@
                     <p class="text-xs text-secondary line-clamp-2">{{ product.description }}</p>
                   </div>
                   <div class="mt-4 flex items-center justify-between">
-                    <span class="font-bold text-primary">{{ formatCurrency(product.price) }}</span>
+                    <div class="flex items-center gap-2">
+                      <span class="font-bold text-primary">{{ formatCurrency(product.price) }}</span>
+                      <span v-if="product.discount_percent > 0" class="text-xs bg-error text-white px-2 py-0.5 rounded-full">-{{ product.discount_percent }}%</span>
+                    </div>
                     <button class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors cursor-pointer" @click.stop="addToCart(product)">
                       <span class="material-symbols-outlined text-sm">add</span>
                     </button>
