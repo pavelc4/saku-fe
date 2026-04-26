@@ -21,11 +21,11 @@ export const usePosStore = defineStore('pos', () => {
     }
   }
 
-  async function openSession(openingBalance: number) {
+  async function openSession(openingBalance: number, cashierName?: string) {
     loading.value = true
     error.value = null
     try {
-      const res = await posApi.openSession({ opening_cash: openingBalance })
+      const res = await posApi.openSession({ opening_cash: openingBalance, cashier_name: cashierName })
       activeSession.value = res.data?.data
       return true
     } catch (err: any) {

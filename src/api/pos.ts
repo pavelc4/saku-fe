@@ -1,7 +1,7 @@
 import apiClient from './client'
 
 export const posApi = {
-  openSession: (data: { opening_cash: number }) =>
+  openSession: (data: { opening_cash: number; cashier_name?: string }) =>
     apiClient.post('/pos/session/open', data),
 
   closeSession: (data: { closing_cash: number | null }) =>

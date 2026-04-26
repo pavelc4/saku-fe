@@ -103,12 +103,12 @@
           <div class="flex-1 overflow-y-auto px-8 py-6">
             <h4 class="font-headline text-lg font-medium text-on-surface mb-4">Items</h4>
             <div class="flex flex-col gap-4">
-              <div v-for="item in selectedTxn.items" :key="item.name" class="flex justify-between items-start">
+              <div v-for="(item, idx) in selectedTxn.items" :key="idx" class="flex justify-between items-start">
                 <div>
                   <p class="font-bold text-on-surface text-sm">{{ item.name }}</p>
-                  <p class="text-xs text-secondary mt-0.5">{{ item.qty }} x {{ formatCurrency(item.price) }}</p>
+                  <p class="text-xs text-secondary mt-0.5">{{ item.quantity }} x {{ formatCurrency(item.price) }}</p>
                 </div>
-                <span class="font-medium text-on-surface text-sm">{{ formatCurrency(item.qty * item.price) }}</span>
+                <span class="font-medium text-on-surface text-sm">{{ formatCurrency(item.quantity * item.price) }}</span>
               </div>
             </div>
           </div>

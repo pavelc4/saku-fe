@@ -283,7 +283,7 @@ const discrepancyIcon = computed(() => {
 });
 
 const openSession = async () => {
-  const ok = await posStore.openSession(initialCash.value);
+  const ok = await posStore.openSession(initialCash.value, cashierName.value);
   if (ok) isModalOpen.value = false;
 };
 
