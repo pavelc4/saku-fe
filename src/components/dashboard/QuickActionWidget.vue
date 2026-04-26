@@ -28,10 +28,16 @@ const generateReportHtml = (transactions: any[], summary: any, insight: any, gen
   if (transactions.length > 0) {
     for (const t of transactions) {
       const time = t.created_at ? new Date(t.created_at * 1000).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '-';
-      const items = t.items && t.items.length > 0 ? t.items.slice(0, 2).map((i: any) => i.name).join(', ') : 'POS';
-      const more = t.items && t.items.length > 2 ? ' +' + (t.items.length - 2) : '';
-      const amount = formatCurrency(t.amount);
-      rowsHtml += '<tr><td>' + time + '</td><td>' + items + more + '</td><td class="amount">' + amount + '</td></tr>';
+      // Get item names from items array or name field
+      let items = 'POS';
+      if (t.items && Array.isArray(t.items) {
+        items = t.items.slice(0, 2).map((i: any) => i.name).join(', ');
+        if (t.items.length > 2) items += ' +' + (t.items.length - 2);
+      } else if (t.name) {
+        items = t.name;
+      }
+      const amount = formatCurrency(t.amount || 0);
+      rowsHtml += '<tr><td>' + time + '</td><td>' + items + '</td><td class="amount">' + amount + '</td></tr>';
     }
   } else {
     rowsHtml = '<tr><td colspan="3" style="text-align:center;padding:32px;color:#89726b;">Belum ada transaksi hari ini</td></tr>';
@@ -102,8 +108,14 @@ const exportPdf = async () => {
       await dashboardStore.fetchDashboard();
     }
     
-    const transactions = dashboardStore.recentTransactions.slice(0, 10);
-    const summary = dashboardStore.metrics || {};
+    const transactions = dashboardStore.recentTransactions;
+    // Calculate summary from transactions
+    const totalOmzet = transactions.reduce((sum: number, t: any) => sum + (t.amount || 0), 0);
+    const summary = {
+      total_omzet: totalOmzet,
+      total_transaksi: transactions.length,
+      pending_count: transactions.filter((t: any) => t.status === 'pending').length
+    };
     const insight = dashboardStore.dailyInsight || {};
     
     const generatedDate = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
