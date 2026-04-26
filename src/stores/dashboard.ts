@@ -27,7 +27,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
       ])
 
       metrics.value = summaryRes.data?.data
-      recentTransactions.value = transRes.data?.data?.items || transRes.data?.data || []
+      recentTransactions.value = transRes.data?.data || []
       
       const dailyData = dailyRes.data?.data || {}
       dailyInsight.value = dailyData
