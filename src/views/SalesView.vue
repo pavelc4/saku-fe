@@ -371,21 +371,27 @@ const formatCurrency = (value: number) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value || 0);
 
 onMounted(async () => {
+  // Set default tax rate 11% if not loaded
+  if (!cartStore.taxRate || cartStore.taxRate === 0) {
+    cartStore.setTaxRate(11);
+  }
+  
   await Promise.all([
     posStore.fetchActiveSession(),
     productsStore.fetchProducts(),
     categoriesStore.fetchCategories(),
   ]);
   
-  // Load tax rate from settings
+  // Try to load tax rate from settings
   try {
     const res = await settingsApi.get();
     if (res.data?.data?.tax_rate) {
       cartStore.setTaxRate(res.data.data.tax_rate);
     }
   } catch (e) { console.error(e); }
-  
+   
   if (!isSessionOpen.value) isModalOpen.value = true;
+});
 });
 </script>
 
