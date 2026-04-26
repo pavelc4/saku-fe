@@ -11,29 +11,29 @@
       <main class="flex-1 overflow-y-auto no-scrollbar p-8 md:p-12 flex flex-col gap-6 bg-surface rounded-tl-[32px] relative z-10 shadow-[-8px_-8px_32px_rgba(27,28,24,0.02)]">
         <!-- Welcome Message / Header (only show if no messages) -->
         <div v-if="chatMessages.length === 0" class="text-center mb-8 max-w-2xl mx-auto mt-4">
-          <div class="w-16 h-16 bg-surface-container-highest rounded-full flex items-center justify-center mx-auto mb-6 text-primary shadow-[0_8px_32px_rgba(27,28,24,0.06)]">
-            <span class="material-symbols-outlined fill text-3xl" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+          <div class="w-12 h-12 sm:w-16 sm:h-16 bg-surface-container-highest rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 text-primary shadow-[0_8px_32px_rgba(27,28,24,0.06)]">
+            <span class="material-symbols-outlined fill text-2xl sm:text-3xl" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
           </div>
-          <h2 class="font-headline text-3xl md:text-4xl text-on-surface mb-3">Selamat datang! Ada yang bisa saya bantu?</h2>
-          <p class="text-secondary font-body">Tanyakan tentang penjualan, inventory, atau performa bisnismu.</p>
+          <h2 class="font-headline text-2xl sm:text-3xl md:text-4xl text-on-surface mb-3">Selamat datang! Ada yang bisa saya bantu?</h2>
+          <p class="text-secondary font-body text-sm sm:text-base">Tanyakan tentang penjualan, inventory, atau performa bisnismu.</p>
         </div>
 
         <!-- Chat Messages -->
-        <div class="max-w-4xl mx-auto w-full flex flex-col gap-6">
+        <div class="max-w-4xl mx-auto w-full flex flex-col gap-4 sm:gap-6 pb-24 sm:pb-28">
           <div v-for="(msg, idx) in chatMessages" :key="idx" 
-               :class="['flex', msg.role === 'user' ? 'justify-end' : 'justify-start items-end gap-3']">
+               :class="['flex', msg.role === 'user' ? 'justify-end' : 'justify-start items-end gap-2 sm:gap-3']">
             
             <!-- User Bubble -->
-            <div v-if="msg.role === 'user'" class="bg-primary text-on-primary rounded-2xl rounded-tr-sm py-3 px-5 max-w-xl shadow-md">
-              <p class="font-body text-lg">{{ msg.content }}</p>
+            <div v-if="msg.role === 'user'" class="bg-primary text-on-primary rounded-2xl rounded-tr-sm py-2 sm:py-3 px-4 sm:px-5 max-w-[85%] sm:max-w-xl shadow-md">
+              <p class="font-body text-sm sm:text-lg">{{ msg.content }}</p>
             </div>
             
             <!-- AI Bubble -->
             <template v-else>
-              <div class="w-10 h-10 bg-surface-container-highest rounded-full flex items-center justify-center text-primary shrink-0">
-                <span class="material-symbols-outlined fill text-xl" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+              <div class="w-8 h-8 sm:w-10 sm:h-10 bg-surface-container-highest rounded-full flex items-center justify-center text-primary shrink-0">
+                <span class="material-symbols-outlined fill text-lg sm:text-xl" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
               </div>
-              <div class="bg-surface-container-lowest text-on-surface rounded-3xl rounded-bl-sm py-4 px-6 max-w-3xl shadow-md">
+              <div class="bg-surface-container-lowest text-on-surface rounded-3xl rounded-bl-sm py-3 sm:py-4 px-4 sm:px-6 max-w-[85%] sm:max-w-3xl shadow-md">
                 <!-- Loading -->
                 <div v-if="msg.loading" class="flex items-center gap-2">
                   <span class="material-symbols-outlined animate-spin text-primary">sync</span>
@@ -45,10 +45,10 @@
                   <p class="font-body text-on-surface-variant mb-3">{{ msg.parsed.summary || msg.content }}</p>
                   
                   <div v-if="msg.parsed.data || msg.parsed.chart" class="mt-4 bg-surface-container-low rounded-xl p-4">
-                    <div v-if="msg.parsed.data" class="grid grid-cols-2 gap-3 mb-4">
-                      <div v-for="(val, key) in msg.parsed.data" :key="key" class="bg-surface-container-lowest p-3 rounded-lg">
+                    <div v-if="msg.parsed.data" class="grid grid-cols-2 gap-2 sm:gap-3 mb-3 sm:mb-4">
+                      <div v-for="(val, key) in msg.parsed.data" :key="key" class="bg-surface-container-lowest p-2 sm:p-3 rounded-lg">
                         <p class="text-xs text-secondary capitalize">{{ String(key).replace(/_/g, ' ') }}</p>
-                        <p class="font-headline text-xl">{{ formatValue(val) }}</p>
+                        <p class="font-headline text-lg sm:text-xl">{{ formatValue(val) }}</p>
                       </div>
                     </div>
                     <div v-if="msg.parsed.chart?.length" class="h-24 flex items-end gap-1">
@@ -61,25 +61,25 @@
                 
                 <!-- Plain text -->
                 <template v-else>
-                  <p class="font-body text-lg text-on-surface-variant">{{ msg.content }}</p>
+                  <p class="font-body text-sm sm:text-lg text-on-surface-variant">{{ msg.content }}</p>
                 </template>
-              </div>
+            </div>
             </template>
           </div>
         </div>
 
         <!-- Input Area (fixed at bottom) -->
-        <div class="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-surface via-surface to-surface">
-          <div class="max-w-3xl mx-auto flex items-center gap-3">
+        <div class="fixed bottom-0 left-0 right-0 p-3 sm:p-6 bg-gradient-to-t from-surface via-surface to-surface">
+          <div class="max-w-3xl mx-auto flex items-center gap-2 sm:gap-3">
             <input v-model="advisorQuestion" 
                    @keyup.enter="sendMessage"
-                   class="flex-1 bg-surface-container-lowest border-none rounded-full px-6 py-4 text-on-surface placeholder:text-secondary focus:ring-2 focus:ring-primary/30" 
+                   class="flex-1 bg-surface-container-lowest border-none rounded-full px-4 sm:px-6 py-2 sm:py-4 text-sm sm:text-base text-on-surface placeholder:text-secondary focus:ring-2 focus:ring-primary/30" 
                    placeholder="Ketik pesan..." 
                    type="text"/>
             <button @click="sendMessage" 
                     :disabled="advisorLoading || !advisorQuestion.trim()" 
-                    class="w-14 h-14 bg-primary text-on-primary rounded-full flex items-center justify-center hover:bg-primary-container disabled:opacity-50 transition-all shadow-lg">
-              <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span>
+                    class="w-10 h-10 sm:w-14 sm:h-14 bg-primary text-on-primary rounded-full flex items-center justify-center hover:bg-primary-container disabled:opacity-50 transition-all shadow-lg">
+              <span class="material-symbols-outlined text-lg sm:text-xl" style="font-variation-settings: 'FILL' 1;">send</span>
             </button>
           </div>
         </div>

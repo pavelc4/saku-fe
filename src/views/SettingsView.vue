@@ -6,19 +6,19 @@
       <TopNav :user="user" />
 
       <!-- Page Content -->
-      <main class="flex-1 overflow-y-auto bg-surface rounded-tl-[32px] p-8 md:p-12 lg:p-16 shadow-[-8px_-8px_32px_rgba(27,28,24,0.02)]">
-        <div class="max-w-4xl mx-auto space-y-16">
+      <main class="flex-1 overflow-y-auto bg-surface rounded-tl-[32px] p-4 sm:p-6 md:p-8 lg:p-16 shadow-[-8px_-8px_32px_rgba(27,28,24,0.02)]">
+        <div class="max-w-4xl mx-auto space-y-8 md:space-y-12 lg:space-y-16">
           <div>
-            <h2 class="text-4xl font-headline font-medium text-on-surface mb-2">User Settings</h2>
-            <p class="text-secondary font-body">Manage your profile, security, and preferences.</p>
+            <h2 class="text-2xl md:text-3xl lg:text-4xl font-headline font-medium text-on-surface mb-2">User Settings</h2>
+            <p class="text-secondary font-body text-sm md:text-base">Manage your profile, security, and preferences.</p>
           </div>
 
           <!-- 1. Profile Header -->
-          <section class="bg-surface-container-lowest rounded-lg p-8 shadow-[0_8px_48px_rgba(27,28,24,0.04)]">
-            <h3 class="text-2xl font-headline font-medium text-on-surface mb-8">Profile Details</h3>
-            <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
+          <section class="bg-surface-container-lowest rounded-lg p-4 sm:p-6 md:p-8 shadow-[0_8px_48px_rgba(27,28,24,0.04)]">
+            <h3 class="text-xl md:text-2xl font-headline font-medium text-on-surface mb-6 md:mb-8">Profile Details</h3>
+            <div class="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8">
               <div class="relative group cursor-pointer shrink-0">
-                <img :src="avatarPreview || getR2Url(user?.avatar)" alt="Profile Preview" class="w-32 h-32 rounded-full object-cover shadow-[0_8px_32px_rgba(27,28,24,0.08)]" />
+                <img :src="avatarPreview || getR2Url(user?.avatar)" alt="Profile Preview" class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover shadow-[0_8px_32px_rgba(27,28,24,0.08)]" />
                 <input type="file" ref="avatarInput" accept="image/jpeg,image/png,image/webp" class="hidden" @change="handleAvatarChange" />
                 <div @click="triggerAvatarUpload" class="absolute inset-0 bg-on-surface/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
                   <span class="material-symbols-outlined text-surface-container-lowest">photo_camera</span>
@@ -26,11 +26,11 @@
               </div>
               <div class="flex-1 space-y-6 w-full">
                 <p class="text-sm text-secondary font-body">Upload a new avatar. Larger images will be resized automatically. Maximum upload size is 2 MB.</p>
-                <div class="flex gap-3">
-                  <button @click="triggerAvatarUpload" :disabled="avatarLoading" class="bg-surface-container-highest text-on-surface font-label font-medium px-6 py-3 rounded-full hover:bg-surface-container-high transition-colors cursor-pointer disabled:opacity-50">
+                <div class="flex flex-col sm:flex-row gap-3">
+                  <button @click="triggerAvatarUpload" :disabled="avatarLoading" class="bg-surface-container-highest text-on-surface font-label font-medium px-4 sm:px-6 py-2 sm:py-3 rounded-full hover:bg-surface-container-high transition-colors cursor-pointer disabled:opacity-50 text-sm sm:text-base">
                     {{ avatarLoading ? 'Uploading...' : 'Upload New Photo' }}
                   </button>
-                  <button v-if="user?.avatar" @click="deleteAvatar" :disabled="avatarLoading" class="text-error font-label font-medium px-4 py-3 rounded-full hover:bg-error-container/50 transition-colors cursor-pointer disabled:opacity-50">
+                  <button v-if="user?.avatar" @click="deleteAvatar" :disabled="avatarLoading" class="text-error font-label font-medium px-3 sm:px-4 py-2 sm:py-3 rounded-full hover:bg-error-container/50 transition-colors cursor-pointer disabled:opacity-50 text-sm sm:text-base">
                     Remove
                   </button>
                 </div>
@@ -39,21 +39,21 @@
           </section>
 
           <!-- 2. Account Information -->
-          <section class="bg-surface-container-lowest rounded-lg p-8 shadow-[0_8px_48px_rgba(27,28,24,0.04)]">
-            <h3 class="text-2xl font-headline font-medium text-on-surface mb-8">Account Information</h3>
-            <form class="space-y-6" @submit.prevent="saveProfile">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <section class="bg-surface-container-lowest rounded-lg p-4 sm:p-6 md:p-8 shadow-[0_8px_48px_rgba(27,28,24,0.04)]">
+            <h3 class="text-xl md:text-2xl font-headline font-medium text-on-surface mb-6 md:mb-8">Account Information</h3>
+            <form class="space-y-4 sm:space-y-6" @submit.prevent="saveProfile">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 <div class="space-y-2">
                   <label class="block text-sm font-label font-medium text-on-surface-variant" for="fullName">Full Name</label>
-                  <input v-model="profileForm.name" class="w-full bg-surface border border-surface-container-highest focus:border-primary focus:bg-surface-container-lowest text-on-surface rounded-xl py-3 px-4 transition-colors font-label focus:ring-2 focus:ring-primary/20" id="fullName" type="text" />
+                  <input v-model="profileForm.name" class="w-full bg-surface border border-surface-container-highest focus:border-primary focus:bg-surface-container-lowest text-on-surface rounded-xl py-2.5 sm:py-3 px-3 sm:px-4 transition-colors font-label focus:ring-2 focus:ring-primary/20 text-sm sm:text-base" id="fullName" type="text" />
                 </div>
                 <div class="space-y-2">
                   <label class="block text-sm font-label font-medium text-on-surface-variant" for="emailAddress">Email Address</label>
-                  <input v-model="profileForm.email" class="w-full bg-surface border border-surface-container-highest focus:border-primary focus:bg-surface-container-lowest text-on-surface rounded-xl py-3 px-4 transition-colors font-label focus:ring-2 focus:ring-primary/20" id="emailAddress" type="email" />
+                  <input v-model="profileForm.email" class="w-full bg-surface border border-surface-container-highest focus:border-primary focus:bg-surface-container-lowest text-on-surface rounded-xl py-2.5 sm:py-3 px-3 sm:px-4 transition-colors font-label focus:ring-2 focus:ring-primary/20 text-sm sm:text-base" id="emailAddress" type="email" />
                 </div>
               </div>
               <div class="pt-4 flex justify-end">
-                <button class="bg-primary text-on-primary font-label font-medium px-8 py-3 rounded-full hover:bg-surface-tint shadow-[0_4px_16px_rgba(154,64,33,0.2)] transition-all hover:shadow-[0_8px_24px_rgba(154,64,33,0.3)] cursor-pointer" type="submit">
+                <button class="bg-primary text-on-primary font-label font-medium px-6 sm:px-8 py-2.5 sm:py-3 rounded-full hover:bg-surface-tint shadow-[0_4px_16px_rgba(154,64,33,0.2)] transition-all hover:shadow-[0_8px_24px_rgba(154,64,33,0.3)] cursor-pointer text-sm sm:text-base" type="submit">
                   Save Changes
                 </button>
               </div>
@@ -61,26 +61,26 @@
           </section>
 
           <!-- 3. Security -->
-          <section class="bg-surface-container-lowest rounded-lg p-8 shadow-[0_8px_48px_rgba(27,28,24,0.04)]">
-            <div class="flex items-center gap-3 mb-8">
+          <section class="bg-surface-container-lowest rounded-lg p-4 sm:p-6 md:p-8 shadow-[0_8px_48px_rgba(27,28,24,0.04)]">
+            <div class="flex items-center gap-3 mb-6 md:mb-8">
               <span class="material-symbols-outlined text-primary">lock</span>
-              <h3 class="text-2xl font-headline font-medium text-on-surface">Security</h3>
+              <h3 class="text-xl md:text-2xl font-headline font-medium text-on-surface">Security</h3>
             </div>
-            <form class="space-y-6 max-w-lg" @submit.prevent="updatePassword">
+            <form class="space-y-4 sm:space-y-6 max-w-lg" @submit.prevent="updatePassword">
               <div class="space-y-2">
                 <label class="block text-sm font-label font-medium text-on-surface-variant" for="currentPassword">Current Password</label>
-                <input v-model="passwords.current" class="w-full bg-surface border border-surface-container-highest focus:border-primary focus:bg-surface-container-lowest text-on-surface rounded-xl py-3 px-4 transition-colors font-label focus:ring-2 focus:ring-primary/20" id="currentPassword" type="password" />
+                <input v-model="passwords.current" class="w-full bg-surface border border-surface-container-highest focus:border-primary focus:bg-surface-container-lowest text-on-surface rounded-xl py-2.5 sm:py-3 px-3 sm:px-4 transition-colors font-label focus:ring-2 focus:ring-primary/20 text-sm sm:text-base" id="currentPassword" type="password" />
               </div>
               <div class="space-y-2">
                 <label class="block text-sm font-label font-medium text-on-surface-variant" for="newPassword">New Password</label>
-                <input v-model="passwords.new" class="w-full bg-surface border border-surface-container-highest focus:border-primary focus:bg-surface-container-lowest text-on-surface rounded-xl py-3 px-4 transition-colors font-label focus:ring-2 focus:ring-primary/20" id="newPassword" type="password" />
+                <input v-model="passwords.new" class="w-full bg-surface border border-surface-container-highest focus:border-primary focus:bg-surface-container-lowest text-on-surface rounded-xl py-2.5 sm:py-3 px-3 sm:px-4 transition-colors font-label focus:ring-2 focus:ring-primary/20 text-sm sm:text-base" id="newPassword" type="password" />
               </div>
               <div class="space-y-2">
                 <label class="block text-sm font-label font-medium text-on-surface-variant" for="confirmPassword">Confirm New Password</label>
-                <input v-model="passwords.confirm" class="w-full bg-surface border border-surface-container-highest focus:border-primary focus:bg-surface-container-lowest text-on-surface rounded-xl py-3 px-4 transition-colors font-label focus:ring-2 focus:ring-primary/20" id="confirmPassword" type="password" />
+                <input v-model="passwords.confirm" class="w-full bg-surface border border-surface-container-highest focus:border-primary focus:bg-surface-container-lowest text-on-surface rounded-xl py-2.5 sm:py-3 px-3 sm:px-4 transition-colors font-label focus:ring-2 focus:ring-primary/20 text-sm sm:text-base" id="confirmPassword" type="password" />
               </div>
               <div class="pt-4">
-                <button class="bg-surface-container-highest text-on-surface font-label font-medium px-8 py-3 rounded-full hover:bg-surface-container-high transition-colors cursor-pointer" type="submit">
+                <button class="bg-surface-container-highest text-on-surface font-label font-medium px-6 sm:px-8 py-2.5 sm:py-3 rounded-full hover:bg-surface-container-high transition-colors cursor-pointer text-sm sm:text-base" type="submit">
                   Update Password
                 </button>
               </div>
@@ -88,10 +88,10 @@
           </section>
 
           <!-- 5. Danger Zone -->
-          <section class="bg-error-container/30 rounded-lg p-8 shadow-[0_8px_48px_rgba(186,26,26,0.02)]">
-            <h3 class="text-2xl font-headline font-medium text-error mb-4">Danger Zone</h3>
-            <p class="text-on-surface-variant font-body mb-6">Once you delete your account, there is no going back. Please be certain.</p>
-            <button class="bg-error text-on-error font-label font-medium px-6 py-3 rounded-full hover:bg-error/90 transition-colors cursor-pointer" type="button" @click="deleteAccount">
+          <section class="bg-error-container/30 rounded-lg p-4 sm:p-6 md:p-8 shadow-[0_8px_48px_rgba(186,26,26,0.02)]">
+            <h3 class="text-xl md:text-2xl font-headline font-medium text-error mb-3 md:mb-4">Danger Zone</h3>
+            <p class="text-on-surface-variant font-body mb-4 md:mb-6 text-sm md:text-base">Once you delete your account, there is no going back. Please be certain.</p>
+            <button class="bg-error text-on-error font-label font-medium px-4 sm:px-6 py-2 sm:py-3 rounded-full hover:bg-error/90 transition-colors cursor-pointer text-sm sm:text-base" type="button" @click="deleteAccount">
               Delete Account
             </button>
           </section>

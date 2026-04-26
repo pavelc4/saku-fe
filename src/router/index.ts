@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Home from '../views/Home.vue'
+import AppLayout from '../components/layout/AppLayout.vue'
 import DashboardView from '../views/DashboardView.vue'
 import SettingsView from '../views/SettingsView.vue'
 import SalesView from '../views/SalesView.vue'
@@ -19,58 +20,56 @@ const routes: RouteRecordRaw[] = [
     component: Home
   },
   {
-    path: '/dashboard',
-    name: 'dashboard',
-    component: DashboardView,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/sales',
-    name: 'sales',
-    component: SalesView,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/transactions',
-    name: 'transactions',
-    component: TransactionsView,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/inventory',
-    name: 'inventory',
-    component: InventoryView,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/categories',
-    name: 'categories',
-    component: CategoriesView,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/notifications',
-    name: 'notifications',
-    component: NotificationsView,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/ai-insights',
-    name: 'ai-insights',
-    component: AiInsightsView,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/reports',
-    name: 'reports',
-    component: () => import('../views/ReportView.vue'),
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/settings',
-    name: 'settings',
-    component: SettingsView,
-    meta: { requiresAuth: true }
+    path: '/',
+    component: AppLayout,
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: 'dashboard',
+        name: 'dashboard',
+        component: DashboardView
+      },
+      {
+        path: 'sales',
+        name: 'sales',
+        component: SalesView
+      },
+      {
+        path: 'transactions',
+        name: 'transactions',
+        component: TransactionsView
+      },
+      {
+        path: 'inventory',
+        name: 'inventory',
+        component: InventoryView
+      },
+      {
+        path: 'categories',
+        name: 'categories',
+        component: CategoriesView
+      },
+      {
+        path: 'notifications',
+        name: 'notifications',
+        component: NotificationsView
+      },
+      {
+        path: 'ai-insights',
+        name: 'ai-insights',
+        component: AiInsightsView
+      },
+      {
+        path: 'reports',
+        name: 'reports',
+        component: () => import('../views/ReportView.vue')
+      },
+      {
+        path: 'settings',
+        name: 'settings',
+        component: SettingsView
+      }
+    ]
   },
   {
     path: '/login',

@@ -1,9 +1,9 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-background">
+  <div class="min-h-screen flex items-center justify-center bg-background p-4">
     <div class="text-center">
-      <span class="material-symbols-outlined text-primary text-5xl animate-spin" style="font-variation-settings: 'FILL' 1;">sync</span>
-      <h2 class="font-headline text-2xl text-on-surface mt-4">Mengautentikasi...</h2>
-      <p class="text-on-surface-variant font-body">Mohon tunggu sebentar, Anda sedang dialihkan.</p>
+      <span class="material-symbols-outlined text-4xl sm:text-5xl text-primary animate-spin" style="font-variation-settings: 'FILL' 1;">sync</span>
+      <h2 class="font-headline text-xl sm:text-2xl text-on-surface mt-4">Mengautentikasi...</h2>
+      <p class="text-on-surface-variant font-body text-sm sm:text-base mt-2">Mohon tunggu sebentar, Anda sedang dialihkan.</p>
     </div>
   </div>
 </template>
