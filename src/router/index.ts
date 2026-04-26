@@ -11,6 +11,7 @@ import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
 import OAuthSuccess from '../views/OAuthSuccess.vue'
 import TransactionsView from '../views/TransactionsView.vue'
+import ReportView from '../views/ReportView.vue'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -58,6 +59,12 @@ const routes: RouteRecordRaw[] = [
     path: '/ai-insights',
     name: 'ai-insights',
     component: AiInsightsView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/reports',
+    name: 'reports',
+    component: ReportView,
     meta: { requiresAuth: true }
   },
   {
