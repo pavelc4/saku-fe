@@ -7,7 +7,15 @@
 
       <main class="flex-1 overflow-y-auto bg-surface rounded-tl-[32px] p-12 shadow-[-8px_-8px_32px_rgba(27,28,24,0.02)]">
         
-        <header class="mb-12 flex justify-between items-center">
+        <header v-if="loading" class="flex items-center justify-center py-20">
+          <div class="text-center">
+            <span class="material-symbols-outlined text-5xl text-primary animate-spin">sync</span>
+            <p class="font-body text-on-surface-variant mt-4">Memuat data...</p>
+          </div>
+        </header>
+        
+        <template v-else>
+          <header class="mb-12 flex justify-between items-center">
           <div>
             <h2 class="font-headline text-4xl font-medium text-on-surface tracking-tight">Business Performance Review</h2>
             <p class="font-body text-on-surface-variant mt-2 text-lg">Generate and export your monthly performance report.</p>
@@ -91,17 +99,14 @@
                 <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                   <span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">psychology</span>
                 </div>
-                <h2 class="text-2xl font-headline font-medium text-primary">AI Intelligence Narrative</h2>
+                <h2 class="text-2xl font-headline font-medium text-primary">Analisis AI</h2>
               </div>
               <div class="font-headline text-xl text-on-surface/90 leading-[1.8] space-y-6">
-                <p>
-                  The business health remains robust entering the fourth quarter. The <strong class="text-primary font-semibold">12.4% increase in revenue</strong> is largely attributed to the seasonal surge in the <span class="italic">"Apothecary & Wellness"</span> category, which outperformed projections by 22%.
+                <p v-if="aiInsight?.insight">
+                  {{ aiInsight.insight }}
                 </p>
-                <p>
-                  Best-selling items this period were the <em class="text-on-surface font-medium underline decoration-primary/30 decoration-2 underline-offset-4">Botanical Sleep Tincture</em> and the <em class="text-on-surface font-medium underline decoration-primary/30 decoration-2 underline-offset-4">Heirloom Tomato Seeds</em>. We noted a slight inventory lag in the gardening tools sector; replenishing prior to mid-November is advised to capture upcoming holiday demand.
-                </p>
-                <p>
-                  Cashflow predictions indicate a steady upward trajectory through December, provided operational expenses remain within the current 2% variance threshold. The Scholarly Concierge suggests a targeted promotional campaign for slow-moving artisanal ceramics to optimize warehouse space.
+                <p v-else class="text-on-surface-variant italic">
+                  Belum ada analisis untuk periode ini.
                 </p>
               </div>
             </section>
@@ -147,6 +152,7 @@
             </footer>
           </div>
         </div>
+        </template>
 
         <div class="h-12"></div>
       </main>
@@ -192,6 +198,17 @@ const transactions = computed(() => (posStore.transactions || []).slice(0, 10).m
   amount: t.amount || 0,
 })));
 
+const aiInsight = ref<any>(null);
+
+const loadAiInsight = async () => {
+  try {
+    const res = await insightsApi.getDaily();
+    aiInsight.value = res.data?.data || {};
+  } catch (e) {
+    aiInsight.value = { insight: 'Belum ada data untuk hari ini' };
+  }
+};
+
 const formatCurrency = (val: number) => 
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val || 0);
 
@@ -227,6 +244,7 @@ onMounted(async () => {
   await Promise.all([
     posStore.fetchTransactions({ limit: 20 }),
     posStore.fetchSummary(),
+    loadAiInsight(),
   ]);
   loading.value = false;
 });
