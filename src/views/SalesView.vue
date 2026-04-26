@@ -265,9 +265,10 @@ const user = computed(() => ({ name: authStore.user?.name || 'Kasir', email: aut
 const isSessionOpen = computed(() => !!posStore.activeSession);
 const isModalOpen = ref(false);
 const isCloseModalOpen = ref(false);
-
 const initialCash = ref(0);
 const actualCash = ref(0);
+const cashierName = ref('');
+const totalSales = ref(0);
 
 const expectedCash = computed(() => posStore.activeSession?.opening_cash || 0);
 const discrepancyAmount = computed(() => actualCash.value - expectedCash.value);
