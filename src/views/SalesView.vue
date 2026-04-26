@@ -355,7 +355,8 @@ const checkout = async () => {
   isCheckoutLoading.value = true;
   checkoutError.value = null;
   const items = cart.value.map(i => ({ product_id: i.id, quantity: i.quantity }));
-  const result = await posStore.checkout(items, selectedPaymentMethod.value);
+  const taxRate = cartStore.taxRate || 11;
+  const result = await posStore.checkout(items, selectedPaymentMethod.value, { tax_rate: taxRate });
   if (result) {
     cartStore.clearCart();
     checkoutSuccess.value = true;

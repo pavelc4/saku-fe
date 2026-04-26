@@ -17,6 +17,7 @@ export const posApi = {
     category_id?: string;
     discount?: number;
     discount_type?: 'none' | 'fixed' | 'percent';
+    tax_rate?: number;
   }) => apiClient.post('/pos/checkout', data),
 
   getTransactions: (params?: { page?: number; limit?: number; session_id?: string }) =>

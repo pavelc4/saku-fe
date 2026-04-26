@@ -53,13 +53,14 @@ export const usePosStore = defineStore('pos', () => {
     }
   }
 
-  async function checkout(items: any[], paymentMethod: 'cash' | 'transfer' | 'qris') {
+  async function checkout(items: any[], paymentMethod: 'cash' | 'transfer' | 'qris', options?: { tax_rate?: number }) {
     loading.value = true
     error.value = null
     try {
       const res = await posApi.createTransaction({
         items,
         payment_method: paymentMethod,
+        ...options,
       })
       return res.data?.data
     } catch (err: any) {
