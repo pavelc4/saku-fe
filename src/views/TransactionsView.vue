@@ -120,13 +120,17 @@
                 <span class="text-sm text-secondary">Subtotal</span>
                 <span class="text-sm font-medium text-on-surface">{{ formatCurrency((selectedTxn.amount || 0) - (selectedTxn.tax || 0) + (selectedTxn.discount || 0)) }}</span>
               </div>
+              <div v-if="selectedTxn.discount > 0" class="flex justify-between items-center">
+                <span class="text-sm text-secondary">Diskon</span>
+                <span class="text-sm font-medium text-error">-{{ formatCurrency(selectedTxn.discount || 0) }}</span>
+              </div>
               <div class="flex justify-between items-center">
                 <span class="text-sm text-secondary">Tax ({{ selectedTxn.tax_rate || 0 }}%)</span>
                 <span class="text-sm font-medium text-on-surface">{{ formatCurrency(selectedTxn.tax || 0) }}</span>
               </div>
               <div class="flex justify-between items-center">
-                <span class="text-sm text-secondary">Discount</span>
-                <span class="text-sm font-medium text-on-surface">-{{ formatCurrency(selectedTxn.discount || 0) }}</span>
+                <span class="text-sm text-secondary">Total</span>
+                <span class="text-sm font-bold text-primary">{{ formatCurrency(selectedTxn.amount || 0) }}</span>
               </div>
             </div>
 
