@@ -1,14 +1,5 @@
 <template>
-  <div class="antialiased flex h-screen overflow-hidden bg-surface-container-low text-on-surface">
-    <!-- SideNavBar -->
-    <Sidebar />
-
-    <div class="flex-1 flex flex-col h-screen min-w-0 z-10">
-      <!-- TopNavBar -->
-      <TopNav :user="user" />
-
-      <!-- Main Content Canvas -->
-      <main class="flex-1 overflow-y-auto bg-surface rounded-tl-[32px] p-8 lg:p-12 shadow-[-8px_-8px_32px_rgba(27,28,24,0.02)]">
+  <div>
         <!-- Page Header -->
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12">
           <div>
@@ -163,8 +154,6 @@
             </div>
           </div>
         </div>
-      </main>
-    </div>
 
     <!-- Edit Product Modal -->
     <div v-if="isEditModalOpen" class="fixed inset-0 bg-on-background/20 backdrop-blur-md z-50 flex items-center justify-center p-4">
@@ -431,8 +420,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
-import Sidebar from '../components/layout/Sidebar.vue';
-import TopNav from '../components/layout/TopNav.vue';
 import { useAuthStore, getR2Url } from '../stores/auth';
 import { useProductsStore } from '../stores/products';
 import { useCategoriesStore } from '../stores/categories';

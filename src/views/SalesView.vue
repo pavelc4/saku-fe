@@ -1,15 +1,5 @@
 <template>
-  <div class="antialiased flex h-screen overflow-hidden bg-surface-container-low text-on-surface">
-    <!-- SideNavBar -->
-    <Sidebar />
-
-    <!-- Right Side Area -->
-    <div class="flex-1 flex flex-col min-w-0 h-screen relative z-10">
-      <!-- TopNavBar -->
-      <TopNav :user="user" :showCloseShift="isSessionOpen" @close-shift="isCloseModalOpen = true" />
-
-      <!-- Main Content Area -->
-      <main class="flex-1 bg-surface rounded-tl-[32px] overflow-hidden flex p-12 gap-8 relative shadow-[-8px_-8px_32px_rgba(27,28,24,0.02)] border-none">
+  <div class="h-full flex flex-col overflow-hidden">
         
         <template v-if="isSessionOpen">
           <!-- Left Column: Products -->
@@ -155,8 +145,6 @@
             Buka Shift Sekarang
           </button>
         </div>
-      </main>
-    </div>
 
     <!-- Modal Buka Shift (Open Session) -->
     <div v-if="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-on-surface/30 backdrop-blur-[4px] transition-opacity" @click.self="isModalOpen = false">
@@ -274,8 +262,6 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import Sidebar from '../components/layout/Sidebar.vue';
-import TopNav from '../components/layout/TopNav.vue';
 import { useAuthStore, getR2Url } from '../stores/auth';
 import { useProductsStore } from '../stores/products';
 import { useCategoriesStore } from '../stores/categories';

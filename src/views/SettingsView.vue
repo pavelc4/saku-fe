@@ -1,12 +1,5 @@
 <template>
-  <div class="antialiased flex h-screen overflow-hidden bg-surface-container-low text-on-surface">
-    <Sidebar />
-
-    <div class="flex-1 flex flex-col h-screen min-w-0">
-      <TopNav :user="user" />
-
-      <!-- Page Content -->
-      <main class="flex-1 overflow-y-auto bg-surface rounded-tl-[32px] p-4 sm:p-6 md:p-8 lg:p-16 shadow-[-8px_-8px_32px_rgba(27,28,24,0.02)]">
+  <div>
         <div class="max-w-4xl mx-auto space-y-8 md:space-y-12 lg:space-y-16">
           <div>
             <h2 class="text-2xl md:text-3xl lg:text-4xl font-headline font-medium text-on-surface mb-2">User Settings</h2>
@@ -98,15 +91,11 @@
         </div>
 
         <div class="h-12"></div>
-      </main>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import Sidebar from '../components/layout/Sidebar.vue';
-import TopNav from '../components/layout/TopNav.vue';
 import { useAuthStore, getR2Url } from '../stores/auth';
 import { usersApi } from '../api/users';
 import { authApi } from '../api/auth';

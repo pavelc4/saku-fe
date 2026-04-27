@@ -1,11 +1,5 @@
 <template>
-  <div class="antialiased flex h-screen overflow-hidden bg-surface-container-low text-on-surface">
-    <Sidebar />
-
-    <div class="flex-1 flex flex-col h-screen min-w-0">
-      <TopNav :user="user" />
-
-      <main class="flex-1 overflow-hidden flex gap-8 p-8 bg-surface rounded-tl-[32px] shadow-[-8px_-8px_32px_rgba(27,28,24,0.02)]">
+  <div class="h-full flex flex-col overflow-hidden">
         <!-- Transaction List -->
         <div class="flex-1 flex flex-col overflow-hidden bg-surface-container-lowest rounded-xl shadow-sm">
           <div class="p-6 pb-2">
@@ -168,15 +162,11 @@
           <span class="material-symbols-outlined text-4xl mb-2">info</span>
           Select a transaction to view details
         </div>
-      </main>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import Sidebar from '../components/layout/Sidebar.vue';
-import TopNav from '../components/layout/TopNav.vue';
 import ReceiptModal from '../components/transactions/ReceiptModal.vue';
 import { useAuthStore } from '../stores/auth';
 import { usePosStore } from '../stores/pos';

@@ -124,7 +124,7 @@
       </header>
 
       <main class="flex-1 overflow-y-auto bg-surface rounded-tl-[24px] md:rounded-tl-[32px] p-4 md:p-6 lg:p-12 shadow-[-8px_-8px_32px_rgba(27,28,24,0.02)]">
-        <slot />
+        <router-view />
       </main>
     </div>
   </div>

@@ -1,11 +1,5 @@
 <template>
-  <div class="antialiased flex h-screen overflow-hidden bg-surface-container-low text-on-surface">
-    <Sidebar />
-
-    <div class="flex-1 flex flex-col h-screen min-w-0 z-10 relative">
-      <TopNav :user="user" />
-
-      <main class="flex-1 overflow-y-auto bg-surface rounded-tl-[32px] p-8 md:p-12 shadow-[-8px_-8px_32px_rgba(27,28,24,0.02)]">
+  <div>
         <div class="max-w-5xl mx-auto space-y-12">
           <div>
             <h1 class="font-headline text-4xl text-on-surface mb-2 tracking-tight">Inventory Categorization</h1>
@@ -109,8 +103,6 @@
             </div>
           </div>
         </div>
-      </main>
-    </div>
   </div>
 
   <!-- MODAL OVERLAY -->
@@ -263,8 +255,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
-import Sidebar from '../components/layout/Sidebar.vue';
-import TopNav from '../components/layout/TopNav.vue';
 import { useAuthStore } from '../stores/auth';
 import { useCategoriesStore } from '../stores/categories';
 import { settingsApi } from '../api/settings';

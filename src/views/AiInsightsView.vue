@@ -1,14 +1,5 @@
 <template>
-  <div class="antialiased flex h-screen overflow-hidden bg-surface-container-low text-on-surface">
-    <!-- SideNavBar -->
-    <Sidebar />
-
-    <div class="flex-1 flex flex-col h-screen min-w-0 z-10 relative">
-      <!-- TopNavBar -->
-      <TopNav :user="user" />
-
-      <!-- Chat Canvas -->
-      <main class="flex-1 overflow-y-auto no-scrollbar p-8 md:p-12 flex flex-col gap-6 bg-surface rounded-tl-[32px] relative z-10 shadow-[-8px_-8px_32px_rgba(27,28,24,0.02)]">
+  <div class="flex flex-col gap-4 md:gap-6">
         <!-- Welcome Message / Header (only show if no messages) -->
         <div v-if="chatMessages.length === 0" class="text-center mb-8 max-w-2xl mx-auto mt-4">
           <div class="w-12 h-12 sm:w-16 sm:h-16 bg-surface-container-highest rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 text-primary shadow-[0_8px_32px_rgba(27,28,24,0.06)]">
@@ -83,15 +74,11 @@
             </button>
           </div>
         </div>
-      </main>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import Sidebar from '../components/layout/Sidebar.vue';
-import TopNav from '../components/layout/TopNav.vue';
 import { useAuthStore } from '../stores/auth';
 import { insightsApi } from '../api/insights';
 

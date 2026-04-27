@@ -1,68 +1,57 @@
 <template>
-  <div class="antialiased flex h-screen overflow-hidden bg-surface-container-low text-on-surface">
-    <Sidebar />
+  <div>
+    <header class="mb-8 md:mb-12">
+      <h2 class="font-headline text-3xl md:text-4xl font-medium text-on-surface tracking-tight">{{ greeting }}, {{ user.name }}</h2>
+      <p class="font-body text-on-surface-variant mt-2 text-base md:text-lg">Here is your daily editorial overview.</p>
+    </header>
 
-    <div class="flex-1 flex flex-col h-screen min-w-0">
-      <TopNav :user="user" />
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+      
+      <div class="lg:col-span-2 space-y-6 md:space-y-8">
+        <InsightCard 
+          :title="dailyInsightTitle" 
+          :message="dailyInsightMessage || 'Belum ada insight untuk hari ini.'"
+        />
 
-      <main class="flex-1 overflow-y-auto bg-surface rounded-tl-[32px] p-12 shadow-[-8px_-8px_32px_rgba(27,28,24,0.02)]">
-        
-        <header class="mb-12">
-          <h2 class="font-headline text-4xl font-medium text-on-surface tracking-tight">{{ greeting }}, {{ user.name }}</h2>
-          <p class="font-body text-on-surface-variant mt-2 text-lg">Here is your daily editorial overview.</p>
-        </header>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          <div class="lg:col-span-2 space-y-8">
-            <InsightCard 
-              :title="dailyInsightTitle" 
-              :message="dailyInsightMessage || 'Belum ada insight untuk hari ini.'"
-            />
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <MetricCard 
-                title="Total Pendapatan" 
-                :value="formatCurrency(metrics?.income || 0)" 
-                icon="trending_up" 
-                iconColorClass="text-primary"
-                :trendText="`Bulan ini`"
-                trendIcon="arrow_upward"
-                trendTextColorClass="text-tertiary-container"
-              />
-              <MetricCard 
-                title="Total Pengeluaran" 
-                :value="formatCurrency(metrics?.expense || 0)" 
-                icon="account_balance_wallet" 
-                iconColorClass="text-secondary"
-                :trendText="`Bulan ini`"
-                trendTextColorClass="text-on-surface-variant"
-              />
-            </div>
-
-            <RevenueChart :total="formatCurrency(metrics?.income || 0)" :data="chartData" />
-            <RecentTransactionsWidget />
-          </div>
-
-          <div class="space-y-8">
-            <LowStockWidget :items="lowStockItems" @restock="handleRestock" />
-            <TopSellingWidget />
-            <QuickActionWidget :loading="reportLoading" @generate="generateReport" />
-          </div>
-          
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+          <MetricCard 
+            title="Total Pendapatan" 
+            :value="formatCurrency(metrics?.income || 0)" 
+            icon="trending_up" 
+            iconColorClass="text-primary"
+            :trendText="`Bulan ini`"
+            trendIcon="arrow_upward"
+            trendTextColorClass="text-tertiary-container"
+          />
+          <MetricCard 
+            title="Total Pengeluaran" 
+            :value="formatCurrency(metrics?.expense || 0)" 
+            icon="account_balance_wallet" 
+            iconColorClass="text-secondary"
+            :trendText="`Bulan ini`"
+            trendTextColorClass="text-on-surface-variant"
+          />
         </div>
-        
-        <div class="h-12"></div>
-      </main>
+
+        <RevenueChart :total="formatCurrency(metrics?.income || 0)" :data="chartData" />
+        <RecentTransactionsWidget />
+      </div>
+
+      <div class="space-y-6 md:space-y-8">
+        <LowStockWidget :items="lowStockItems" @restock="handleRestock" />
+        <TopSellingWidget />
+        <QuickActionWidget :loading="reportLoading" @generate="generateReport" />
+      </div>
+      
     </div>
+    
+    <div class="h-8 md:h-12"></div>
   </div>
 </template>
 
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import Sidebar from '../components/layout/Sidebar.vue';
-import TopNav from '../components/layout/TopNav.vue';
 import InsightCard from '../components/dashboard/InsightCard.vue';
 import MetricCard from '../components/dashboard/MetricCard.vue';
 import RevenueChart from '../components/dashboard/RevenueChart.vue';
@@ -117,9 +106,6 @@ const metrics = computed(() => dashboardStore.metrics)
 
 const formatCurrency = (val: number) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val || 0);
-
-const netProfit = computed(() => formatCurrency(dashboardStore.metrics?.net || 0));
-const totalTransactions = computed(() => dashboardStore.metrics?.transaction_count || 0);
 
 const lowStockItems = computed(() =>
   dashboardStore.lowStock.map(p => ({

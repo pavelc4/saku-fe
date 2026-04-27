@@ -1,11 +1,5 @@
 <template>
-  <div class="antialiased flex h-screen overflow-hidden bg-surface-container-low text-on-surface">
-    <Sidebar />
-
-    <div class="flex-1 flex flex-col h-screen min-w-0">
-      <TopNav :user="user" />
-
-      <main class="flex-1 overflow-y-auto bg-surface rounded-tl-[32px] p-12 shadow-[-8px_-8px_32px_rgba(27,28,24,0.02)]">
+  <div>
         
         <header v-if="loading" class="flex items-center justify-center py-20">
           <div class="text-center">
@@ -155,15 +149,11 @@
         </template>
 
         <div class="h-12"></div>
-      </main>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import Sidebar from '../components/layout/Sidebar.vue';
-import TopNav from '../components/layout/TopNav.vue';
 import { useAuthStore } from '../stores/auth';
 import { usePosStore } from '../stores/pos';
 import { insightsApi } from '../api/insights';
