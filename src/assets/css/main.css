@@ -35,10 +35,20 @@
 
 @layer base {
   body {
-    @apply bg-background text-on-background antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col;
+    @apply bg-background text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col;
     font-family: var(--font-body);
   }
   h1, h2, h3, h4, h5, h6, .font-headline {
     font-family: var(--font-headline);
   }
 }
+
+/* Override font-display to 'swap' for all icon/body fonts to prevent CLS and render blocking */
+@font-face {
+  font-family: 'Material Symbols Outlined';
+  font-style: normal;
+  font-weight: 100 700;
+  font-display: swap;
+  src: url('material-symbols/material-symbols-outlined.woff2') format('woff2');
+}
+

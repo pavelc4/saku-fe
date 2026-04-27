@@ -157,7 +157,6 @@ import { ref, computed, onMounted } from 'vue';
 import { useAuthStore } from '../stores/auth';
 import { usePosStore } from '../stores/pos';
 import { insightsApi } from '../api/insights';
-import html2pdf from 'html2pdf.js';
 
 const authStore = useAuthStore();
 const posStore = usePosStore();
@@ -213,7 +212,7 @@ const exportToPdf = async () => {
   }
 
   try {
-    // Try html2pdf.js first
+    const { default: html2pdf } = await import('html2pdf.js');
     const opt = {
       margin: 10,
       filename: `Saku_Report_${new Date().toISOString().split('T')[0]}.pdf`,
