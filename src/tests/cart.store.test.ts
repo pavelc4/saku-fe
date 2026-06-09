@@ -62,16 +62,16 @@ describe('Cart Store', () => {
     expect(store.subtotal).toBe(35000)
   })
 
-  it('tax 10% dihitung dengan benar', () => {
+  it('tax 11% dihitung dengan benar', () => {
     const store = useCartStore()
     store.addToCart(mockProduct) // 25000
-    expect(store.tax).toBe(2500)
+    expect(store.tax).toBe(2750)
   })
 
   it('totalPrice = subtotal + tax', () => {
     const store = useCartStore()
-    store.addToCart(mockProduct) // 25000 + 2500 tax
-    expect(store.totalPrice).toBe(27500)
+    store.addToCart(mockProduct) // 25000 + 2750 tax
+    expect(store.totalPrice).toBe(27750)
   })
 
   it('clearCart mengosongkan semua item', () => {
