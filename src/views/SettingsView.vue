@@ -53,6 +53,26 @@
             </form>
           </section>
 
+          <!-- 2.5 Business Information -->
+          <section class="bg-surface-container-lowest rounded-lg p-4 sm:p-6 md:p-8 shadow-[0_8px_48px_rgba(27,28,24,0.04)]">
+            <h3 class="text-xl md:text-2xl font-headline font-medium text-on-surface mb-6 md:mb-8">Business Information</h3>
+            <form class="space-y-4 sm:space-y-6" @submit.prevent="saveBusinessSettings">
+              <div class="space-y-2">
+                <label class="block text-sm font-label font-medium text-on-surface-variant" for="businessName">Business Name (for Receipt)</label>
+                <input v-model="businessForm.business_name" class="w-full bg-surface border border-surface-container-highest focus:border-primary focus:bg-surface-container-lowest text-on-surface rounded-xl py-2.5 sm:py-3 px-3 sm:px-4 transition-colors font-label focus:ring-2 focus:ring-primary/20 text-sm sm:text-base" id="businessName" type="text" placeholder="e.g. Apothecary & Botanicals" />
+              </div>
+              <div class="space-y-2">
+                <label class="block text-sm font-label font-medium text-on-surface-variant" for="businessAddress">Business Address</label>
+                <textarea v-model="businessForm.business_address" rows="3" class="w-full bg-surface border border-surface-container-highest focus:border-primary focus:bg-surface-container-lowest text-on-surface rounded-xl py-2.5 sm:py-3 px-3 sm:px-4 transition-colors font-label focus:ring-2 focus:ring-primary/20 text-sm sm:text-base resize-none" id="businessAddress" placeholder="e.g. Jl. Senopati No. 45..."></textarea>
+              </div>
+              <div class="pt-4 flex justify-end">
+                <button class="bg-primary text-on-primary font-label font-medium px-6 sm:px-8 py-2.5 sm:py-3 rounded-full hover:bg-surface-tint shadow-[0_4px_16px_rgba(154,64,33,0.2)] transition-all hover:shadow-[0_8px_24px_rgba(154,64,33,0.3)] cursor-pointer text-sm sm:text-base disabled:opacity-50" type="submit" :disabled="businessLoading">
+                  {{ businessLoading ? 'Saving...' : 'Save Business Info' }}
+                </button>
+              </div>
+            </form>
+          </section>
+
           <!-- 3. Security -->
           <section class="bg-surface-container-lowest rounded-lg p-4 sm:p-6 md:p-8 shadow-[0_8px_48px_rgba(27,28,24,0.04)]">
             <div class="flex items-center gap-3 mb-6 md:mb-8">
@@ -99,6 +119,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useAuthStore, getR2Url } from '../stores/auth';
 import { usersApi } from '../api/users';
 import { authApi } from '../api/auth';
+import { settingsApi } from '../api/settings';
 
 const authStore = useAuthStore();
 
@@ -151,6 +172,10 @@ const saveLoading = ref(false);
 const saveSuccess = ref(false);
 const saveError = ref<string | null>(null);
 
+// Business form
+const businessForm = ref({ business_name: '', business_address: '' });
+const businessLoading = ref(false);
+
 // Password form
 const passwords = ref({ current: '', new: '', confirm: '' });
 const passwordError = ref<string | null>(null);
@@ -169,6 +194,22 @@ async function saveProfile() {
     saveError.value = err.response?.data?.error?.message || 'Gagal menyimpan profil';
   } finally {
     saveLoading.value = false;
+  }
+}
+
+async function saveBusinessSettings() {
+  businessLoading.value = true;
+  try {
+    await settingsApi.update({
+      business_name: businessForm.value.business_name,
+      business_address: businessForm.value.business_address
+    });
+    alert('Business info saved!');
+  } catch (err: any) {
+    console.error('Failed to save business info', err);
+    alert('Gagal menyimpan info bisnis');
+  } finally {
+    businessLoading.value = false;
   }
 }
 
@@ -200,10 +241,19 @@ async function deleteAccount() {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   if (authStore.user) {
     profileForm.value.name = authStore.user.name || '';
     profileForm.value.email = authStore.user.email || '';
+  }
+  try {
+    const res = await settingsApi.get();
+    if (res.data?.data) {
+      businessForm.value.business_name = res.data.data.business_name || '';
+      businessForm.value.business_address = res.data.data.business_address || '';
+    }
+  } catch (err) {
+    console.error('Failed to load settings', err);
   }
 });
 </script>
