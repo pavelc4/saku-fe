@@ -25,4 +25,7 @@ export const posApi = {
 
   getSummaryToday: () =>
     apiClient.get('/pos/summary/today'),
+
+  cancelTransaction: (id: string) =>
+    apiClient.delete(`/pos/transactions/${id}`),
 }

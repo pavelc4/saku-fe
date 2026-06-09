@@ -65,7 +65,14 @@
               <span class="material-symbols-outlined" style="font-size: 32px; font-variation-settings: 'FILL' 1;">check_circle</span>
             </div>
             <h2 class="font-headline text-3xl font-medium text-on-surface mb-1">{{ formatCurrency(selectedTxn.amount) }}</h2>
-            <p class="text-sm text-secondary font-label bg-surface-variant px-3 py-1 rounded-full mt-2">Completed</p>
+            <p :class="[
+              'text-sm font-label px-3 py-1 rounded-full mt-2 capitalize',
+              selectedTxn.status === 'pending' ? 'bg-primary-container text-on-primary-container' : 
+              selectedTxn.status === 'confirmed' ? 'bg-surface-variant text-secondary' : 
+              'bg-error-container text-error'
+            ]">
+              {{ selectedTxn.status }}
+            </p>
           </div>
 
           <!-- Meta Data -->
@@ -141,9 +148,14 @@
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">print</span>
                 Reprint Receipt
               </button>
-              <button class="w-full py-4 rounded-full bg-transparent text-error font-bold hover:bg-error-container/50 transition-colors flex items-center justify-center gap-2 border border-transparent hover:border-error-container">
+              <button 
+                v-if="selectedTxn.status === 'pending'"
+                @click="handleRefund(selectedTxn.id)"
+                :disabled="posStore.loading"
+                class="w-full py-4 rounded-full bg-transparent text-error font-bold hover:bg-error-container/50 transition-colors flex items-center justify-center gap-2 border border-transparent hover:border-error-container disabled:opacity-50"
+              >
                 <span class="material-symbols-outlined">undo</span>
-                Refund Transaction
+                {{ posStore.loading ? 'Refunding...' : 'Refund Transaction' }}
               </button>
             </div>
           </div>
@@ -198,12 +210,24 @@ const transactions = computed(() => posStore.transactions.map((t: any) => {
     tax_rate: t.tax_rate || 0,
     method: t.payment_method || 'cash',
     cashier: t.cashier_name || '-',
+    status: t.status || 'pending',
     items: t.items || []
   };
 }));
 
 const selectedTxn = ref<any>(null);
 const isReceiptOpen = ref(false);
+
+const handleRefund = async (id: string) => {
+  if (!confirm('Apakah Anda yakin ingin refund transaksi ini? Stok barang akan dikembalikan otomatis.')) return;
+  const success = await posStore.refundTransaction(id);
+  if (success) {
+    selectedTxn.value = null;
+    alert('Transaksi berhasil di-refund.');
+  } else {
+    alert(posStore.error || 'Gagal refund transaksi.');
+  }
+};
 
 const formatCurrency = (val: number) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val);

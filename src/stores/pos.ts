@@ -93,5 +93,21 @@ export const usePosStore = defineStore('pos', () => {
     }
   }
 
-  return { activeSession, transactions, summary, loading, error, fetchActiveSession, openSession, closeSession, checkout, fetchTransactions, fetchSummary }
+  async function refundTransaction(id: string) {
+    loading.value = true
+    error.value = null
+    try {
+      await posApi.cancelTransaction(id)
+      await fetchTransactions()
+      await fetchSummary()
+      return true
+    } catch (err: any) {
+      error.value = err.response?.data?.error?.message || 'Gagal membatalkan transaksi'
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
+  return { activeSession, transactions, summary, loading, error, fetchActiveSession, openSession, closeSession, checkout, fetchTransactions, fetchSummary, refundTransaction }
 })
