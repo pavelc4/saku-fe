@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full flex flex-col overflow-hidden">
+  <div class="h-full flex flex-col md:flex-row gap-4 md:gap-6 overflow-hidden">
         <!-- Transaction List -->
         <div class="flex-1 flex flex-col overflow-hidden bg-surface-container-lowest rounded-xl shadow-sm">
           <div class="p-6 pb-2">
@@ -52,14 +52,14 @@
         </div>
 
         <!-- Detail Panel -->
-        <div v-if="selectedTxn" class="w-96 flex flex-col bg-surface-container-lowest rounded-xl shadow-lg shadow-on-background/5 overflow-hidden border-none ring-1 ring-outline-variant/20">
+        <div v-if="selectedTxn" class="fixed inset-0 md:relative md:inset-auto z-[60] md:z-auto w-full md:w-96 shrink-0 flex flex-col bg-surface-container-lowest md:rounded-xl shadow-lg shadow-on-background/5 overflow-hidden border-none md:ring-1 ring-outline-variant/20 transition-all">
           <!-- Header -->
-          <div class="p-8 pb-6 bg-surface-container-low flex flex-col items-center relative text-center">
+          <div class="p-8 pb-6 bg-surface-container-low flex flex-col items-center relative text-center pt-16 md:pt-8">
             <button 
               @click="selectedTxn = null"
-              class="absolute top-4 right-4 text-secondary hover:text-on-surface p-2 rounded-full hover:bg-surface-container-highest transition-colors"
+              class="absolute top-4 left-4 md:right-4 md:left-auto text-secondary hover:text-on-surface p-2 rounded-full hover:bg-surface-container-highest transition-colors"
             >
-              <span class="material-symbols-outlined">close</span>
+              <span class="material-symbols-outlined">{{ 'close' /* on mobile it could be arrow_back but close is fine */ }}</span>
             </button>
             <div class="w-16 h-16 rounded-full bg-surface-container-highest flex items-center justify-center text-primary mb-4 shadow-sm">
               <span class="material-symbols-outlined" style="font-size: 32px; font-variation-settings: 'FILL' 1;">check_circle</span>
@@ -158,7 +158,7 @@
         />
 
         <!-- Empty State for Detail -->
-        <div v-else class="w-96 flex flex-col items-center justify-center bg-surface-container-lowest rounded-xl border border-dashed border-outline-variant/50 text-secondary italic">
+        <div v-else class="hidden md:flex w-96 shrink-0 flex-col items-center justify-center bg-surface-container-lowest rounded-xl border border-dashed border-outline-variant/50 text-secondary italic">
           <span class="material-symbols-outlined text-4xl mb-2">info</span>
           Select a transaction to view details
         </div>
