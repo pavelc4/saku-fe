@@ -18,7 +18,9 @@
     "@tailwindcss/vite": "^4.2.4",
     "@vueuse/head": "^0.9.8",
     "axios": "^1.15.2",
+    "dompurify": "^3.4.8",
     "html2pdf.js": "^0.14.0",
+    "marked": "^18.0.5",
     "material-symbols": "^0.44.4",
     "pinia": "^3.0.4",
     "vue": "^3.5.33",
@@ -26,6 +28,8 @@
   },
   "devDependencies": {
     "@iconify-json/material-symbols": "^1.2.69",
+    "@types/dompurify": "^3.2.0",
+    "@types/marked": "^6.0.0",
     "@vitejs/plugin-vue": "^6.0.6",
     "@vitest/coverage-v8": "^4.1.5",
     "@vue/test-utils": "^2.4.8",

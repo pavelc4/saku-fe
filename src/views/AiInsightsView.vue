@@ -33,7 +33,7 @@
                 
                 <!-- Parsed JSON -->
                 <template v-else-if="msg.parsed">
-                  <p class="font-body text-on-surface-variant mb-3">{{ msg.parsed.summary || msg.content }}</p>
+                  <div class="font-body text-on-surface-variant mb-3 [&_a]:text-primary [&_a]:underline [&_a]:font-medium [&_p]:mb-2 [&_p:last-child]:mb-0 whitespace-pre-wrap" v-html="renderMarkdown(msg.parsed.summary || msg.content)"></div>
                   
                   <div v-if="msg.parsed.data || msg.parsed.chart" class="mt-4 bg-surface-container-low rounded-xl p-4">
                     <div v-if="msg.parsed.data" class="grid grid-cols-2 gap-2 sm:gap-3 mb-3 sm:mb-4">
@@ -52,7 +52,7 @@
                 
                 <!-- Plain text -->
                 <template v-else>
-                  <p class="font-body text-sm sm:text-lg text-on-surface-variant">{{ msg.content }}</p>
+                  <div class="font-body text-sm sm:text-lg text-on-surface-variant [&_a]:text-primary [&_a]:underline [&_a]:font-medium [&_p]:mb-2 [&_p:last-child]:mb-0 whitespace-pre-wrap" v-html="renderMarkdown(msg.content)"></div>
                 </template>
             </div>
             </template>
@@ -81,6 +81,8 @@
 import { ref, computed, onMounted } from 'vue';
 import { useAuthStore } from '../stores/auth';
 import { insightsApi } from '../api/insights';
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 
 const authStore = useAuthStore();
 const user = computed(() => ({ name: authStore.user?.name || 'Admin', email: authStore.user?.email || '' }));
@@ -180,6 +182,12 @@ const formatValue = (val: any) => {
 const getMaxChartValue = (chart: any[]) => {
   if (!chart || !chart.length) return 1
   return Math.max(...chart.map((c: any) => c.value || 0), 1)
+}
+
+const renderMarkdown = (text: string) => {
+  if (!text) return '';
+  const rawHtml = marked.parse(text, { async: false }) as string;
+  return DOMPurify.sanitize(rawHtml);
 }
 
 onMounted(() => fetchInsights())
