@@ -2,6 +2,7 @@
   <div class="h-full flex flex-col overflow-hidden">
         
         <template v-if="isSessionOpen">
+          <div class="w-full flex-1 flex flex-col lg:flex-row overflow-hidden lg:gap-6">
           <!-- Left Column: Products -->
           <div class="flex-1 flex flex-col min-w-0">
           <!-- Filter Tabs -->
@@ -49,7 +50,7 @@
         </div>
 
         <!-- Right Column: Current Order Panel -->
-        <div class="w-96 flex-shrink-0 bg-surface-container-low rounded-xl flex flex-col overflow-hidden relative shadow-[0_8px_32px_rgba(27,28,24,0.06)]">
+        <div class="w-full lg:w-96 h-[45vh] lg:h-full flex-shrink-0 bg-surface-container-low lg:rounded-xl rounded-t-2xl flex flex-col overflow-hidden relative shadow-[0_-8px_32px_rgba(27,28,24,0.06)] lg:shadow-[0_8px_32px_rgba(27,28,24,0.06)] border-t border-outline-variant/10 lg:border-none z-10">
           <!-- Order Header -->
           <div class="p-6 pb-4">
             <h2 class="font-headline text-2xl font-medium text-on-surface">Current Order</h2>
@@ -129,6 +130,7 @@
             <div v-if="checkoutError" class="mt-3 p-3 bg-error/10 text-error text-sm rounded-lg text-center">
               {{ checkoutError }}
             </div>
+          </div>
           </div>
           </div>
         </template>
