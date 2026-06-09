@@ -4,6 +4,8 @@ export interface UserSettings {
   tax_rate: number
   currency: string
   auto_sync_inventory: boolean
+  business_name?: string
+  business_address?: string
 }
 
 export const settingsApi = {
