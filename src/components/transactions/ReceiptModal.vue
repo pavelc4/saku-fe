@@ -17,11 +17,8 @@
             <span class="material-symbols-outlined text-primary text-5xl" style="font-variation-settings: 'FILL' 1;">spa</span>
           </div>
           <h2 class="font-headline text-5xl font-bold text-primary mb-1 italic tracking-tighter">Saku</h2>
-          <p class="font-body text-sm text-on-surface-variant uppercase tracking-[0.2em] font-bold">Apothecary & Botanicals</p>
-          <p class="font-body text-xs text-on-surface-variant mt-4 leading-relaxed italic">
-            Jl. Senopati No. 45, Kebayoran Baru<br/>
-            Jakarta Selatan, 12190
-          </p>
+          <p class="font-body text-sm text-on-surface-variant uppercase tracking-[0.2em] font-bold">{{ businessName }}</p>
+          <p class="font-body text-xs text-on-surface-variant mt-4 leading-relaxed italic whitespace-pre-line">{{ businessAddress }}</p>
         </div>
 
         <!-- Meta Info -->
@@ -104,6 +101,9 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { settingsApi } from '../../api/settings';
+
 const props = defineProps<{
   isOpen: boolean;
   transaction: {
@@ -122,6 +122,21 @@ const props = defineProps<{
 }>();
 
 defineEmits(['close']);
+
+const businessName = ref('Apothecary & Botanicals');
+const businessAddress = ref('Jl. Senopati No. 45, Kebayoran Baru\nJakarta Selatan, 12190');
+
+onMounted(async () => {
+  try {
+    const res = await settingsApi.get();
+    if (res.data?.data) {
+      if (res.data.data.business_name) businessName.value = res.data.data.business_name;
+      if (res.data.data.business_address) businessAddress.value = res.data.data.business_address;
+    }
+  } catch (e) {
+    console.error('Failed to load business info', e);
+  }
+});
 
 const formatCurrency = (val: number) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val);
