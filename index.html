@@ -3,23 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Saku - Expressive Commerce Platform</title>
-    <meta name="description" content="Saku is an expressive, scholarly concierge for modern retail operations. Intelligence meets commerce." />
-    <meta name="keywords" content="POS, Point of Sale, Retail, Commerce, Inventory, Saku, Cloudflare" />
-    <meta property="og:title" content="Saku - Expressive Commerce Platform" />
-    <meta property="og:description" content="Intelligence meets commerce. Saku combines microsecond edge performance with narrative financial insights." />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Saku - Expressive Commerce Platform" />
-    <meta name="twitter:description" content="Intelligence meets commerce." />
-    <!-- Google Fonts: loaded non-blocking (self-hosted via App.vue onMounted) -->
-    <!-- CDN fonts removed: App.vue defers @fontsource/newsreader, manrope, material-symbols after paint -->
-    <!-- Material Symbols CDN removed: self-hosted 3.8MB deduped via npm package in App.vue -->
+    <title>Saku</title>
     <style>
+      /* Critical inline styles for instant FCP */
       body { margin: 0; background-color: #fbf9f2; }
-      #initial-loader { position: fixed; inset: 0; display: flex; flex-direction: column; gap: 16px; align-items: center; justify-content: center; background-color: #fbf9f2; z-index: 9999; transition: opacity 0.4s ease; font-family: system-ui, -apple-system, sans-serif; }
-      .loader-text { color: #9a4021; font-size: 24px; font-weight: bold; letter-spacing: -0.5px; }
-      .spinner { width: 32px; height: 32px; border: 3px solid rgba(154, 64, 33, 0.2); border-top-color: #9a4021; border-radius: 50%; animation: spin 1s linear infinite; }
+      #initial-loader {
+        position: fixed; inset: 0; display: flex; flex-direction: column; gap: 16px; align-items: center; justify-content: center;
+        background-color: #fbf9f2; z-index: 9999; transition: opacity 0.4s ease;
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+      .loader-text {
+        color: #9a4021; font-size: 24px; font-weight: bold; letter-spacing: -0.5px;
+      }
+      .spinner {
+        width: 32px; height: 32px; border: 3px solid rgba(154, 64, 33, 0.2);
+        border-top-color: #9a4021; border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
       @keyframes spin { to { transform: rotate(360deg); } }
     </style>
   </head>
@@ -31,10 +31,14 @@
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
     <script>
+      // Remove loader once the app mounts
       window.addEventListener('load', () => {
         setTimeout(() => {
           const loader = document.getElementById('initial-loader');
-          if (loader) { loader.style.opacity = '0'; setTimeout(() => loader.remove(), 400); }
+          if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => loader.remove(), 400);
+          }
         }, 100);
       });
     </script>
