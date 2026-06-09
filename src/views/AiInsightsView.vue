@@ -60,7 +60,7 @@
         </div>
 
         <!-- Input Area (fixed at bottom) -->
-        <div class="fixed bottom-0 left-0 right-0 p-3 sm:p-6 bg-gradient-to-t from-surface via-surface to-surface">
+        <div class="fixed bottom-0 left-0 right-0 md:left-72 p-3 sm:p-6 bg-gradient-to-t from-surface via-surface to-surface">
           <div class="max-w-3xl mx-auto flex items-center gap-2 sm:gap-3">
             <input v-model="advisorQuestion" 
                    @keyup.enter="sendMessage"
@@ -149,15 +149,21 @@ async function sendMessage() {
     const rawAnswer = res.data?.data?.answer || res.data?.data
     
     let parsed = null
-    try {
-      const jsonMatch = rawAnswer.match(/\{[\s\S]*\}/)
-      if (jsonMatch) {
-        parsed = JSON.parse(jsonMatch[0])
-      }
-    } catch {}
+    
+    // Check if backend already parsed it as JSON object
+    if (typeof rawAnswer === 'object' && rawAnswer !== null) {
+      parsed = rawAnswer
+    } else if (typeof rawAnswer === 'string') {
+      try {
+        const jsonMatch = rawAnswer.match(/\{[\s\S]*\}/)
+        if (jsonMatch) {
+          parsed = JSON.parse(jsonMatch[0])
+        }
+      } catch {}
+    }
     
     const lastMsg = chatMessages.value[chatMessages.value.length - 1]
-    lastMsg.content = rawAnswer
+    lastMsg.content = typeof rawAnswer === 'string' ? rawAnswer : (parsed?.summary || '')
     lastMsg.parsed = parsed
     lastMsg.loading = false
   } catch {
