@@ -71,7 +71,7 @@
               selectedTxn.status === 'confirmed' ? 'bg-surface-variant text-secondary' : 
               'bg-error-container text-error'
             ]">
-              {{ selectedTxn.status }}
+              {{ selectedTxn.status === 'pending' ? 'Sukses (Bisa Refund)' : selectedTxn.status === 'confirmed' ? 'Selesai (Kasir Tutup)' : selectedTxn.status }}
             </p>
           </div>
 
