@@ -186,7 +186,7 @@ async function saveProfile() {
   saveError.value = null;
   saveSuccess.value = false;
   try {
-    await usersApi.updateProfile({ name: profileForm.value.name, email: profileForm.value.email });
+    await usersApi.updateProfile({ name: profileForm.value.name });
     await authStore.fetchMe();
     saveSuccess.value = true;
     setTimeout(() => saveSuccess.value = false, 3000);
@@ -225,8 +225,7 @@ async function updatePassword() {
     return;
   }
   try {
-    // Note: The updatePassword endpoint might be different, but using updateProfile for now as in original
-    await usersApi.updateProfile({ name: profileForm.value.name } as any);
+    await authApi.changePassword(passwords.value.current, passwords.value.new);
     passwordSuccess.value = true;
     passwords.value = { current: '', new: '', confirm: '' };
     setTimeout(() => passwordSuccess.value = false, 3000);
@@ -237,6 +236,9 @@ async function updatePassword() {
 
 async function deleteAccount() {
   if (confirm('Apakah Anda yakin ingin menghapus akun? Tindakan ini tidak dapat dibatalkan.')) {
+    try {
+      await usersApi.deleteAccount();
+    } catch {}
     await authStore.logout();
   }
 }

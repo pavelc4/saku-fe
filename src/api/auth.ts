@@ -12,4 +12,7 @@ export const authApi = {
 
   getMe: () =>
     apiClient.get('/auth/me'),
+
+  changePassword: (currentPassword: string, newPassword: string) =>
+    apiClient.put('/auth/password', { current_password: currentPassword, new_password: newPassword }),
 }

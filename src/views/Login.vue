@@ -65,7 +65,7 @@
             <div class="space-y-2">
               <div class="flex justify-between items-center px-1">
                 <label class="text-xs uppercase tracking-wider font-bold text-on-surface-variant" for="password">Kata Sandi</label>
-                <a class="text-xs text-primary font-bold hover:underline" href="#">Lupa Sandi?</a>
+                <span class="text-xs text-secondary cursor-not-allowed">Lupa Sandi?</span>
               </div>
               <div class="relative group">
                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">

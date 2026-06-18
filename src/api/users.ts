@@ -14,4 +14,7 @@ export const usersApi = {
 
   deleteAvatar: () =>
     apiClient.delete('/users/me/avatar'),
+
+  deleteAccount: () =>
+    apiClient.delete('/users/me'),
 }
